@@ -1,11 +1,11 @@
 ---
 name: strategy-sync
-description: Update Strategy docs (Doc1-6) to reflect shipped features — close the documentation loop
+description: Update Strategy docs to reflect shipped features — close the documentation loop
 ---
 
 # Strategy Sync Skill
 
-Updates Strategy docs to reflect what was actually built. Closes the documentation loop so that anyone reading Doc1-6 understands the app as it exists today — not just as it was originally envisioned.
+Updates Strategy docs to reflect what was actually built. Closes the documentation loop so that anyone reading the Strategy docs understands the product as it exists today — not just as it was originally envisioned.
 
 ## Triggers
 
@@ -15,12 +15,7 @@ Updates Strategy docs to reflect what was actually built. Closes the documentati
 
 ## Purpose
 
-Strategy docs (Doc1-5) are the human-readable explanation of the product. They serve two audiences:
-
-1. **Stakeholders** (Doc1, Doc3) — understand what the app does in simple terms
-2. **Developers** (Doc2, Doc5) — understand the technical model and permissions
-
-After features ship, these docs must be updated to reflect reality. Without this, the docs drift and become unreliable — a new reader gets a picture that doesn't match the actual app.
+Strategy docs are the human-readable explanation of the product. After features ship, these docs must be updated to reflect reality. Without this, the docs drift and become unreliable — a new reader gets a picture that doesn't match the actual app.
 
 ## The Documentation Loop
 
@@ -52,13 +47,14 @@ If a Changelog doc exists in the manifest, it is excluded from sync content — 
 
 ### Phase 1 — Identify Shipped Work
 
-1. Read `Strategy/Doc1_ConceptualOverview.md` version header to get the last update date
-2. Read `.vbw-planning/STATE.md` for recently completed phases/waves
-3. Query Linear for issues in Done state since the last Strategy doc update date:
+1. Read `method.config.md` to get the strategy doc manifest
+2. Read the first strategy doc's version header to get the last update date
+3. Read `.vbw-planning/STATE.md` for recently completed phases/waves
+4. Query Linear for issues in Done state since the last Strategy doc update date:
    - Use `mcp__linear-server__list_issues` filtered by state = Done
    - Filter to issues completed after the last doc update
-4. For each Done issue: check if it has a light spec (look for `## Light Spec` in description)
-5. Group shipped features by complexity:
+5. For each Done issue: check if it has a light spec (look for `## Light Spec` in description)
+6. Group shipped features by complexity:
    - **Has light spec:** Full spec available — primary source for doc updates
    - **No spec (bug/fix):** Check if it changed user-visible behavior
    - **Internal only:** Skip (no doc impact)
@@ -67,20 +63,17 @@ If a Changelog doc exists in the manifest, it is excluded from sync content — 
 
 For each shipped feature with doc impact:
 
-1. Read the light spec's Technical Context section for § references (e.g., "Doc1 §3.4")
-2. If no explicit reference, match by keyword:
-   - Feature touches budgets → Doc1 §3 (Budget Management), Doc2 §5 (Budget Schema)
-   - Feature touches auth → Doc1 §6 (User Management), Doc5 (Permissions)
-   - Feature touches AI → Doc1 §4 (AI Features), Doc2 §7 (AI Architecture)
-   - Feature touches vendors → Doc1 §5 (Vendor Management), Doc2 §6 (Vendor Schema)
-   - Feature touches UX/help/shortcuts → Doc6 (UX Reference)
+1. Read the light spec's Technical Context section for § references to specific strategy doc sections
+2. If no explicit reference, match by keyword against each doc in the manifest:
+   - Read each strategy doc's section headers
+   - Match the feature's domain to relevant sections based on the doc's Purpose field
 3. Build a mapping table:
 
 ```
-| Feature (WIT-#) | Doc1 Sections | Doc2 Sections | Doc3 Impact | Doc5 Impact | Doc6 Impact |
-|-----------------|---------------|---------------|-------------|-------------|-------------|
-| WIT-7 Rate Cards | §3.4 | §5.x (new) | New workflow | New RLS | — |
-| WIT-8 Block Types | §3.3 | §5.x (new) | — | — | — |
+| Feature | Affected Docs | Sections |
+|---------|--------------|----------|
+| RSV-7 Rate Cards | Conceptual Overview §3.4, Technical Architecture §5.x | Update + new |
+| RSV-8 Block Types | Conceptual Overview §3.3 | Update |
 ```
 
 ### Phase 3 — Compare and Draft
@@ -92,12 +85,10 @@ For each affected section, use an Explore agent to:
 3. **Read the actual implementation** (key schema, API routes, components) to catch any spec-to-code drift
 4. **Draft an updated section** that:
    - Reflects what was ACTUALLY built (code is truth, not the spec)
-   - Maintains the doc's tone and audience level:
-     - Doc1: Simple, conceptual, no code. A CFO should understand it.
-     - Doc2: Technical, schema-level detail, code patterns.
-     - Doc3: Step-by-step scenarios with concrete examples.
-     - Doc5: Permission model, RLS policies, role definitions.
-     - Doc6: UX-facing, practical. A producer or support agent should understand it.
+   - Maintains the doc's tone and audience level based on the manifest's Audience field:
+     - Stakeholder docs: simple, conceptual, no code — a non-technical reader should understand
+     - Developer docs: technical, schema-level detail, code patterns
+     - All-audience docs: step-by-step scenarios with concrete examples
    - Preserves descriptions of future-phase features that weren't built yet
    - Clearly distinguishes "what exists today" from "what's planned"
 
@@ -107,33 +98,24 @@ For features that are entirely new (no existing Strategy doc section):
 
 1. Determine the appropriate location in the doc structure
 2. Draft a new section following the existing numbering convention
-3. Add cross-references to related sections
-4. For Doc3: draft a new workflow example if the feature has a distinct user flow
+3. Add cross-references to related sections in other docs
+4. For workflow-focused docs: draft a new workflow example if the feature has a distinct user flow
 
 ### Phase 5 — Present Diffs
 
 Show each proposed change as a before/after comparison:
 
 ```markdown
-## Doc1 § 3.4 — Rate Cards
+## Conceptual Overview § 3.4 — Rate Cards
 
 **Current (v2.6.1, Feb 2026):**
 > Rate cards provide standard pricing templates at the entity level.
-> A producer selects a rate card when creating a budget, and standard
-> rates pre-populate for common line items.
 
-**Proposed (reflects WIT-7 + WIT-8 implementation):**
+**Proposed (reflects RSV-7 + RSV-8 implementation):**
 > Rate cards provide standard pricing at Entity, Client, or Project
-> scope with optional lineage inheritance (Entity → Client → Project).
-> Each subsection in a budget can have one rate card assigned, matched
-> by block type. Producers select entries from the rate card to
-> pre-populate line item rates, markup, units, and multipliers.
-> A dedicated Rate Card Management system allows creating and
-> organizing cards across scopes.
+> scope with optional lineage inheritance.
 
-**What changed:** Cascade model with optional lineage replaced
-simple entity-level cards. Subsection-level assignment (not
-budget-level). Dedicated management UI. See WIT-7 light spec.
+**What changed:** Cascade model replaced simple entity-level cards.
 ```
 
 For each diff, ask: _"Approve this update? [yes / edit / skip]"_
@@ -145,18 +127,17 @@ For each diff, ask: _"Approve this update? [yes / edit / skip]"_
    - New features added → minor bump (e.g., v2.6.1 → v2.7.0)
    - Corrections/clarifications only → patch bump (e.g., v2.6.1 → v2.6.2)
 3. Update the version header and date in each modified doc
-4. Add a Doc4 changelog entry summarizing all Strategy doc updates
+4. If a Changelog doc exists in the manifest, add an entry summarizing the sync
 
 ### Phase 7 — Cross-Sync
 
-After updating primary docs, check consistency across all docs:
+After updating primary docs, check consistency across all docs in the manifest:
 
-1. **Terminology:** Do Doc1 and Doc2 use the same terms for the same concepts?
-2. **Workflow examples:** Do Doc3 scenarios still match the updated Doc1 concepts?
-3. **Permissions:** Does Doc5 reflect any new tables, RLS policies, or role changes from shipped features?
-4. **UX consistency:** Do Doc6 keyboard shortcuts, tour steps, and UI patterns match what Doc1 describes conceptually and Doc3 shows in workflows?
-5. **Cross-references:** Are all § references between docs still valid? Do all docs reference "Document X of 6"?
-6. Flag inconsistencies for manual review — do NOT auto-fix cross-doc issues without approval
+1. **Terminology:** Do docs use the same terms for the same concepts?
+2. **Workflows:** Do workflow docs still match the updated conceptual docs?
+3. **Permissions:** Do permission docs reflect any new tables, RLS policies, or role changes?
+4. **Cross-references:** Are all § references between docs still valid?
+5. Flag inconsistencies for manual review — do NOT auto-fix cross-doc issues without approval
 
 ### Phase 8 — Summary
 
@@ -166,22 +147,20 @@ After updating primary docs, check consistency across all docs:
 ### Updates Applied
 | Doc | Sections Updated | New Sections | Version |
 |-----|-----------------|--------------|---------|
-| Doc1 | §3.4, §4.2 | §3.8 | v2.7.0 |
-| Doc2 | §5.1 | §5.9 | v2.7.0 |
-| Doc3 | — | Workflow 12 | v2.7.0 |
-| Doc5 | §2.3 | — | v2.7.0 |
-| Doc6 | §2.1 | — | v1.1.0 |
+| Conceptual Overview | §3.4, §4.2 | §3.8 | v2.7.0 |
+| Technical Architecture | §5.1 | §5.9 | v2.7.0 |
+| Permissions | §2.3 | — | v2.7.0 |
 
 ### Features Synced
-- WIT-7: Rate Cards → Doc1 §3.4, Doc2 §5.x
-- WIT-8: Block Types → Doc1 §3.3, Doc2 §5.x
+- RSV-7: Rate Cards → Conceptual Overview §3.4, Technical Architecture §5.x
+- RSV-8: Block Types → Conceptual Overview §3.3
 
 ### Skipped (no Strategy doc impact)
-- WIT-261: Foundation fix (internal only)
+- RSV-261: Foundation fix (internal only)
 
 ### Cross-Sync
 - 0 terminology mismatches
-- 1 Doc3 workflow needs update (flagged)
+- 1 workflow doc needs update (flagged)
 
 ### Doc Freshness
 Strategy docs now reflect all shipped features through YYYY-MM-DD.
@@ -200,13 +179,14 @@ Run at these moments:
 
 - **Code is truth.** If the code differs from the light spec, the Strategy doc should match the code — not the spec.
 - **Preserve future-phase content.** Don't remove descriptions of features that haven't been built yet. Mark them clearly as planned.
-- **Maintain audience level.** Doc1 stays simple even when the feature is complex. Save technical detail for Doc2.
+- **Maintain audience level.** Use the manifest's Audience field. Stakeholder docs stay simple even when the feature is complex.
 - **Never auto-apply.** Always present diffs for human approval before writing.
 - **Version discipline.** Every sync bumps the version. No silent edits.
 
 ## Related
 
-- [The Piper Method](../../../method/Piper_Method.md) — this skill is the post-pipeline documentation step
+- See `method.md` — this skill is the post-pipeline documentation step
+- `/strategy-create` — bootstraps the docs this skill updates
 - `/roadmap-review` — flags doc staleness; run this skill to resolve it
-- `/end-session` — maintains Doc4 (Changelog); this skill handles Doc1, 2, 3, 5, 6
+- `/end-session` — maintains the Changelog doc (if one exists); this skill handles all other strategy docs
 - `/light-spec` — the specs that feed into this skill's comparison logic

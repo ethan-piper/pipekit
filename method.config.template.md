@@ -28,6 +28,7 @@ Skills use these IDs to transition issues. Get them from Linear API or the Linea
 
 | State | ID |
 |-------|-----|
+| Triage | `` |
 | Ideas | `` |
 | Future Waves | `` |
 | On Deck | `` |

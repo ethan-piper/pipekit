@@ -33,7 +33,7 @@ Break the build into phases. Each phase should be independently deployable and t
 | What's deferred? | Everything else — write it down so you don't forget, but don't build it |
 
 **Output:** A `Strategy/` directory with at minimum:
-- `Doc1_ConceptualOverview.md` — what the product does in plain language
+- `ConceptualOverview.md` — what the product does in plain language
 - Phase breakdown with scope boundaries
 
 ### 1.3 Linear Setup Decisions

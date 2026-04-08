@@ -139,7 +139,10 @@ check_paths() {
     local doc_has_issues=false
 
     while IFS= read -r path; do
-      # Skip if already checked this path
+      # Clean the path first — remove trailing punctuation, markdown artifacts
+      path=$(echo "$path" | sed 's/[,;:)]*$//' | sed 's/^"//' | sed 's/"$//')
+
+      # Skip if already checked this cleaned path
       local already_checked=false
       for cp in "${checked_paths[@]+"${checked_paths[@]}"}"; do
         if [ "$cp" = "$path" ]; then
@@ -149,9 +152,6 @@ check_paths() {
       done
       if $already_checked; then continue; fi
       checked_paths+=("$path")
-
-      # Clean the path — remove trailing punctuation, markdown artifacts
-      path=$(echo "$path" | sed 's/[,;:)]*$//' | sed 's/^"//' | sed 's/"$//')
 
       # Skip template/example paths
       if echo "$path" | grep -qE '\[.*\]|{.*}|<.*>|your-project|kebab-name|XXX|YYYY'; then
@@ -168,7 +168,7 @@ check_paths() {
         if echo "$path" | grep -qE '^\.(claude|vbw-planning)/'; then
           continue
         fi
-        if echo "$path" | grep -qE '^(method/|Strategy/|Security/|src/|src_poc/|packages/|Logs/)'; then
+        if echo "$path" | grep -qE '^(method/|Strategy/|Security/|src/|src_poc/|packages/|Logs/|rules/)'; then
           continue
         fi
         if echo "$path" | grep -qE '^concept-brief\.md$|^project-definition\.md$|^method\.config\.md$'; then
@@ -359,11 +359,21 @@ check_skill_refs() {
     skill_names+=("$name")
   done < <(find "$skills_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null)
 
-  # Check each skill for references to other skills
-  while IFS= read -r skill_file; do
+  # Collect files to scan — skill files AND all other docs
+  local files_to_scan=()
+  while IFS= read -r f; do files_to_scan+=("$f"); done < <(find "$skills_dir" -name "skill.md" 2>/dev/null)
+  while IFS= read -r f; do files_to_scan+=("$f"); done < <(collect_docs)
+
+  # Deduplicate
+  local unique_files
+  unique_files=$(printf '%s\n' "${files_to_scan[@]}" | sort -u)
+
+  # Check each file for skill references
+  local checked_refs=()
+  while IFS= read -r scan_file; do
     # Find /skill-name references
     local refs
-    refs=$(grep -oE '`/[a-z][a-z0-9-]+`' "$skill_file" 2>/dev/null | sed 's/`//g; s/^\///' | sort -u || true)
+    refs=$(grep -oE '`/[a-z][a-z0-9-]+`' "$scan_file" 2>/dev/null | sed 's/`//g; s/^\///' | sort -u || true)
 
     if [ -z "$refs" ]; then continue; fi
 
@@ -372,13 +382,21 @@ check_skill_refs() {
       if echo "$ref" | grep -qE '^(g-promote|g-test|g-deploy|migrate|component|reset-user|seed-data)'; then
         continue  # Project-specific skills — not expected in method repo
       fi
-      if echo "$ref" | grep -qE '^(vbw:|speckit|board|code-review|commit|simplify)'; then
-        continue  # External tools / Claude Code built-ins
+      if echo "$ref" | grep -qE '^(vbw:|speckit|board|code-review|commit|simplify|skill-name)'; then
+        continue  # External tools / Claude Code built-ins / generic examples
       fi
       # Skip references with arguments (e.g., /launch WIT-123, /light-spec RSV-1)
       if echo "$ref" | grep -qE ' '; then
         continue
       fi
+
+      # Skip if already checked this ref
+      local already=false
+      for cr in "${checked_refs[@]+"${checked_refs[@]}"}"; do
+        if [ "$cr" = "$ref" ]; then already=true; break; fi
+      done
+      if $already; then continue; fi
+      checked_refs+=("$ref")
 
       # Check if a skill directory exists for this reference
       local found=false
@@ -393,12 +411,12 @@ check_skill_refs() {
       done
 
       if ! $found; then
-        echo -e "  ${YELLOW}UNRESOLVED${NC}  /$ref — referenced in $skill_file"
+        echo -e "  ${YELLOW}UNRESOLVED${NC}  /$ref — referenced in $scan_file"
         missing_refs=$((missing_refs + 1))
         WARN_COUNT=$((WARN_COUNT + 1))
       fi
     done <<< "$refs"
-  done < <(find "$skills_dir" -name "skill.md" 2>/dev/null)
+  done <<< "$unique_files"
 
   if [ $missing_refs -eq 0 ]; then
     echo -e "  ${GREEN}All skill cross-references resolve${NC}"

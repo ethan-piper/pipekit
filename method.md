@@ -57,20 +57,20 @@ Phase 0 runs once per project. `/startup` orchestrates the full flow.
 
 | # | Step | Tool | Input | Output | Gate |
 |---|------|------|-------|--------|------|
-| 1 | **Roadmap Review** | `/roadmap-review` | ROADMAP, Linear state, WAVES.md | Health report: Phase 0 check, gaps, ordering, spec coverage, doc freshness | Phase 0 complete, plan coherent |
-| 2 | **Light Spec** | `/light-spec` + Linear | Feature idea or issue | Structured spec exploring codebase and Strategy docs | — |
-| 3 | **Agent Review** | Linear Spec Review Agent | Light spec | Pass/Revise verdict with readiness score | Spec must be unambiguous and decomposable without guessing |
-| 4 | **Human Review** | You in Linear | Agent-reviewed spec | Approved spec with product decisions locked | Human signs off on scope, decisions, and priority |
-| 5 | **Launch** | `/launch {ISSUE}` | Approved spec | Gates validated, complexity routed, issue → Building | Spec exists, deps met, milestone siblings all specced |
-| 6 | **VBW Plan** | VBW Lead Agent (via `/launch`) | Approved spec from Linear | `PLAN.md` with task decomposition, verify/done criteria | — (Low complexity skips to batch runner) |
-| 7 | **Plan Review** | `plan-reviewer` agent (via `/launch`) | PLAN.md | Validated plan or revision requests | Plan must be executable step-by-step without ambiguity |
-| 8 | **Execution** | VBW Dev Agent or `/linear-todo-runner` (via `/launch`) | Approved plan or AC | Atomic commits per task | Each task passes its own verify/done criteria |
-| 9 | **QA** | VBW QA Agent (via `/launch`) | Completed tasks | Verification report, issue → UAT | All tasks verified against goals |
-| 10 | **UAT** | You | Built feature | Accepted or rejected | Feature matches spec AC under real usage |
-| 11 | **Ship** | Promotion skills | Accepted feature | Production release | CI gates pass, smoke tests pass |
-| 12 | **Strategy Sync** | `/strategy-sync` | Shipped features, current Strategy docs | Updated docs reflecting reality | Code is truth; diffs approved before apply |
+| 0 | **Roadmap Review** | `/roadmap-review` | ROADMAP, Linear state, WAVES.md | Health report: Phase 0 check, gaps, ordering, spec coverage, doc freshness | Phase 0 complete, plan coherent |
+| 1 | **Light Spec** | `/light-spec` + Linear | Feature idea or issue | Structured spec exploring codebase and Strategy docs | — |
+| 2 | **Agent Review** | Linear Spec Review Agent | Light spec | Pass/Revise verdict with readiness score | Spec must be unambiguous and decomposable without guessing |
+| 3 | **Human Review** | You in Linear | Agent-reviewed spec | Approved spec with product decisions locked | Human signs off on scope, decisions, and priority |
+| 4 | **Launch** | `/launch {ISSUE}` | Approved spec | Gates validated, complexity routed, issue → Building | Spec exists, deps met, milestone siblings all specced |
+| 5 | **VBW Plan** | VBW Lead Agent (via `/launch`) | Approved spec from Linear | `PLAN.md` with task decomposition, verify/done criteria | — (Low complexity skips to batch runner) |
+| 6 | **Plan Review** | `plan-reviewer` agent (via `/launch`) | PLAN.md | Validated plan or revision requests | Plan must be executable step-by-step without ambiguity |
+| 7 | **Execution** | VBW Dev Agent or `/linear-todo-runner` (via `/launch`) | Approved plan or AC | Atomic commits per task | Each task passes its own verify/done criteria |
+| 8 | **QA** | VBW QA Agent (via `/launch`) | Completed tasks | Verification report, issue → UAT | All tasks verified against goals |
+| 9 | **UAT** | You | Built feature | Accepted or rejected | Feature matches spec AC under real usage |
+| 10 | **Ship** | Promotion skills | Accepted feature | Production release | CI gates pass, smoke tests pass |
+| 11 | **Strategy Sync** | `/strategy-sync` | Shipped features, current Strategy docs | Updated docs reflecting reality | Code is truth; diffs approved before apply |
 
-**Feedback loops:** Steps 3, 7, 9, and 10 can send work backward. Agent review returns specs for revision. Plan review returns plans for rework. QA returns tasks to dev. UAT returns features to execution. The pipeline is linear by default, corrective when needed.
+**Feedback loops:** Steps 2, 6, 8, and 9 can send work backward. Agent review returns specs for revision. Plan review returns plans for rework. QA returns tasks to dev. UAT returns features to execution. The pipeline is linear by default, corrective when needed.
 
 **Between waves:** `/wave-plan --next` selects the next batch of issues and promotes them to "Needs Spec." `/roadmap-review` validates before speccing begins.
 
@@ -102,7 +102,7 @@ Runs once per project. Takes a raw idea through structured definition, strategy 
 
 ## Pre-Condition: Roadmap Review
 
-**Step:** 1
+**Step:** 0
 
 **Tools:** `/roadmap-review`
 
@@ -115,6 +115,7 @@ Run before entering the spec pipeline to validate that Phase 0 is complete and t
 ## Phase 1: Definition (Spec Quality Gate)
 
 **Steps:** 1–3 (Light Spec → Agent Review → Human Review)
+**Pre-condition:** Roadmap Review (Step 0) must pass
 
 **Tools:** `/light-spec`, Spec Review Agent, Human
 
@@ -132,6 +133,7 @@ Run before entering the spec pipeline to validate that Phase 0 is complete and t
 ## Phase 2: Launch & Planning (Execution Quality Gate)
 
 **Steps:** 4–6 (Launch → VBW Plan → Plan Review)
+
 
 **Tools:** `/launch`, VBW Lead Agent, `plan-reviewer` agent
 

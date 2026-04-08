@@ -132,12 +132,13 @@ For the next planned wave (issues in On Deck/Needs Spec/Specced for the active p
 
 ### Phase 7 — Doc Freshness (Light Check)
 
-1. Read version headers from all Strategy docs (Doc1-6) to find the oldest update date
-2. Query Linear for issues in Done state
-3. Count features shipped since the oldest Strategy doc was last updated
-4. If significant features shipped (>3) without a doc update, flag as stale
-5. List which docs are most affected by shipped features
-6. Recommend `/strategy-sync` if stale
+1. Read `method.config.md` to get the strategy doc manifest
+2. Read version headers from all listed strategy docs to find the oldest update date
+3. Query Linear for issues in Done state
+4. Count features shipped since the oldest Strategy doc was last updated
+5. If significant features shipped (>3) without a doc update, flag as stale
+6. List which docs are most affected by shipped features
+7. Recommend `/strategy-sync` if stale
 
 ### Phase 8 — Report
 
@@ -198,11 +199,9 @@ To find parked items: fetch issues with `Parked` label, read the trigger conditi
 ### Strategy Doc Freshness
 | Doc | Version | Last Updated | Features Since |
 |-----|---------|-------------|----------------|
-| Doc1 | vX.X.X | YYYY-MM-DD | X |
-| Doc2 | vX.X.X | YYYY-MM-DD | X |
-| Doc3 | vX.X.X | YYYY-MM-DD | X |
-| Doc5 | vX.X.X | YYYY-MM-DD | X |
-| Doc6 | vX.X.X | YYYY-MM-DD | X |
+| {doc name from config} | vX.X.X | YYYY-MM-DD | X |
+| {doc name from config} | vX.X.X | YYYY-MM-DD | X |
+| ... | | | |
 - **Recommendation:** Run `/strategy-sync` if any doc has >3 unsynced features
 
 ### Action Items (Priority Order)
@@ -223,7 +222,7 @@ Run at these moments:
 
 ## Related
 
-- [The Piper Method](../../../method/Piper_Method.md) — the overall pipeline this validates
-- [Linear Configuration](../../../method/sop/Linear%20SOP.md) — dependency graph and workflow states
+- See `method.md` — the overall pipeline this validates
+- See `sop/Linear_SOP.md` — dependency graph and workflow states
 - `/strategy-sync` — runs after shipping to update Strategy docs (this skill flags staleness)
 - `/light-spec` — generates specs for issues flagged as needing them
