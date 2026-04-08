@@ -152,4 +152,4 @@ All remaining items are independent — can be done in any order:
 | 3 | Ad-hoc Plan Gate | **Done** — rule template at `templates/rules/ad-hoc-plan-gate.md` | WIT-162 ✓ |
 | 4 | Brainstorm Disposition | **Done** — EXPAND/HOLD/REDUCE integrated into `/brainstorm` and `/brainstorm-review`, parked items surfaced by `/roadmap-review` | None |
 | 5 | CLAUDE.md Thinning | **Done** (WIT-162 shipped 2026-04-06) | — |
-| 6 | Automated Drift Detection | Planned | WIT-162 (file topology) |
+| 6 | Automated Drift Detection | **Done** — `scripts/drift-check.sh` checks file paths, skill cross-refs, doc staleness, script refs, config completeness | WIT-162 ✓ |

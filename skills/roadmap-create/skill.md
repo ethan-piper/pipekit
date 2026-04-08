@@ -247,4 +247,4 @@ If you catch yourself thinking any of these, follow the process more strictly:
 - `/vbw:init` — scaffolds `.vbw-planning/` (run before this skill)
 - `/wave-plan` — next step: select issues for the first execution wave
 - `/roadmap-review` — validates the roadmap after creation
-- `/seed-linear` — this skill IS the Linear seeding step (no separate skill needed)
+- This skill IS the Linear seeding step (no separate seed skill needed)

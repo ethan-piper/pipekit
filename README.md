@@ -78,6 +78,7 @@ piper-dev-method/
     skill-index/                   #   Sync skill index
   scripts/
     sync-method.sh                 # Pull method into a consuming project
+    drift-check.sh                 # Detect stale references in documentation
 ```
 
 ## Quick Start

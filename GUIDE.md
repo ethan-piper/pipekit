@@ -954,6 +954,54 @@ cp ~/Projects/piper-dev-method/scripts/sync-method.sh scripts/
 
 ---
 
+## Drift Detection
+
+Documentation references file paths, skill names, commands, and config values that can go stale when code changes. The drift checker (`scripts/drift-check.sh`) catches this automatically.
+
+### What It Checks
+
+| Check | What It Does |
+|-------|-------------|
+| **File paths** | Extracts backtick-quoted paths from all markdown files, verifies they exist on disk |
+| **Skill cross-references** | Verifies that `/skill-name` references in skills point to real skills |
+| **Document staleness** | Flags docs not updated in 50+ commits |
+| **Script references** | Checks that `pnpm run X` commands exist in `package.json` |
+| **Config completeness** | Checks `method.config.md` for empty fields and missing strategy doc files |
+
+### Usage
+
+```bash
+./scripts/drift-check.sh              # Full check
+./scripts/drift-check.sh --paths      # File path check only
+./scripts/drift-check.sh --stale      # Staleness check only
+./scripts/drift-check.sh --scripts    # Script/command check only
+./scripts/drift-check.sh --ci         # Exit 1 if errors found (for CI)
+```
+
+### Context Detection
+
+The script auto-detects whether it's running in the method repo or a consuming project:
+- **Method repo:** Scans skills, templates, SOPs, method.md, GUIDE.md
+- **Consuming project:** Scans CLAUDE.md, `.claude/rules/`, synced method docs, skills
+
+### When to Run
+
+- After renaming or moving files
+- After modifying CLAUDE.md or rules
+- Before committing documentation changes
+- As a post-commit hook or CI step
+- Periodically as a health check
+
+### Wiring as a Post-Commit Hook
+
+Add to `.git/hooks/post-commit` or your project's hook system:
+
+```bash
+./scripts/drift-check.sh --ci || echo "Drift detected — review documentation references"
+```
+
+---
+
 ## Skill Quick Reference
 
 ### Phase 0: Foundation
