@@ -47,6 +47,9 @@ piper-dev-method/
       data-model.md
       workflow-examples.md
       ux-reference.md
+    rules/                         #   Portable rule templates for .claude/rules/
+      verify-library-api.md        #     Check installed versions before using APIs
+      ad-hoc-plan-gate.md          #     Lightweight plan gate for interactive sessions
   skills/                          # Portable Claude Code skills
     concept/                       #   Phase 0: project-level ideation
     define/                        #   Phase 0: distill concept into definition

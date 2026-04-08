@@ -1000,6 +1000,104 @@ cp ~/Projects/piper-dev-method/scripts/sync-method.sh scripts/
 
 ---
 
+## Red Flags in Skills
+
+Key skills include a `## Red Flags` section — self-sabotage thoughts that Claude should recognize as danger signals. When any of these thoughts arise, the skill's process should be followed *more* strictly, not less.
+
+**Examples from across the pipeline:**
+
+| Thought | What It Really Means |
+|---------|---------------------|
+| "This is simple, I don't need a plan" | You definitely need a plan |
+| "I know this API" | Check the installed version — your training data is stale |
+| "The spec is close enough" | If it doesn't pass the gate, it doesn't launch |
+| "Phase 1 needs Feature X to be useful" | The phase split is wrong — Phase 1 must stand alone |
+| "I'll write tests after" | Write them first or concurrently |
+| "This doesn't need a Linear issue" | Every idea gets an issue. Issues without tracking get forgotten. |
+| "I'll keep it in Ideas for now" | "Keep" without a trigger condition is how issues die |
+
+Skills with Red Flags: `/concept`, `/define`, `/strategy-create`, `/roadmap-create`, `/wave-plan`, `/launch`, `/light-spec`, `/brainstorm`.
+
+---
+
+## Portable Rule Templates
+
+The method includes rule templates in `templates/rules/` that consuming projects can copy into their `.claude/rules/` directory. These are auto-loaded every session by Claude Code.
+
+### Verify Library API (`templates/rules/verify-library-api.md`)
+
+Before using any library API, check the installed version and read `node_modules/` source as ground truth. Not docs, not training data.
+
+**Process:**
+1. Check installed version: `cat node_modules/{package}/package.json | grep version`
+2. Read the actual source for the function/component you're using
+3. Never assume signatures, config options, or import paths haven't changed
+
+**When:** Any library call you haven't verified this session. Especially after upgrades. Especially for fast-moving libraries (Next.js, shadcn, Supabase SDK).
+
+### Ad-hoc Plan Gate (`templates/rules/ad-hoc-plan-gate.md`)
+
+For non-VBW interactive work (quick fixes, bug fixes, exploratory changes), present a 3-5 bullet plan and get user approval before writing code:
+
+```
+## Plan: {what you're doing}
+1. What changes: {files/areas}
+2. What doesn't change: {preserved}
+3. Approach: {strategy}
+4. Key decisions: {trade-offs}
+5. Verify: {how to confirm}
+Proceed? (y/n)
+```
+
+**Why:** VBW handles planned work with verify/done criteria. Interactive sessions have no gate. This lightweight plan prevents scope creep, wrong-direction work, and silent assumptions.
+
+---
+
+## Brainstorm Disposition (EXPAND/HOLD/REDUCE)
+
+`/brainstorm` creates well-analyzed Linear issues, but without a disposition step they accumulate in Ideas with no next step. The method uses a three-phase framework to force a decision:
+
+### EXPAND
+
+Already handled by `/brainstorm` — full vision, feasibility analysis, codebase exploration, complexity estimate.
+
+### HOLD (Disposition)
+
+Immediately after creating the issue, force one of three decisions:
+
+| Decision | What Happens |
+|----------|-------------|
+| **Now** | Route to pipeline — assign to a wave/phase, move to Needs Spec |
+| **Later** | Park with explicit trigger condition + target wave. Tagged `Parked` in Linear. |
+| **Kill** | Archive with rationale. Move to Canceled. |
+
+**Parking rules for "Later" items:**
+- Must have a trigger condition (e.g., "revisit when RSV-56 ships")
+- Must have a target wave/phase (e.g., "Wave 4+")
+- Surfaced by `/roadmap-review` when trigger conditions are met
+
+### REDUCE (for "Now" items)
+
+If the brainstorm is broad, cut to v1 scope before entering the spec pipeline:
+- "What's the smallest useful version?"
+- "What can wait for v2?"
+- Update the issue with a `## v1 Scope` section
+
+### Batch Disposition
+
+`/brainstorm-review` handles batch triage — reviewing all undisposed issues at once with the same Now/Later/Kill framework. Run it periodically to clear the backlog.
+
+### Integration Points
+
+| Skill | Role |
+|-------|------|
+| `/brainstorm` | EXPAND + immediate HOLD + optional REDUCE |
+| `/brainstorm-review` | Batch HOLD for untriaged backlog |
+| `/roadmap-review` | Surfaces parked items whose triggers have fired |
+| `/wave-plan --rebalance` | Adds "Now" dispositions to current wave |
+
+---
+
 ## Key Principles
 
 ### No Guesswork
