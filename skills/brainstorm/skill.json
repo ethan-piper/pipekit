@@ -1,0 +1,5 @@
+{
+  "name": "brainstorm",
+  "description": "Analyze a feature idea, assess feasibility, and save to Notes_Ideas/Brainstorms.md",
+  "invocable": true
+}

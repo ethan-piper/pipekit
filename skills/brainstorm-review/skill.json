@@ -1,0 +1,9 @@
+{
+  "name": "brainstorm-review",
+  "description": "Review and process brainstorm ideas into tasks, strategy updates, or discard them",
+  "triggers": [
+    "/brainstorm-review",
+    "review brainstorms",
+    "process brainstorms"
+  ]
+}

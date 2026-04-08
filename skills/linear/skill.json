@@ -1,0 +1,5 @@
+{
+  "name": "linear",
+  "description": "Work on a Linear issue end-to-end: fetch details, create branch, update status, post comments, create PR, and close on merge",
+  "invocable": true
+}

@@ -1,0 +1,79 @@
+---
+name: task-processor
+description: Process and execute tasks from Linear systematically
+---
+# Task Processor Skill
+
+You are a task processor for the project. Your role is to fetch, prioritize, and execute tasks from Linear. Read `method.config.md` for project context.
+
+## Triggers
+
+This skill is invoked when the user says:
+
+- `/task-processor`
+- "process tasks"
+- "work on tasks"
+
+## Purpose
+
+Process tasks from Linear in a user-directed, interactive manner. Show available tasks and prompt the user to select which task to work on.
+
+## Execution Steps
+
+### 1. Fetch Tasks from Linear
+
+Use `mcp__linear-server__list_issues` to get open issues:
+
+```
+team: "{team from method.config.md}"
+state: "Approved"
+```
+
+Then repeat for `state: "Needs Spec"` and `state: "On Deck"`.
+
+### 2. Present Task Queue
+
+Group by priority and project. Show:
+- Issue identifier (e.g., WIT-42)
+- Title
+- Priority (Urgent/High/Normal/Low)
+- Project name
+- Labels
+
+Ask which task to work on.
+
+### 3. Execute Selected Task
+
+- Move issue to "Building" using `mcp__linear-server__save_issue` with `stateId: {Building state ID from method.config.md}`
+- Read full issue description for requirements
+- **Check for spec links:** Look for `**Spec:**` or `**Linked spec:**` lines in the description
+  - If spec link exists → read the spec files before executing
+- Create a worktree for the work (use `/branch` skill or manually branch from `dev`)
+- Execute actions based on issue description + spec (if any)
+- Validate against success criteria
+- When done, ask user: move to **Done** or **UAT**?
+  - Done: `stateId: {Done state ID from method.config.md}`
+  - UAT: `stateId: {UAT state ID from method.config.md}`
+- Ask if user wants another task
+
+### 4. Final Summary
+
+Show completed tasks, files modified, remaining tasks.
+
+## Options
+
+- `--priority=urgent` - Filter by priority (0=None, 1=Urgent, 2=High, 3=Normal, 4=Low)
+- `--project=Budget Editor` - Filter by project
+- `--spec` - View the spec for a task without starting execution (reads spec files linked in description)
+
+## Linear State IDs
+
+Read all state IDs from your project's `method.config.md` under "Workflow State IDs". The table maps state names (Building, UAT, Done, etc.) to Linear state UUIDs specific to your workspace.
+
+## Related
+
+- Linear issue workflow: `/linear WIT-123` — full end-to-end issue workflow
+- Parallel batch execution: `/linear-todo-runner` — rolling queue with up to 4 concurrent agents
+- Branch skill: `/branch` — creates worktree + branch
+- Start/end session: `/start-session`, `/end-session`
+- Linear workspace: {Linear workspace URL from method.config.md}
