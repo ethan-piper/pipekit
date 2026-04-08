@@ -7,20 +7,33 @@
 
 ---
 
-## Environments
+## Git Architecture
 
-Define your project's environments in `method.config.md`. Standard pattern:
+Your project's branching model is chosen during `/startup` and recorded in `method.config.md` under `## Git Architecture`. This choice determines environments, promotion skills, and release flow.
+
+### Two-Tier (dev → main)
+
+Best for solo dev, small teams, or projects where preview URLs replace a staging environment.
+
+```
+main (production)
+dev  (active development)
+  └── feature/*, fix/*   → Preview URLs
+```
 
 | Environment | Branch | Purpose |
 |---|---|---|
-| **Production** | `main` | Live, public |
-| **Beta** | `beta` | Pre-release, password-protected |
-| **Dev** | `dev` | Active development, team-only |
+| **Production** | `main` | Live |
+| **Dev** | `dev` | Active development |
 | **Preview** | PR branches | Per-PR preview URLs |
 
----
+**Release flow:** `feature/*` → PR to `dev` → PR to `main`
+**Promotion skills:** `/g-promote-dev`, `/g-promote-main`
+**Linear transitions:** merge to `main` → issues move to Done
 
-## Branch Structure
+### Three-Tier (dev → beta → main)
+
+Best for teams with QA, projects needing a stable UAT environment, or regulated industries.
 
 ```
 main (production)
@@ -29,7 +42,18 @@ dev  (active development)
   └── feature/*, fix/*   → Preview URLs
 ```
 
-### Branch Naming
+| Environment | Branch | Purpose |
+|---|---|---|
+| **Production** | `main` | Live |
+| **Beta** | `beta` | Pre-release, password-protected |
+| **Dev** | `dev` | Active development |
+| **Preview** | PR branches | Per-PR preview URLs |
+
+**Release flow:** `feature/*` → PR to `dev` → PR to `beta` → PR to `main`
+**Promotion skills:** `/g-promote-dev`, `/g-promote-beta`, `/g-promote-main`
+**Linear transitions:** merge to `beta` → issues move to UAT; merge to `main` → issues move to Done
+
+### Branch Naming (both models)
 
 | Prefix | Base Branch | Purpose |
 |--------|-------------|---------|
@@ -37,21 +61,22 @@ dev  (active development)
 | `fix/` | `dev` | Bug fixes |
 | `hotfix/` | `main` | Urgent production fixes |
 
-### Branch Protection
+### Branch Protection (both models)
 
 | Branch | Rules |
 |---|---|
 | `main` | Protected. Requires PR, CI passing. No direct pushes. |
-| `beta` | Protected. Requires PR + CI passing. No direct merges. |
+| `beta` (three-tier only) | Protected. Requires PR + CI passing. No direct merges. |
 | `dev` | Default branch for PRs. CI runs on all PRs targeting dev. |
 
 ---
 
 ## Release Flow
 
-**Core principle: every step forward is a PR. No direct merges between long-lived branches.** (Exception: hotfix cherry-picks back to dev and beta are direct pushes.)
+**Core principle: every step forward is a PR. No direct merges between long-lived branches.** (Exception: hotfix cherry-picks back to dev — and beta in three-tier — are direct pushes.)
 
-**Normal flow:** `feature/*` → PR to `dev` → PR to `beta` → PR to `main`
+**Two-tier flow:** `feature/*` → PR to `dev` → PR to `main`
+**Three-tier flow:** `feature/*` → PR to `dev` → PR to `beta` → PR to `main`
 
 Each project defines its own promotion skills. After merge, issues transition in Linear:
 - Merge to beta → issues move to **UAT**
@@ -132,13 +157,11 @@ PR is reviewed, approved, and merged. Feature available on dev.
 
 Clean up: `/branch finish` from within the worktree.
 
-### Step 6: Promote to Beta
+### Step 6: Promote to Production
 
-PR from `dev` → `beta`. After merge, referenced Linear issues move to **UAT**.
+**Two-tier:** PR from `dev` → `main`. After merge, referenced Linear issues move to **Done**.
 
-### Step 7: Deploy to Production
-
-PR from `beta` → `main`. After merge, referenced Linear issues move to **Done**.
+**Three-tier:** PR from `dev` → `beta` (issues → UAT), then PR from `beta` → `main` (issues → Done).
 
 ### Verification
 
@@ -154,7 +177,11 @@ After any promotion, verify the deployment (smoke tests, health check).
 
 # 2. Fix, commit, push, PR to main
 
-# 3. After merge, cherry-pick back to dev and beta immediately
+# 3. After merge, cherry-pick back immediately
+# Two-tier:
+git checkout dev && git pull && git cherry-pick <hash> && git push origin dev
+
+# Three-tier (also cherry-pick to beta):
 git checkout dev && git pull && git cherry-pick <hash> && git push origin dev
 git checkout beta && git pull && git cherry-pick <hash> && git push origin beta
 
@@ -207,4 +234,4 @@ Migrations are forward-only. To undo: create a new migration that reverses the c
 6. **Commit often, push when stable.** Small commits are easier to debug.
 7. **Never force push to main.** Use `--force-with-lease` on feature branches only.
 8. **Write meaningful commit messages.** Follow the type(scope) format.
-9. **Cherry-pick hotfixes back immediately.** Both dev and beta, verified clean.
+9. **Cherry-pick hotfixes back immediately.** To dev (and beta if three-tier), verified clean.

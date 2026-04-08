@@ -255,6 +255,18 @@ Downstream transitions (not owned by `/launch`):
 
 ---
 
+## Red Flags
+
+If you catch yourself thinking any of these, follow the process more strictly:
+
+- **"The spec is close enough, I'll just launch it"** → If the spec doesn't pass the gate, it doesn't launch. Run `/light-spec` first.
+- **"I'll skip the milestone gate, it's just one issue"** → The milestone gate exists because later specs change assumptions. Use `--force` only if the user explicitly says so.
+- **"This is Low complexity, it doesn't need AC"** → The batch runner requires AC. No AC = no execution. Every issue needs verifiable criteria.
+- **"I'll fix the dependency issue after launching"** → Dependencies exist for a reason. If a blocker isn't Done, the issue isn't ready. Period.
+- **"I know the complexity without reading the spec"** → Read the spec. Every time. Your estimate from the title is wrong.
+
+---
+
 ## Relationship to Other Skills
 
 | Skill | Relationship |

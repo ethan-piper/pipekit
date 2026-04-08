@@ -17,25 +17,55 @@ Comprehensive health check of the overall plan. Run before speccing a new wave t
 ## Purpose
 
 Validate that:
-1. Every ROADMAP requirement has corresponding Linear issues
-2. Issues are in the correct phase/project
-3. Dependencies and blockers are set correctly
-4. Workflow states are consistent with dependency ordering
-5. Spec coverage is adequate for the next planned wave
-6. Strategy docs are flagged if stale
+1. **Phase 0 outputs exist** — concept, definition, strategy docs, roadmap, wave
+2. Every ROADMAP requirement has corresponding Linear issues
+3. Issues are in the correct phase/project
+4. Dependencies and blockers are set correctly
+5. Workflow states are consistent with dependency ordering
+6. Spec coverage is adequate for the next planned wave
+7. Strategy docs are flagged if stale
 
-This is the **pre-condition** for the Piper Method pipeline. Run it before starting a new wave of specs.
+This is the **gate between Phase 0 (Foundation) and Phase 1 (Definition)** in the Piper Method pipeline. Run it before starting a new wave of specs.
 
 ## Execution Steps
+
+### Phase 0 — Foundation Check
+
+Validate that pre-pipeline outputs exist. If any are missing, report which skill to run.
+
+| Check | File | If Missing |
+|-------|------|-----------|
+| Concept brief | `concept-brief.md` | Run `/concept` |
+| Project definition | `project-definition.md` | Run `/define` |
+| Strategy docs | `Strategy/` matching `method.config.md` manifest | Run `/strategy-create` |
+| VBW scaffold | `.vbw-planning/` directory | Run `/vbw:init` |
+| Roadmap | `.vbw-planning/ROADMAP.md` with content | Run `/roadmap-create` |
+| Linear board | Issues exist for roadmap requirements | Run `/roadmap-create` |
+| Wave defined | `.vbw-planning/WAVES.md` with current wave | Run `/wave-plan` |
+
+If any Phase 0 check fails, report it prominently at the top of the health report:
+
+```
+## Phase 0: Foundation — INCOMPLETE
+
+Missing:
+  - concept-brief.md → run /concept
+  - .vbw-planning/WAVES.md → run /wave-plan
+
+Phase 0 must be complete before entering the spec pipeline.
+```
+
+If all Phase 0 checks pass, continue to Phase 1.
 
 ### Phase 1 — Gather State
 
 1. Read `.vbw-planning/ROADMAP.md` for requirements by phase
 2. Read `.vbw-planning/linear-map.json` for ID mappings
 3. Read `.vbw-planning/STATE.md` for current progress
-4. Fetch all initiatives via `mcp__linear-server__list_initiatives`
-5. For each active and next-up initiative, fetch projects via `mcp__linear-server__list_projects`
-6. For each project, fetch issues via `mcp__linear-server__list_issues`
+4. Read `.vbw-planning/WAVES.md` for current wave composition
+5. Fetch all initiatives via `mcp__linear-server__list_initiatives`
+6. For each active and next-up initiative, fetch projects via `mcp__linear-server__list_projects`
+7. For each project, fetch issues via `mcp__linear-server__list_issues`
 
 ### Phase 2 — Completeness Check
 
@@ -151,6 +181,19 @@ Present a summary dashboard:
 **Issues needing specs:**
 - WIT-XXX: [title]
 - WIT-XXX: [title]
+
+### Parked Items (trigger check)
+
+Parked items are brainstorm dispositions marked "Later" with trigger conditions. Check if any triggers have fired:
+
+| Issue | Trigger Condition | Target | Triggered? |
+|-------|------------------|--------|-----------|
+| {issue} | "revisit when {X} ships" | Wave {N} | ✓ {X} is Done |
+| {issue} | "revisit after Phase 1 UAT" | Phase 2 | ✗ Phase 1 in progress |
+
+**Triggered items need re-disposition** — run `/brainstorm-review` on them or add to the current wave via `/wave-plan --rebalance`.
+
+To find parked items: fetch issues with `Parked` label, read the trigger condition from their Linear comments.
 
 ### Strategy Doc Freshness
 | Doc | Version | Last Updated | Features Since |

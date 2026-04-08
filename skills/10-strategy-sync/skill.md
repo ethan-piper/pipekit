@@ -34,16 +34,19 @@ This skill closes the right side of that loop.
 
 ## Document Map
 
-| Doc | Purpose | Audience | Key Content |
-|-----|---------|----------|-------------|
-| Doc1 | Conceptual Overview | CFO, Stakeholders | How the app works in simple terms |
-| Doc2 | Technical Spec | Developers | Schema, APIs, data model, calculations |
-| Doc3 | Workflow Examples | All | Step-by-step scenarios showing how features work |
-| Doc4 | Changelog | All | Version history (updated by `/end-session`, not this skill) |
-| Doc5 | Permissions | Developers, Admins | RLS, roles, access control model |
-| Doc6 | UX Reference | Producers, Support | Keyboard shortcuts, onboarding, help system, UI patterns |
+Read the project's strategy doc manifest from `method.config.md` under `## Strategy Docs`. This table defines which docs exist, their file paths, purposes, and audiences. Example:
 
-**Doc4 content is excluded** from this skill — it's maintained by `/end-session` as a running log. However, this skill updates Doc4's header/formatting for cross-doc consistency (e.g., "Document 4 of 6") and adds a single changelog entry recording what was synced.
+| Doc | File | Purpose | Audience |
+|-----|------|---------|----------|
+| Conceptual Overview | `Strategy/ConceptualOverview.md` | What the product does | Stakeholders |
+| Technical Architecture | `Strategy/TechnicalArchitecture.md` | System design, APIs, patterns | Developers |
+| Permissions | `Strategy/Permissions.md` | Auth, roles, access control | Developers, Admins |
+
+Use the **Purpose** field to determine the tone and depth of updates. Use the **Audience** field to calibrate language level (stakeholder docs stay simple, developer docs include technical detail).
+
+If a Changelog doc exists in the manifest, it is excluded from sync content — it's maintained by `/end-session`. However, this skill adds a single changelog entry recording what was synced.
+
+**If no Strategy Docs table exists in `method.config.md`:** warn the user and suggest running `/strategy-create` to set up the manifest.
 
 ## Execution Steps
 

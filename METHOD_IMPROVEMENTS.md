@@ -147,9 +147,9 @@ All remaining items are independent — can be done in any order:
 
 | # | Improvement | Status | Dependency |
 |---|------------|--------|------------|
-| 1 | Red Flags in Skills | Planned | None |
-| 2 | Verify Library API | Ready — rules/ infra exists, needs the actual rule | WIT-162 ✓ |
-| 3 | Ad-hoc Plan Gate | Ready — Decision-Making Protocol exists, needs the plan gate rule | WIT-162 ✓ |
-| 4 | Brainstorm Disposition | Planned | None |
+| 1 | Red Flags in Skills | **Done** — added to concept, define, strategy-create, roadmap-create, wave-plan, launch, light-spec, brainstorm | None |
+| 2 | Verify Library API | **Done** — rule template at `templates/rules/verify-library-api.md` | WIT-162 ✓ |
+| 3 | Ad-hoc Plan Gate | **Done** — rule template at `templates/rules/ad-hoc-plan-gate.md` | WIT-162 ✓ |
+| 4 | Brainstorm Disposition | **Done** — EXPAND/HOLD/REDUCE integrated into `/brainstorm` and `/brainstorm-review`, parked items surfaced by `/roadmap-review` | None |
 | 5 | CLAUDE.md Thinning | **Done** (WIT-162 shipped 2026-04-06) | — |
 | 6 | Automated Drift Detection | Planned | WIT-162 (file topology) |

@@ -1,0 +1,128 @@
+---
+name: concept
+description: Analyze a project idea — assess viability, capture context, and produce a structured concept brief
+---
+
+# Concept Skill
+
+Take a raw project idea, ingest any existing documents, assess viability, and produce a structured concept brief. This is the first step in the Piper Dev Method — before definition, strategy docs, or roadmap.
+
+## Triggers
+
+- `/concept`
+- `/concept --docs path/to/folder/`
+- "I have a project idea"
+- "new project concept"
+
+## Arguments
+
+| Argument | What it does |
+|----------|--------------|
+| (none) | Start from scratch — interactive Q&A |
+| `--docs <path>` | Read existing documents first, then ask what's missing |
+| `--docs <path1> <path2>` | Read multiple document paths |
+
+## Purpose
+
+Determine whether a project idea is specific enough to invest definition time. The output — `concept-brief.md` — feeds into `/define`, which produces the full project definition.
+
+**This is brainstorming at the project level.** `/brainstorm` handles feature-level ideas within an existing project. `/concept` handles "should I build this product at all?"
+
+## Execution Steps
+
+### Phase 1 — Ingest Existing Context
+
+1. **If `--docs` provided:** Use an Explore agent to read all files at the provided paths:
+   - Read every document (markdown, text, PDFs, etc.)
+   - Extract: problem statements, user descriptions, scope ideas, constraints, competitive mentions
+   - Summarize what the documents cover and what's missing
+   - Store extracted context for use in Phase 2
+
+2. **If no docs:** Skip to Phase 2 — start from scratch.
+
+3. **Always check** if `concept-brief.md` already exists in the project root. If it does:
+   - Read it
+   - Ask: _"A concept brief already exists. Want to refine it, or start fresh?"_
+
+### Phase 2 — Capture the Idea
+
+If source documents were ingested, pre-fill answers from them. Only ask about gaps.
+
+Walk through each section of the concept brief template (`templates/concept-brief.md`):
+
+1. **Problem** — What problem does this solve? Who has it? Why now?
+2. **Proposed Solution** — What are we building? (1-2 sentences)
+3. **Target Users** — Who uses it? How many? Technical sophistication?
+4. **Scale & Revenue** — User count, revenue model, pricing approach, cost drivers
+5. **Constraints** — Timeline, budget, compliance, existing systems, team
+6. **Competitive Landscape** — What alternatives exist? Why are they inadequate?
+7. **Initial Risk Assessment** — What could go wrong?
+
+For each section:
+- If source docs answered it clearly: present the extracted answer, ask for confirmation
+- If source docs partially answered it: present what was found, ask for the rest
+- If no info available: ask the question interactively
+
+### Phase 3 — Synthesize
+
+1. Draft the complete concept brief using the template from `templates/concept-brief.md`
+2. Fill in the `## Source Documents` table with all ingested document paths
+3. Present the draft to the user
+
+Ask: _"Does this capture the concept accurately? Want to refine anything?"_
+
+Iterate until the user approves.
+
+### Phase 4 — Gate Decision
+
+Present the gate question:
+
+> **Is this concept specific enough to invest definition time?**
+>
+> - **Yes** → Proceed to `/define` to create a full project definition
+> - **No** → Needs more research or refinement (save as draft)
+> - **Kill** → Not worth pursuing (record rationale and save)
+
+### Phase 5 — Save
+
+1. Write `concept-brief.md` to the project root
+2. Set the Status field based on the gate decision:
+   - Yes → `Validated`
+   - No → `Draft`
+   - Kill → `Draft` with kill rationale in Decision section
+3. Report next steps:
+
+```
+## Concept Brief Created
+
+File: concept-brief.md
+Status: {Validated | Draft}
+Source docs: {N} documents ingested
+
+Next steps:
+  - /define — create full project definition (tech stack, phases, workflows)
+  - /concept — re-run to refine
+```
+
+## Rules
+
+- **Ingest first, ask second.** If the user has existing documents, read them before asking questions. Don't make the user re-state what's already written.
+- **Project-level, not feature-level.** This skill is for "should I build this product?" — not "should I add this feature?" For features, use `/brainstorm`.
+- **No tech stack decisions.** Those come in `/define` and `/startup`. Keep this focused on the problem and the idea, not the implementation.
+- **Human decides viability.** Present analysis, but the go/no-go decision is the user's.
+- **Save drafts.** Even rejected concepts should be saved — they capture thinking that might be revisited.
+
+## Red Flags
+
+If you catch yourself thinking any of these, follow the process more strictly:
+
+- **"The user already knows what they want, I'll skip the questions"** → The concept brief exists to surface gaps. Ask anyway.
+- **"This idea is obviously good/bad"** → You don't decide viability. Present the analysis, let the human call it.
+- **"I don't need to read those docs, the user explained it"** → If `--docs` was provided, read every file. The user may have forgotten what's in them.
+- **"This is just a small project, it doesn't need a concept brief"** → Every project needs a concept brief. Small projects that skip it become big projects with no foundation.
+
+## Related
+
+- `/define` — next step: distill the concept into a full project definition
+- `/brainstorm` — feature-level ideation within an existing project
+- `/startup` — full project bootstrap (orchestrates concept → define → setup → ...)

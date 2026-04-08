@@ -24,40 +24,89 @@ When ambiguity is detected, the pipeline sends work backward — not forward. A 
 
 ## Pipeline
 
-[Roadmap Review] → Light Spec → Agent Review → Human Review → **Launch** → VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
+```
+Phase 0: Foundation (runs once per project)
+  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /wave-plan
 
-**Bookends:** `/roadmap-review` validates the plan before entering the pipeline. `/strategy-sync` updates Strategy docs after features ship — closing the documentation loop.
+Phase 1-5: Development Pipeline (repeats per wave/feature)
+  [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
+  VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
+```
+
+**Phase 0** takes a project from idea to first wave ready for speccing. **Phases 1-5** repeat for each wave of features.
+
+**Bookends:** `/roadmap-review` validates Phase 0 outputs and plan health before entering the pipeline. `/strategy-sync` updates Strategy docs after features ship — closing the documentation loop.
 
 ### Step-by-Step
 
+#### Phase 0: Foundation
+
 | # | Step | Tool | Input | Output | Gate |
 |---|------|------|-------|--------|------|
-| 0 | **Roadmap Review** | `/roadmap-review` | ROADMAP, Linear state | Health report: gaps, ordering, spec coverage, doc freshness | Plan must be coherent before speccing |
-| 1 | **Light Spec** | `/light-spec` + Linear | Feature idea or issue | Structured spec exploring codebase and Strategy docs | — |
-| 2 | **Agent Review** | Linear Spec Review Agent | Light spec | Pass/Revise verdict with readiness score | Spec must be unambiguous and decomposable without guessing |
-| 3 | **Human Review** | You in Linear | Agent-reviewed spec | Approved spec with product decisions locked | Human signs off on scope, decisions, and priority |
-| 4 | **Launch** | `/launch {ISSUE}` | Approved spec | Gates validated, complexity routed, issue → Building | Spec exists, deps met, milestone siblings all specced |
-| 5 | **VBW Plan** | VBW Lead Agent (via `/launch`) | Approved spec from Linear | `PLAN.md` with task decomposition, verify/done criteria | — (Low complexity skips to batch runner) |
-| 6 | **Plan Review** | `plan-reviewer` agent (via `/launch`) | PLAN.md | Validated plan or revision requests | Plan must be executable step-by-step without ambiguity |
-| 7 | **Execution** | VBW Dev Agent or `/linear-todo-runner` (via `/launch`) | Approved plan or AC | Atomic commits per task | Each task passes its own verify/done criteria |
-| 8 | **QA** | VBW QA Agent (via `/launch`) | Completed tasks | Verification report, issue → UAT | All tasks verified against goals |
-| 9 | **UAT** | You | Built feature | Accepted or rejected | Feature matches spec AC under real usage |
-| 10 | **Ship** | Promotion skills | Accepted feature | Production release | CI gates pass, smoke tests pass |
-| 11 | **Strategy Sync** | `/strategy-sync` | Shipped features, current Strategy docs | Updated docs reflecting reality | Code is truth; diffs approved before apply |
+| 0.1 | **Concept** | `/concept` | Raw idea + existing docs | `concept-brief.md` | Idea is specific enough to define |
+| 0.2 | **Define** | `/define` | Concept brief | `project-definition.md` | Definition supports tech stack + strategy decisions |
+| 0.3 | **Strategy Create** | `/strategy-create` | Project definition | `Strategy/` docs | Docs describe a coherent product |
+| 0.4 | **Infra Setup** | `/startup` (Phases 3-6) | Tech stack decisions | Working repo, DB, deploy, MCP | Pre-deploy gate passes |
+| 0.5 | **VBW Init** | `/vbw:init` | — | `.vbw-planning/` scaffold | Directory exists |
+| 0.6 | **Roadmap** | `/roadmap-create` | Strategy docs + definition | `ROADMAP.md` + populated Linear | Every requirement has an issue |
+| 0.7 | **Wave Plan** | `/wave-plan` | Populated Linear board | First wave in "Needs Spec" | Dependencies clear, wave sized |
 
-**Feedback loops:** Steps 2, 6, 8, and 9 can send work backward. Agent review returns specs for revision. Plan review returns plans for rework. QA returns tasks to dev. UAT returns features to execution. The pipeline is linear by default, corrective when needed.
+Phase 0 runs once per project. `/startup` orchestrates the full flow.
 
-> **Optional pre-step:** `/brainstorm` — for exploring raw ideas, assessing feasibility, and estimating complexity before committing to a spec. Not part of the core pipeline.
+#### Phase 1-5: Development Pipeline
+
+| # | Step | Tool | Input | Output | Gate |
+|---|------|------|-------|--------|------|
+| 1 | **Roadmap Review** | `/roadmap-review` | ROADMAP, Linear state, WAVES.md | Health report: Phase 0 check, gaps, ordering, spec coverage, doc freshness | Phase 0 complete, plan coherent |
+| 2 | **Light Spec** | `/light-spec` + Linear | Feature idea or issue | Structured spec exploring codebase and Strategy docs | — |
+| 3 | **Agent Review** | Linear Spec Review Agent | Light spec | Pass/Revise verdict with readiness score | Spec must be unambiguous and decomposable without guessing |
+| 4 | **Human Review** | You in Linear | Agent-reviewed spec | Approved spec with product decisions locked | Human signs off on scope, decisions, and priority |
+| 5 | **Launch** | `/launch {ISSUE}` | Approved spec | Gates validated, complexity routed, issue → Building | Spec exists, deps met, milestone siblings all specced |
+| 6 | **VBW Plan** | VBW Lead Agent (via `/launch`) | Approved spec from Linear | `PLAN.md` with task decomposition, verify/done criteria | — (Low complexity skips to batch runner) |
+| 7 | **Plan Review** | `plan-reviewer` agent (via `/launch`) | PLAN.md | Validated plan or revision requests | Plan must be executable step-by-step without ambiguity |
+| 8 | **Execution** | VBW Dev Agent or `/linear-todo-runner` (via `/launch`) | Approved plan or AC | Atomic commits per task | Each task passes its own verify/done criteria |
+| 9 | **QA** | VBW QA Agent (via `/launch`) | Completed tasks | Verification report, issue → UAT | All tasks verified against goals |
+| 10 | **UAT** | You | Built feature | Accepted or rejected | Feature matches spec AC under real usage |
+| 11 | **Ship** | Promotion skills | Accepted feature | Production release | CI gates pass, smoke tests pass |
+| 12 | **Strategy Sync** | `/strategy-sync` | Shipped features, current Strategy docs | Updated docs reflecting reality | Code is truth; diffs approved before apply |
+
+**Feedback loops:** Steps 3, 7, 9, and 10 can send work backward. Agent review returns specs for revision. Plan review returns plans for rework. QA returns tasks to dev. UAT returns features to execution. The pipeline is linear by default, corrective when needed.
+
+**Between waves:** `/wave-plan --next` selects the next batch of issues and promotes them to "Needs Spec." `/roadmap-review` validates before speccing begins.
+
+> **Optional pre-step:** `/brainstorm` — for exploring feature-level ideas within an existing project. For project-level ideation, use `/concept`.
+
+---
+
+## Phase 0: Foundation
+
+**Steps:** 0.1–0.7 (Concept → Define → Strategy → Setup → VBW Init → Roadmap → Wave Plan)
+
+**Tools:** `/concept`, `/define`, `/strategy-create`, `/startup`, `/vbw:init`, `/roadmap-create`, `/wave-plan`
+
+Runs once per project. Takes a raw idea through structured definition, strategy documentation, infrastructure setup, and roadmap creation to produce a populated Linear board with the first wave ready for speccing.
+
+- `/concept` captures the idea and assesses viability — supports ingesting existing documents (proposals, research, notes)
+- `/define` distills the concept into phases, roles, workflows, and success criteria
+- `/strategy-create` generates configurable strategy docs (doc set defined in `method.config.md`)
+- `/startup` orchestrates the full flow and handles infrastructure (repo, DB, deploy, MCP, Linear)
+- `/vbw:init` scaffolds `.vbw-planning/` for the planning engine
+- `/roadmap-create` extracts requirements from strategy docs and populates both ROADMAP.md and Linear
+- `/wave-plan` selects 3-8 issues for the first execution wave
+
+**Output:** `concept-brief.md`, `project-definition.md`, `Strategy/` docs, working infrastructure, `.vbw-planning/ROADMAP.md`, populated Linear board, `.vbw-planning/WAVES.md` with first wave defined.
+
+**Gate:** `/roadmap-review` validates all Phase 0 outputs before the spec pipeline begins.
 
 ---
 
 ## Pre-Condition: Roadmap Review
 
-**Step:** 0
+**Step:** 1
 
 **Tools:** `/roadmap-review`
 
-Run before entering the pipeline to validate that the roadmap is coherent: all requirements have Linear issues, dependencies are set, workflow states are consistent, and spec coverage is adequate for the next wave. Also flags Strategy doc staleness (recommends `/strategy-sync` if needed).
+Run before entering the spec pipeline to validate that Phase 0 is complete and the roadmap is coherent: concept and definition exist, strategy docs match config, all requirements have Linear issues, dependencies are set, workflow states are consistent, current wave is defined, and spec coverage is adequate. Also flags Strategy doc staleness (recommends `/strategy-sync` if needed).
 
 **Output:** Health report with action items. Resolve blockers before speccing.
 
@@ -189,10 +238,23 @@ Skills are convenience wrappers. They automate the same conventions documented i
 
 ### Interactive Skills (for hands-on sessions)
 
+**Phase 0: Foundation**
+
 | Skill | Purpose |
 |-------|---------|
-| `/roadmap-review` | Pre-pipeline health check: completeness, dependencies, spec coverage |
-| `/brainstorm` | Feasibility exploration (lighter than spec) |
+| `/concept` | Project-level ideation — produce a concept brief from ideas + existing docs |
+| `/define` | Distill concept into full project definition (phases, roles, workflows) |
+| `/strategy-create` | Bootstrap strategy docs from project definition |
+| `/startup` | Full project bootstrap orchestrator (chains all Phase 0 + setup skills) |
+| `/roadmap-create` | Create ROADMAP.md and populate Linear with issues |
+| `/wave-plan` | Select execution waves, track progress, manage wave transitions |
+
+**Development Pipeline**
+
+| Skill | Purpose |
+|-------|---------|
+| `/roadmap-review` | Phase 0 gate + health check: completeness, dependencies, spec coverage |
+| `/brainstorm` | Feature-level feasibility exploration (within an existing project) |
 | `/light-spec` | Structured spec generation with agent review |
 | `/launch {ISSUE}` | Formalized trigger: validates gates, routes by complexity, manages status |
 | `/launch --milestone {WP}` | Launch all ready issues in a milestone |
