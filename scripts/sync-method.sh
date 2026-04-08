@@ -22,7 +22,7 @@
 
 set -euo pipefail
 
-METHOD_REPO="${METHOD_REPO:-git@github.com:ethan-piper/method.git}"
+METHOD_REPO="${METHOD_REPO:-git@github.com:ethan-piper/piper-dev-method.git}"
 REF="${1:-main}"
 DRY_RUN=false
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"

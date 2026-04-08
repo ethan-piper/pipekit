@@ -51,7 +51,7 @@ method/
 ### 1. Clone this repo
 
 ```bash
-git clone git@github.com:ethan-piper/method.git ~/Projects/method
+git clone git@github.com:ethan-piper/piper-dev-method.git ~/Projects/piper-dev-method
 ```
 
 ### 2. In your project, create the config
