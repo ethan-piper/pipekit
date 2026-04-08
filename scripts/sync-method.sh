@@ -113,7 +113,9 @@ mkdir -p "$PROJECT_ROOT/method"
 sync_dir "$TEMP/sop" "$PROJECT_ROOT/method/sop" "sop/"
 sync_dir "$TEMP/templates" "$PROJECT_ROOT/method/templates" "templates/"
 sync_file "$TEMP/method.md" "$PROJECT_ROOT/method/method.md" "method.md"
+sync_file "$TEMP/GUIDE.md" "$PROJECT_ROOT/method/GUIDE.md" "GUIDE.md"
 sync_file "$TEMP/METHOD_IMPROVEMENTS.md" "$PROJECT_ROOT/method/METHOD_IMPROVEMENTS.md" "METHOD_IMPROVEMENTS.md"
+sync_file "$TEMP/STARTUP.md" "$PROJECT_ROOT/method/STARTUP.md" "STARTUP.md"
 
 # --- Sync portable skills ---
 echo ""
@@ -152,6 +154,15 @@ for skill in $PORTABLE_SKILLS; do
     CHANGES=$((CHANGES + 1))
   fi
 done
+
+# --- Sync scripts ---
+echo ""
+echo "Scripts:"
+sync_file "$TEMP/scripts/drift-check.sh" "$PROJECT_ROOT/scripts/drift-check.sh" "drift-check.sh"
+# Make drift-check executable
+if [ -f "$PROJECT_ROOT/scripts/drift-check.sh" ]; then
+  chmod +x "$PROJECT_ROOT/scripts/drift-check.sh"
+fi
 
 # --- Check for method.config.md ---
 echo ""
