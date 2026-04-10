@@ -8,7 +8,7 @@ A walkthrough for bootstrapping a new project using the Piper Dev Method. Covers
 
 ---
 
-## Phase 1: Define the Project
+## Step 1: Define the Project
 
 Before touching any code, answer these questions. They inform every decision downstream.
 
@@ -22,19 +22,19 @@ Before touching any code, answer these questions. They inform every decision dow
 | How many users at launch? | 10-50 | ~40 |
 | Revenue model? | SaaS subscription | Annual hosting fee + future success-based pricing |
 
-### 1.2 Scope & Phases
+### 1.2 Scope & Stages
 
-Break the build into phases. Each phase should be independently deployable and testable.
+Break the build into stages. Each stage should be independently deployable and testable.
 
 | Decision | Notes |
 |----------|-------|
-| What ships in Phase 1 (MVP)? | The smallest version that proves value |
-| What's Phase 2? | The features that make it sticky |
+| What ships in Stage 1 (MVP)? | The smallest version that proves value |
+| What's Stage 2? | The features that make it sticky |
 | What's deferred? | Everything else — write it down so you don't forget, but don't build it |
 
 **Output:** A `Strategy/` directory with at minimum:
 - `ConceptualOverview.md` — what the product does in plain language
-- Phase breakdown with scope boundaries
+- Stage breakdown with scope boundaries
 
 ### 1.3 Linear Setup Decisions
 
@@ -44,15 +44,15 @@ Break the build into phases. Each phase should be independently deployable and t
 | **Team name** | e.g., `RSVault`, `Piper` | Determines issue prefix (RSV-1, WIT-1) |
 | **Issue prefix** | e.g., `RSV`, `WIT` | Short, unique, used in commit messages and branch names |
 | **Workflow states** | Use the method standard (13 states) or simplify | Recommendation: start with the full set. You can always skip states, but adding them later means migrating issues. |
-| **Initiatives** | One per phase | Maps 1:1 to VBW phases |
-| **Projects** | Feature clusters within each phase | e.g., "Data Foundation", "Search & CRUD", "Reports" |
+| **Initiatives** | One per stage | Maps 1:1 to VBW phases |
+| **Projects** | Feature clusters within each stage | e.g., "Data Foundation", "Search & CRUD", "Reports" |
 | **Labels** | Domain, Type, Flag, Tier | Domain labels are project-specific. Type/Flag labels are standard. |
 
 **Action:** Create the workspace/team, set up states, create initial initiatives and projects.
 
 ---
 
-## Phase 2: Choose the Tech Stack
+## Step 2: Choose the Tech Stack
 
 Every choice here has downstream implications for skills, deployment, and conventions.
 
@@ -97,7 +97,7 @@ Your tech stack determines which project-specific skills you need:
 
 ---
 
-## Phase 3: Set Up the Stack
+## Step 3: Set Up the Stack
 
 Execute in order. Each step unlocks the next.
 
@@ -185,7 +185,7 @@ Configure in `.mcp.json` with `${VAR}` interpolation for secrets.
 
 ---
 
-## Phase 4: Create Project-Specific Skills
+## Step 4: Create Project-Specific Skills
 
 These are the skills that can't be portable because they depend on your specific stack, domains, and infrastructure.
 
@@ -261,7 +261,7 @@ These are the skills that can't be portable because they depend on your specific
 
 ---
 
-## Phase 5: Configure CLAUDE.md
+## Step 5: Configure CLAUDE.md
 
 Your `CLAUDE.md` is the single document VBW agents and Claude Code sessions read to understand your project. Build it up as the project grows.
 
@@ -318,7 +318,7 @@ Split conventions into focused rule files that auto-load every session:
 
 ---
 
-## Phase 6: Validate the Setup
+## Step 6: Validate the Setup
 
 Before writing any feature code, verify the full pipeline works end-to-end:
 
@@ -345,8 +345,8 @@ If all steps work, the pipeline is ready. Start building.
 ### Project Definition
 - [ ] One-sentence description written
 - [ ] Target users identified
-- [ ] Phase 1 (MVP) scope defined
-- [ ] Phase 2+ deferred and documented
+- [ ] Stage 1 (MVP) scope defined
+- [ ] Stage 2+ deferred and documented
 
 ### Tech Stack
 - [ ] Framework chosen
@@ -361,7 +361,7 @@ If all steps work, the pipeline is ready. Start building.
 - [ ] Workspace/team created
 - [ ] Workflow states configured (13 standard states)
 - [ ] Issue prefix chosen
-- [ ] Initial initiatives (phases) created
+- [ ] Initial initiatives (stages) created
 - [ ] Initial projects (feature clusters) created
 - [ ] Labels configured (Domain, Type, Flag)
 - [ ] State IDs copied into method.config.md

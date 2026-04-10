@@ -9,15 +9,15 @@ A structured AI-assisted software delivery system. Provides a deterministic pipe
 ## The Pipeline
 
 ```
-Phase 0: Foundation (once per project)
+Stage 0: Foundation (once per project)
   /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /wave-plan
 
-Phase 1-5: Development (repeats per wave)
+Stages 1-5: Development (repeats per wave)
   [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
   VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
 ```
 
-Phase 0 takes a project from raw idea to first wave ready for speccing. Phases 1-5 repeat for each wave of features.
+Stage 0 takes a project from raw idea to first wave ready for speccing. Stages 1-5 repeat for each wave of features.
 
 ## What's Included
 
@@ -51,19 +51,19 @@ piper-dev-method/
       verify-library-api.md        #     Check installed versions before using APIs
       ad-hoc-plan-gate.md          #     Lightweight plan gate for interactive sessions
   skills/                          # Portable Claude Code skills
-    concept/                       #   Phase 0: project-level ideation
-    define/                        #   Phase 0: distill concept into definition
-    strategy-create/               #   Phase 0: bootstrap strategy docs
-    roadmap-create/                #   Phase 0: create roadmap + populate Linear
-    wave-plan/                     #   Phase 0: select execution waves
-    startup/                       #   Phase 0: full bootstrap orchestrator
+    concept/                       #   Stage 0: project-level ideation
+    define/                        #   Stage 0: distill concept into definition
+    strategy-create/               #   Stage 0: bootstrap strategy docs
+    roadmap-create/                #   Stage 0: create roadmap + populate Linear
+    wave-plan/                     #   Stage 0: select execution waves
+    startup/                       #   Stage 0: full bootstrap orchestrator
     update-method/                 #   Sync method into consuming projects
-    00-roadmap-review/             #   Phase 0 gate + health check
-    01-light-spec/                 #   Phase 1: structured spec generation
+    00-roadmap-review/             #   Stage 0 gate + health check
+    01-light-spec/                 #   Stage 1: structured spec generation
     brainstorm/                    #   Feature-level ideation
     brainstorm-review/             #   Triage untriaged issues
-    launch/                        #   Phase 2: validate gates, route, execute
-    06-linear-todo-runner/         #   Phase 3: batch execution
+    launch/                        #   Stage 2: validate gates, route, execute
+    06-linear-todo-runner/         #   Stage 3: batch execution
     task-processor/                #   Process Linear tasks
     linear/                        #   Linear issue workflow
     linear-status/                 #   Quick board triage view
@@ -71,7 +71,7 @@ piper-dev-method/
     branch/                        #   Create worktree + branch + Linear link
     start-session/                 #   Session start: review progress
     end-session/                   #   Session end: changelog, updates
-    10-strategy-sync/              #   Phase 5: update docs post-ship
+    10-strategy-sync/              #   Stage 5: update docs post-ship
     pr-fix/                        #   PR review + fix workflow
     security-review/               #   Security review
     spec-validator/                #   Validate spec completeness

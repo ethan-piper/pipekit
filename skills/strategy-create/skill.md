@@ -141,7 +141,7 @@ TBD sections: {N} items across {M} docs need detail as the project develops
 
 Next steps:
   - Tech stack decisions (if not yet made): /startup
-  - /roadmap-create — turn project phases into a structured roadmap
+  - /roadmap-create — turn project stages into a structured roadmap
   - Strategy docs will be updated automatically via /strategy-sync after features ship
 ```
 

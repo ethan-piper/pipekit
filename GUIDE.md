@@ -11,7 +11,7 @@ A complete guide to using the Piper Dev Method from project inception through pr
 1. [What This Is](#what-this-is)
 2. [Core Principle](#core-principle)
 3. [The Complete Pipeline](#the-complete-pipeline)
-4. [Phase 0: Foundation](#phase-0-foundation)
+4. [Stage 0: Foundation](#stage-0-foundation)
    - [Step 0.1: Concept](#step-01-concept)
    - [Step 0.2: Define](#step-02-define)
    - [Step 0.3: Strategy Create](#step-03-strategy-create)
@@ -19,21 +19,21 @@ A complete guide to using the Piper Dev Method from project inception through pr
    - [Step 0.5: VBW Init](#step-05-vbw-init)
    - [Step 0.6: Roadmap Create](#step-06-roadmap-create)
    - [Step 0.7: Wave Plan](#step-07-wave-plan)
-5. [Phase 0 Gate: Roadmap Review](#phase-0-gate-roadmap-review)
-6. [Phase 1: Definition](#phase-1-definition)
+5. [Stage 0 Gate: Roadmap Review](#stage-0-gate-roadmap-review)
+6. [Stage 1: Definition](#stage-1-definition)
    - [Light Spec](#light-spec)
    - [Agent Review](#agent-review)
    - [Human Review](#human-review)
-7. [Phase 2: Launch & Planning](#phase-2-launch--planning)
+7. [Stage 2: Launch & Planning](#stage-2-launch--planning)
    - [Launch](#launch)
    - [VBW Plan](#vbw-plan)
    - [Plan Review](#plan-review)
-8. [Phase 3: Execution](#phase-3-execution)
+8. [Stage 3: Execution](#stage-3-execution)
    - [Execution](#execution)
    - [QA](#qa)
    - [UAT](#uat)
-9. [Phase 4: Release](#phase-4-release)
-10. [Phase 5: Documentation Loop](#phase-5-documentation-loop)
+9. [Stage 4: Release](#stage-4-release)
+10. [Stage 5: Documentation Loop](#stage-5-documentation-loop)
 11. [Between Waves](#between-waves)
 12. [The Wave Model](#the-wave-model)
 13. [The Strategy Doc Framework](#the-strategy-doc-framework)
@@ -74,7 +74,7 @@ When ambiguity is detected, the pipeline sends work **backward** — not forward
 ## The Complete Pipeline
 
 ```
-PHASE 0: FOUNDATION (runs once per project)
+STAGE 0: FOUNDATION (runs once per project)
 ──────────────────────────────────────────────────────────────────────
 
   /concept ──→ /define ──→ /strategy-create ──→ /startup ──→ /vbw:init
@@ -84,12 +84,12 @@ PHASE 0: FOUNDATION (runs once per project)
 
       ──→ /roadmap-create ──→ /wave-plan ──→ /roadmap-review (GATE)
                 │                   │                │
-          ROADMAP.md +          WAVES.md         Phase 0
+          ROADMAP.md +          WAVES.md         Stage 0
           Linear board      (first wave in     validated ✓
           populated         "Needs Spec")
 
 
-PHASES 1-5: DEVELOPMENT PIPELINE (repeats per wave/feature)
+STAGES 1-5: DEVELOPMENT PIPELINE (repeats per wave/feature)
 ──────────────────────────────────────────────────────────────────────
 
   /light-spec ──→ Agent Review ──→ Human Review ──→ /launch
@@ -115,13 +115,13 @@ BETWEEN WAVES:
   /wave-plan --next ──→ /roadmap-review ──→ /light-spec (next wave begins)
 ```
 
-**Phase 0** runs once when the project starts. Everything after that repeats for each wave of features. Between waves, `/wave-plan --next` selects the next batch and `/roadmap-review` validates before speccing begins again.
+**Stage 0** runs once when the project starts. Everything after that repeats for each wave of features. Between waves, `/wave-plan --next` selects the next batch and `/roadmap-review` validates before speccing begins again.
 
 ---
 
-## Phase 0: Foundation
+## Stage 0: Foundation
 
-Phase 0 takes a project from raw idea to first wave ready for speccing. It runs once per project. The `/startup` skill orchestrates the full flow — you can run each step individually or let `/startup` chain them.
+Stage 0 takes a project from raw idea to first wave ready for speccing. It runs once per project. The `/startup` skill orchestrates the full flow — you can run each step individually or let `/startup` chain them.
 
 ### Step 0.1: Concept
 
@@ -176,14 +176,14 @@ The concept brief says "should I build this?" The project definition says "what 
 | Section | What It Captures |
 |---------|-----------------|
 | Project Identity | Name, one-liner, audience, problem, success definition |
-| Phase Breakdown | MVP scope, Phase 2 scope, future parking lot — with exit criteria |
+| Stage Breakdown | MVP scope, Stage 2 scope, future parking lot — with exit criteria |
 | User Roles | Each role, what they do, what they can access |
 | Key Workflows | 3-5 critical user journeys (actor, trigger, steps, outcome) |
-| Integration Requirements | External systems, data flows, priority per phase |
-| Success Criteria | Measurable outcomes per phase (not vague — "10 users complete core workflow") |
+| Integration Requirements | External systems, data flows, priority per stage |
+| Success Criteria | Measurable outcomes per stage (not vague — "10 users complete core workflow") |
 | Non-Functional Requirements | Performance, security, availability, compliance, accessibility |
 
-**Critical rule:** Phase 1 (MVP) must be independently valuable. If Phase 1 only makes sense with Phase 2 features, the split is wrong. Push back.
+**Critical rule:** Stage 1 (MVP) must be independently valuable. If Stage 1 only makes sense with Stage 2 features, the split is wrong. Push back.
 
 **The gate question:** Can we make tech stack decisions and write strategy docs from this definition?
 
@@ -199,15 +199,15 @@ Reading concept-brief.md...
   Users: ~40 property brokers
   Problem: Shared Excel leaks data, corrupts formulas, no search
 
-## Phase Breakdown
+## Stage Breakdown
 
-Phase 1 (MVP):
+Stage 1 (MVP):
   - Property data import and storage
   - Search by criteria (location, price range, type)
   - Basic CRUD operations
   Exit: 10 brokers can search and find properties without Excel
 
-Phase 2 (Growth):
+Stage 2 (Growth):
   - Advanced filters and saved searches
   - Activity tracking and audit log
   - Reporting dashboard
@@ -324,15 +324,15 @@ This is where strategy becomes work items. The skill reads your strategy docs an
 
 **What it produces:**
 
-1. **ROADMAP.md** — requirements organized by phase, grouped into feature clusters, with dependency mapping and strategy doc traceability
+1. **ROADMAP.md** — requirements organized by stage, grouped into feature clusters, with dependency mapping and strategy doc traceability
 2. **Linear Issues** — one issue per requirement, with:
-   - Correct status (On Deck for Phase 1, Future Waves for Phase 2+, Ideas for parking lot)
+   - Correct status (On Deck for Stage 1, Future Waves for Stage 2+, Ideas for parking lot)
    - Dependency relations (`blocked_by`)
    - Type and domain labels
    - Milestone (Work Package) assignment
 3. **linear-map.json** — ID mappings between roadmap and Linear
 
-**Feature clusters become Linear Projects.** A feature cluster is a logical grouping of related requirements — "Data Foundation", "Search & CRUD", "Auth & Permissions." Each becomes a Linear Project under its phase's Initiative.
+**Feature clusters become Linear Projects.** A feature cluster is a logical grouping of related requirements — "Data Foundation", "Search & CRUD", "Auth & Permissions." Each becomes a Linear Project under its stage's Initiative.
 
 **Manual vs. automated:** The skill automates issue creation, relations, and labels via MCP. For things that require the Linear UI (initiatives, workflow states), it gives explicit step-by-step instructions.
 
@@ -381,13 +381,13 @@ A wave is a batch of issues selected for the current execution cycle. This skill
 
 ---
 
-## Phase 0 Gate: Roadmap Review
+## Stage 0 Gate: Roadmap Review
 
 **Skill:** `/roadmap-review`
 
-Before the spec pipeline begins, `/roadmap-review` validates that Phase 0 is complete and the roadmap is healthy. This is the gate between "foundation" and "building."
+Before the spec pipeline begins, `/roadmap-review` validates that Stage 0 is complete and the roadmap is healthy. This is the gate between "foundation" and "building."
 
-**Phase 0 checks:**
+**Stage 0 checks:**
 
 | Check | File | If Missing |
 |-------|------|-----------|
@@ -402,7 +402,7 @@ Before the spec pipeline begins, `/roadmap-review` validates that Phase 0 is com
 **Ongoing health checks** (run every wave):
 
 - **Completeness** — every roadmap requirement has a Linear issue
-- **Assignment** — issues are in the correct phase/project/milestone
+- **Assignment** — issues are in the correct stage/project/milestone
 - **Dependencies** — `blocked_by` relations match the roadmap
 - **Ordering** — workflow states are consistent with dependency order
 - **Spec coverage** — how many issues in the current wave have specs
@@ -412,9 +412,9 @@ If any check fails, the report tells you exactly which skill to run to fix it.
 
 ---
 
-## Phase 1: Definition
+## Stage 1: Definition
 
-Phase 1 turns raw issues into planning-safe specs. This is where the "no guesswork" principle is enforced most rigorously.
+Stage 1 turns raw issues into planning-safe specs. This is where the "no guesswork" principle is enforced most rigorously.
 
 ### Light Spec
 
@@ -480,7 +480,7 @@ After agent review passes, you review the spec in Linear. This is where product 
 
 ---
 
-## Phase 2: Launch & Planning
+## Stage 2: Launch & Planning
 
 ### Launch
 
@@ -536,7 +536,7 @@ If the plan fails review, it goes back to the Lead Agent for rework. Once the pl
 
 ---
 
-## Phase 3: Execution
+## Stage 3: Execution
 
 ### Execution
 
@@ -578,7 +578,7 @@ Your turn. Test the feature against the spec's acceptance criteria under real us
 
 ---
 
-## Phase 4: Release
+## Stage 4: Release
 
 **Every step forward is a PR.** No direct merges between long-lived branches.
 
@@ -605,7 +605,7 @@ Each project creates its own promotion skills during `/startup` Phase 9, based o
 
 ---
 
-## Phase 5: Documentation Loop
+## Stage 5: Documentation Loop
 
 **Skill:** `/strategy-sync`
 **Input:** Shipped features + current Strategy docs
@@ -676,7 +676,7 @@ Waves, milestones, and cycles serve different purposes. Understanding their rela
 
 | Concept | What It Is | Linear Construct | Lifespan |
 |---------|-----------|-----------------|----------|
-| **Milestone (Work Package)** | A feature cluster — groups related issues for gating | Linear Milestone | Permanent within a phase |
+| **Milestone (Work Package)** | A feature cluster — groups related issues for gating | Linear Milestone | Permanent within a stage |
 | **Wave** | An execution batch — what we're building right now | `.vbw-planning/WAVES.md` | Temporary (one cycle) |
 | **Cycle** (optional) | A time-boxed sprint — capacity planning | Linear Cycle | Configurable duration |
 
@@ -766,7 +766,7 @@ Linear is the view layer. VBW is the planning engine. They share data but serve 
 ### Hierarchy
 
 ```
-Initiative = Phase              "What phase does this ship in?"
+Initiative = Stage              "What stage does this ship in?"
   └── Project = Feature Cluster   "What area of the product?"
        └── Issue = Feature/Task     "What work needs to happen?"
             └── Milestone = Work Package  "What execution batch?"
@@ -794,7 +794,7 @@ Terminal:
 | Status Group | Wave Role |
 |-------------|-----------|
 | Ideas | Someday — evaluated but not scheduled |
-| Future Waves | Known future phase — not current or next |
+| Future Waves | Known future stage — not current or next |
 | On Deck | Next wave — staging area |
 | Needs Spec → UAT | Current wave — active pipeline |
 | Done | Shipped |
@@ -808,7 +808,7 @@ Terminal:
 | Type | Feature, Bug, Improvement, Research, Tech Debt, Chore | What kind of work |
 | Flag | Quick Win, Blocked, Hotfix, Breaking Change | Special handling |
 | Domain | (project-specific) | Product area |
-| Tier | (phase-numbered) | Which phase |
+| Tier | (stage-numbered) | Which stage |
 | Audience | Client Request | External origin |
 
 ### What Lives Where
@@ -831,19 +831,19 @@ VBW (Vibe-Based Workflow) is the planning and execution engine. Here's where its
 
 | Pipeline Stage | VBW Tool | Purpose |
 |---------------|----------|---------|
-| Phase 0.5 | `/vbw:init` | Scaffold `.vbw-planning/` |
-| Phase 0.6 | `/roadmap-create` writes to `.vbw-planning/ROADMAP.md` | Populate roadmap |
-| Phase 0.7 (optional) | `/vbw:discuss` | Discuss first phase before speccing |
-| Phase 2 | VBW Lead Agent | Generate PLAN.md from spec |
-| Phase 3 | VBW Dev Agent | Execute tasks with atomic commits |
-| Phase 3 | VBW QA Agent | Verify against acceptance criteria |
+| Stage 0.5 | `/vbw:init` | Scaffold `.vbw-planning/` |
+| Stage 0.6 | `/roadmap-create` writes to `.vbw-planning/ROADMAP.md` | Populate roadmap |
+| Stage 0.7 (optional) | `/vbw:discuss` | Discuss first phase before speccing |
+| Stage 2 | VBW Lead Agent | Generate PLAN.md from spec |
+| Stage 3 | VBW Dev Agent | Execute tasks with atomic commits |
+| Stage 3 | VBW QA Agent | Verify against acceptance criteria |
 | Anytime | `/vbw:status` | Project progress dashboard |
 
 ### VBW Agent Roster
 
 | Agent | Role |
 |-------|------|
-| Architect | Requirements → roadmap, phase decomposition |
+| Architect | Requirements → roadmap, stage decomposition |
 | Lead | Research, task decomposition, plan generation |
 | Dev | Plan execution with atomic commits |
 | QA | Goal-backward verification |
@@ -1004,7 +1004,7 @@ Add to `.git/hooks/post-commit` or your project's hook system:
 
 ## Skill Quick Reference
 
-### Phase 0: Foundation
+### Stage 0: Foundation
 
 | Skill | Command | What It Does |
 |-------|---------|-------------|
@@ -1024,7 +1024,7 @@ Add to `.git/hooks/post-commit` or your project's hook system:
 
 | Skill | Command | What It Does |
 |-------|---------|-------------|
-| Roadmap Review | `/roadmap-review` | Full health check (Phase 0 gate) |
+| Roadmap Review | `/roadmap-review` | Full health check (Stage 0 gate) |
 | Brainstorm | `/brainstorm` | Feature-level ideation |
 | Light Spec | `/light-spec RSV-1` | Create spec for an issue |
 | Launch | `/launch RSV-1` | Validate gates → route → execute |
@@ -1059,7 +1059,7 @@ Key skills include a `## Red Flags` section — self-sabotage thoughts that Clau
 | "This is simple, I don't need a plan" | You definitely need a plan |
 | "I know this API" | Check the installed version — your training data is stale |
 | "The spec is close enough" | If it doesn't pass the gate, it doesn't launch |
-| "Phase 1 needs Feature X to be useful" | The phase split is wrong — Phase 1 must stand alone |
+| "Stage 1 needs Feature X to be useful" | The stage split is wrong — Stage 1 must stand alone |
 | "I'll write tests after" | Write them first or concurrently |
 | "This doesn't need a Linear issue" | Every idea gets an issue. Issues without tracking get forgotten. |
 | "I'll keep it in Ideas for now" | "Keep" without a trigger condition is how issues die |
@@ -1115,13 +1115,13 @@ Immediately after creating the issue, force one of three decisions:
 
 | Decision | What Happens |
 |----------|-------------|
-| **Now** | Route to pipeline — assign to a wave/phase, move to Needs Spec |
+| **Now** | Route to pipeline — assign to a wave/stage, move to Needs Spec |
 | **Later** | Park with explicit trigger condition + target wave. Tagged `Parked` in Linear. |
 | **Kill** | Archive with rationale. Move to Canceled. |
 
 **Parking rules for "Later" items:**
 - Must have a trigger condition (e.g., "revisit when RSV-56 ships")
-- Must have a target wave/phase (e.g., "Wave 4+")
+- Must have a target wave/stage (e.g., "Wave 4+")
 - Surfaced by `/roadmap-review` when trigger conditions are met
 
 ### REDUCE (for "Now" items)

@@ -1,6 +1,6 @@
 ---
 name: roadmap-create
-description: Create a phased roadmap from strategy docs and populate Linear with issues, projects, and milestones
+description: Create a staged roadmap from strategy docs and populate Linear with issues, projects, and milestones
 ---
 
 # Roadmap Create Skill
@@ -31,9 +31,9 @@ Bridge the gap between "here's what the product does" (strategy docs) and "here 
 
 ### Phase 1 — Extract Requirements
 
-1. Read `project-definition.md` for phase breakdown, exit criteria, and workflows
+1. Read `project-definition.md` for stage breakdown, exit criteria, and workflows
 2. Read all Strategy docs listed in `method.config.md`'s Strategy Docs table
-3. For each phase defined in the project definition:
+3. For each stage defined in the project definition:
    - Extract features, capabilities, and requirements from the strategy docs
    - Each requirement should be:
      - **Concrete** — "User can search properties by criteria" not "search functionality"
@@ -56,7 +56,7 @@ Write `.vbw-planning/ROADMAP.md` with this structure:
 **Created:** {date}
 **Source:** project-definition.md, Strategy/ docs
 
-## Phase 1: {Phase Name} (MVP)
+## Stage 1: {Stage Name} (MVP)
 
 **Goal:** {from project definition}
 **Exit Criteria:** {from project definition}
@@ -72,7 +72,7 @@ Write `.vbw-planning/ROADMAP.md` with this structure:
 ### Dependencies
 - REQ-003 blocked by REQ-001 (needs data model before CRUD)
 
-## Phase 2: {Phase Name}
+## Stage 2: {Stage Name}
 
 **Goal:** {from project definition}
 **Exit Criteria:** {from project definition}
@@ -81,10 +81,10 @@ Write `.vbw-planning/ROADMAP.md` with this structure:
 - REQ-010: {requirement} — ref: {Strategy doc §section}
 
 ## Future (Parking Lot)
-- REQ-100: {deferred item} — target: Phase 3+
+- REQ-100: {deferred item} — target: Stage 3+
 ```
 
-Present the draft roadmap to the user: _"Here's the requirements breakdown. Review the groupings, dependencies, and phasing?"_
+Present the draft roadmap to the user: _"Here's the requirements breakdown. Review the groupings, dependencies, and staging?"_
 
 Iterate until approved.
 
@@ -98,7 +98,7 @@ Determine what can be automated vs. what needs manual setup.
    - `team`: from `method.config.md`
    - `title`: requirement title
    - `description`: requirement detail + strategy doc reference
-   - `state`: Phase 1 → "On Deck" | Phase 2+ → "Future Waves" | Parking lot → "Ideas"
+   - `state`: Stage 1 → "On Deck" | Stage 2+ → "Future Waves" | Parking lot → "Ideas"
    - `priority`: 0 (None) — triage sets real priority
 
 2. **Set Dependency Relations** — for each dependency in the roadmap:
@@ -122,14 +122,14 @@ Some Linear operations may not be available via MCP. For each, give explicit ins
 The following must be done in the Linear UI:
 
 1. **Create Initiatives** (Settings → Initiatives):
-   - "{Phase 1 Name}" — maps to Phase 1
-   - "{Phase 2 Name}" — maps to Phase 2
+   - "{Stage 1 Name}" — maps to Stage 1
+   - "{Stage 2 Name}" — maps to Stage 2
 
 2. **Create Projects** (within each Initiative):
-   Phase 1:
+   Stage 1:
      - "{Feature Cluster 1}" — contains: {issue list}
      - "{Feature Cluster 2}" — contains: {issue list}
-   Phase 2:
+   Stage 2:
      - "{Feature Cluster 3}" — contains: {issue list}
 
 3. **Verify Workflow States** match method.config.md:
@@ -144,9 +144,9 @@ Create `.vbw-planning/linear-map.json` mapping roadmap IDs to Linear IDs:
 
 ```json
 {
-  "phases": {
-    "phase-1": {
-      "name": "Phase 1: MVP",
+  "stages": {
+    "stage-1": {
+      "name": "Stage 1: MVP",
       "initiative_id": null,
       "clusters": {
         "data-foundation": {
@@ -169,7 +169,7 @@ Fields with `null` are populated after manual Linear setup or on subsequent runs
 Run a completeness check:
 
 1. Every roadmap requirement has a Linear issue
-2. Every Linear issue has the correct state for its phase
+2. Every Linear issue has the correct state for its stage
 3. Dependency relations are set in Linear
 4. Labels are applied
 5. Milestones are assigned
@@ -200,8 +200,8 @@ Run /roadmap-review for a full health check.
 File: .vbw-planning/ROADMAP.md
 Issues created: {N} across {M} feature clusters
 
-Phase 1: {N} requirements → {M} issues (On Deck)
-Phase 2: {N} requirements → {M} issues (Future Waves)
+Stage 1: {N} requirements → {M} issues (On Deck)
+Stage 2: {N} requirements → {M} issues (Future Waves)
 Parking lot: {N} items (Ideas)
 
 Dependencies: {N} relations set
@@ -229,7 +229,7 @@ Next steps:
 - **Trace everything.** Every requirement references a strategy doc section. Untraced requirements are orphans — they need a strategy doc home or they shouldn't be in the roadmap.
 - **Automate what you can.** Create issues, set relations, apply labels via MCP. Give clear manual instructions for the rest.
 - **Human approves the roadmap before Linear population.** Don't create issues until the roadmap structure is approved.
-- **Phase 1 issues go to On Deck.** Not "Needs Spec" — that happens when `/wave-plan` selects them for the first wave.
+- **Stage 1 issues go to On Deck.** Not "Needs Spec" — that happens when `/wave-plan` selects them for the first wave.
 
 ## Red Flags
 

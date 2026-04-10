@@ -43,23 +43,23 @@ Immediately after creating the issue, force a disposition decision:
 
 > **What should happen with this idea?**
 >
-> 1. **Now** → Route to pipeline. Assign to a wave/phase, move to Needs Spec.
+> 1. **Now** → Route to pipeline. Assign to a wave/stage, move to Needs Spec.
 > 2. **Later** → Park with a trigger condition and target wave.
 > 3. **Kill** → Archive with rationale.
 
 **If Now:**
-- Ask which phase/wave this belongs to
+- Ask which stage/wave this belongs to
 - Move issue to "Needs Spec" via `mcp__linear-server__save_issue`
 - Inform: _"Ready for `/light-spec {issue}` when you start the wave."_
 
 **If Later:**
-- Ask for a **trigger condition** — what must be true before revisiting? (e.g., "revisit when RSV-56 ships", "revisit after Phase 1 UAT")
-- Ask for a **target wave/phase** (e.g., "Wave 4+", "Phase 2")
+- Ask for a **trigger condition** — what must be true before revisiting? (e.g., "revisit when RSV-56 ships", "revisit after Stage 1 UAT")
+- Ask for a **target wave/stage** (e.g., "Wave 4+", "Stage 2")
 - Move issue to "Ideas" or "Future Waves" based on target
 - Add a `Parked` label if available
 - Post a Linear comment with the trigger condition:
   ```
-  **Parked:** Revisit when {trigger condition}. Target: {wave/phase}.
+  **Parked:** Revisit when {trigger condition}. Target: {wave/stage}.
   ```
 - These are surfaced by `/roadmap-review` when trigger conditions are met.
 

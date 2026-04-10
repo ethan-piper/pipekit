@@ -17,19 +17,19 @@ Comprehensive health check of the overall plan. Run before speccing a new wave t
 ## Purpose
 
 Validate that:
-1. **Phase 0 outputs exist** — concept, definition, strategy docs, roadmap, wave
+1. **Stage 0 outputs exist** — concept, definition, strategy docs, roadmap, wave
 2. Every ROADMAP requirement has corresponding Linear issues
-3. Issues are in the correct phase/project
+3. Issues are in the correct stage/project
 4. Dependencies and blockers are set correctly
 5. Workflow states are consistent with dependency ordering
 6. Spec coverage is adequate for the next planned wave
 7. Strategy docs are flagged if stale
 
-This is the **gate between Phase 0 (Foundation) and Phase 1 (Definition)** in the Piper Method pipeline. Run it before starting a new wave of specs.
+This is the **gate between Stage 0 (Foundation) and Stage 1 (Definition)** in the Piper Method pipeline. Run it before starting a new wave of specs.
 
 ## Execution Steps
 
-### Phase 0 — Foundation Check
+### Stage 0 Check — Foundation
 
 Validate that pre-pipeline outputs exist. If any are missing, report which skill to run.
 
@@ -43,23 +43,23 @@ Validate that pre-pipeline outputs exist. If any are missing, report which skill
 | Linear board | Issues exist for roadmap requirements | Run `/roadmap-create` |
 | Wave defined | `.vbw-planning/WAVES.md` with current wave | Run `/wave-plan` |
 
-If any Phase 0 check fails, report it prominently at the top of the health report:
+If any Stage 0 check fails, report it prominently at the top of the health report:
 
 ```
-## Phase 0: Foundation — INCOMPLETE
+## Stage 0: Foundation — INCOMPLETE
 
 Missing:
   - concept-brief.md → run /concept
   - .vbw-planning/WAVES.md → run /wave-plan
 
-Phase 0 must be complete before entering the spec pipeline.
+Stage 0 must be complete before entering the spec pipeline.
 ```
 
-If all Phase 0 checks pass, continue to Phase 1.
+If all Stage 0 checks pass, continue to the next check.
 
 ### Phase 1 — Gather State
 
-1. Read `.vbw-planning/ROADMAP.md` for requirements by phase
+1. Read `.vbw-planning/ROADMAP.md` for requirements by stage
 2. Read `.vbw-planning/linear-map.json` for ID mappings
 3. Read `.vbw-planning/STATE.md` for current progress
 4. Read `.vbw-planning/WAVES.md` for current wave composition
@@ -69,9 +69,9 @@ If all Phase 0 checks pass, continue to Phase 1.
 
 ### Phase 2 — Completeness Check
 
-For each phase in ROADMAP.md:
+For each stage in ROADMAP.md:
 
-1. Extract the requirements list from the phase section
+1. Extract the requirements list from the stage section
 2. Match each requirement to Linear issues by:
    - Title keyword matching
    - Project assignment (requirement area → project cluster)
@@ -79,13 +79,13 @@ For each phase in ROADMAP.md:
 3. **Gaps:** Requirements with NO matching issue → these need issues created
 4. **Orphans:** Issues with NO matching requirement → flag for review (may be valid additions from brainstorming, or may be misassigned)
 
-Output: Completeness table per phase.
+Output: Completeness table per stage.
 
 ### Phase 3 — Assignment Validation
 
-For each issue in the active and upcoming phases:
+For each issue in the active and upcoming stages:
 
-1. Verify it belongs to the correct initiative (phase)
+1. Verify it belongs to the correct initiative (stage)
 2. Verify it belongs to a project within that initiative
 3. Verify it has a milestone (work package) if applicable
 4. Verify labels are consistent (Tier label matches Initiative, Domain label matches Project)
@@ -114,7 +114,7 @@ For each issue that has blockers:
 
 ### Phase 6 — Spec Coverage
 
-For the next planned wave (issues in On Deck/Needs Spec/Specced for the active phase):
+For the next planned wave (issues in On Deck/Needs Spec/Specced for the active stage):
 
 1. List all issues that would enter the pipeline
 2. For each issue, check spec status:
@@ -148,7 +148,7 @@ Present a summary dashboard:
 ## Roadmap Health — YYYY-MM-DD
 
 ### Completeness
-| Phase | Requirements | Issues | Gaps | Orphans |
+| Stage | Requirements | Issues | Gaps | Orphans |
 |-------|-------------|--------|------|---------|
 | 01    | 3           | 3      | 0    | 0       |
 | 02    | 18          | 81     | 2    | 5       |
@@ -156,14 +156,14 @@ Present a summary dashboard:
 | ...   |             |        |      |         |
 
 **Gaps (requirements without issues):**
-- Phase 02: "Persistent AI Memory (mem0)" — no matching issue
-- Phase 02: "Piper Slash Command Palette" — no matching issue
+- Stage 02: "Persistent AI Memory (mem0)" — no matching issue
+- Stage 02: "Piper Slash Command Palette" — no matching issue
 
 **Orphans (issues without matching requirements):**
 - WIT-176: "Entities blocked from 2 budgets with same name" — bug, not in ROADMAP
 
 ### Assignment
-- X issues verified in correct phase/project
+- X issues verified in correct stage/project
 - Y misassignments found (list with corrections)
 
 ### Dependencies
@@ -190,7 +190,7 @@ Parked items are brainstorm dispositions marked "Later" with trigger conditions.
 | Issue | Trigger Condition | Target | Triggered? |
 |-------|------------------|--------|-----------|
 | {issue} | "revisit when {X} ships" | Wave {N} | ✓ {X} is Done |
-| {issue} | "revisit after Phase 1 UAT" | Phase 2 | ✗ Phase 1 in progress |
+| {issue} | "revisit after Stage 1 UAT" | Stage 2 | ✗ Stage 1 in progress |
 
 **Triggered items need re-disposition** — run `/brainstorm-review` on them or add to the current wave via `/wave-plan --rebalance`.
 
@@ -216,7 +216,7 @@ Ask the user: _"Want me to fix any of these issues now? I can create missing iss
 
 Run at these moments:
 - **Before speccing a new wave** — ensures the plan is sound before you invest in specs
-- **At the start of a new phase** — validates phase setup is complete
+- **At the start of a new stage** — validates stage setup is complete
 - **Monthly** — routine health check
 - **After major scope changes** — re-validate after adding/removing features
 

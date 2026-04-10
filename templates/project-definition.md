@@ -20,9 +20,9 @@
 
 ---
 
-## Phase Breakdown
+## Stage Breakdown
 
-### Phase 1 — MVP
+### Stage 1 — MVP
 
 **Goal:** The smallest version that proves value.
 
@@ -32,10 +32,10 @@
 **Out of scope (deferred):**
 - 
 
-**Exit criteria:** How do you know Phase 1 is done?
+**Exit criteria:** How do you know Stage 1 is done?
 - 
 
-### Phase 2 — Growth
+### Stage 2 — Growth
 
 **Goal:** The features that make it sticky.
 
@@ -45,7 +45,7 @@
 **Exit criteria:**
 - 
 
-### Future Phases (Parking Lot)
+### Future Stages (Parking Lot)
 
 Features acknowledged but not planned in detail.
 
@@ -94,20 +94,20 @@ The 3-5 critical user journeys that define the product.
 
 | System | Purpose | Direction | Priority |
 |--------|---------|-----------|----------|
-| | | In / Out / Both | MVP / Phase 2 / Future |
+| | | In / Out / Both | MVP / Stage 2 / Future |
 | | | | |
 
 ---
 
 ## Success Criteria
 
-Measurable outcomes per phase.
+Measurable outcomes per stage.
 
-### Phase 1
+### Stage 1
 - [ ] [metric]: [target]
 - [ ] [metric]: [target]
 
-### Phase 2
+### Stage 2
 - [ ] [metric]: [target]
 
 ---

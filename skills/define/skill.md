@@ -1,6 +1,6 @@
 ---
 name: define
-description: Distill a validated concept into a full project definition — phases, roles, workflows, success criteria
+description: Distill a validated concept into a full project definition — stages, roles, workflows, success criteria
 ---
 
 # Define Skill
@@ -31,7 +31,7 @@ Take a validated concept brief and produce a complete project definition. This i
 Produce a `project-definition.md` that is complete enough to:
 1. Make tech stack decisions
 2. Write strategy docs
-3. Create a phased roadmap
+3. Create a staged roadmap
 4. Set up Linear with the right structure
 
 The concept brief says "should I build this?" The project definition says "what exactly am I building?"
@@ -62,24 +62,24 @@ Extract or confirm from the concept brief:
 
 Present for confirmation: _"Here's the project identity I extracted. Correct?"_
 
-### Phase 3 — Phase Breakdown
+### Phase 3 — Stage Breakdown
 
-This is the core of the definition — splitting the product into independently deployable phases.
+This is the core of the definition — splitting the product into independently deployable stages.
 
 1. Read the concept brief's full scope
-2. Propose a phase breakdown:
-   - **Phase 1 (MVP):** The smallest version that proves value
-   - **Phase 2 (Growth):** Features that make it sticky
-   - **Future Phases:** Everything else — documented but not planned
-3. For each phase, define:
+2. Propose a stage breakdown:
+   - **Stage 1 (MVP):** The smallest version that proves value
+   - **Stage 2 (Growth):** Features that make it sticky
+   - **Future Stages:** Everything else — documented but not planned
+3. For each stage, define:
    - **Goal** — one sentence
    - **In scope** — concrete deliverables
    - **Out of scope** — explicitly excluded (prevents scope creep)
-   - **Exit criteria** — how do you know this phase is done? (measurable)
+   - **Exit criteria** — how do you know this stage is done? (measurable)
 
-Present each phase for approval. The user may move features between phases.
+Present each stage for approval. The user may move features between stages.
 
-**Key principle:** Phase 1 must be independently valuable. If Phase 1 only makes sense with Phase 2, the split is wrong.
+**Key principle:** Stage 1 must be independently valuable. If Stage 1 only makes sense with Stage 2, the split is wrong.
 
 ### Phase 4 — User Roles
 
@@ -93,7 +93,7 @@ Present each phase for approval. The user may move features between phases.
 
 Identify the 3-5 critical user journeys that define the product.
 
-1. For each phase, ask: _"What are the most important things a user does?"_
+1. For each stage, ask: _"What are the most important things a user does?"_
 2. For each workflow, capture:
    - **Actor** — which role
    - **Trigger** — what starts this workflow
@@ -109,16 +109,16 @@ These workflows seed the Strategy docs (Workflow Examples) and help identify dat
    - System name
    - Purpose (what data flows and why)
    - Direction (in, out, or both)
-   - Priority (MVP or later phase)
+   - Priority (MVP or later stage)
 
 ### Phase 7 — Success Criteria
 
-Define measurable outcomes per phase. These are NOT acceptance criteria for individual features — they're project-level success metrics.
+Define measurable outcomes per stage. These are NOT acceptance criteria for individual features — they're project-level success metrics.
 
 Examples:
-- Phase 1: "10 users complete the core workflow without support intervention"
-- Phase 1: "Data migration from Excel completes for 3 pilot customers"
-- Phase 2: "Monthly active users > 30"
+- Stage 1: "10 users complete the core workflow without support intervention"
+- Stage 1: "Data migration from Excel completes for 3 pilot customers"
+- Stage 2: "Monthly active users > 30"
 
 ### Phase 8 — Non-Functional Requirements
 
@@ -155,30 +155,30 @@ If no: identify which sections need more detail and iterate.
 
 File: project-definition.md
 Status: {Approved | Draft}
-Phases: {N} defined
+Stages: {N} defined
 Roles: {N} identified
 Workflows: {N} captured
 
 Next steps:
   - Tech stack decisions (via /startup Phase 3)
   - /strategy-create — generate strategy docs from this definition
-  - /roadmap-create — turn phases into a structured roadmap
+  - /roadmap-create — turn stages into a structured roadmap
 ```
 
 ## Rules
 
 - **Distill, don't invent.** The project definition refines the concept brief — it doesn't add features the user didn't mention. If you think something is missing, ask, don't assume.
-- **Phase 1 must stand alone.** If MVP only works with Phase 2 features, push back on the split.
+- **Stage 1 must stand alone.** If MVP only works with Stage 2 features, push back on the split.
 - **Measurable exit criteria.** "Users like it" is not an exit criterion. "10 users complete the core workflow" is.
 - **WHAT, not HOW.** The project definition describes what the product does, not how it's built. Tech stack, architecture, and implementation patterns come later.
-- **Human decides scope.** Present trade-offs, but the user decides what's in Phase 1 vs. Phase 2.
+- **Human decides scope.** Present trade-offs, but the user decides what's in Stage 1 vs. Stage 2.
 
 ## Red Flags
 
 If you catch yourself thinking any of these, follow the process more strictly:
 
-- **"Phase 1 needs Feature X to be useful"** → If Phase 1 can't stand alone, the phase split is wrong. Push back.
-- **"I'll add that to Phase 1, it's small"** → Scope creep starts here. If it wasn't in the concept brief, question why it's in Phase 1.
+- **"Stage 1 needs Feature X to be useful"** → If Stage 1 can't stand alone, the stage split is wrong. Push back.
+- **"I'll add that to Stage 1, it's small"** → Scope creep starts here. If it wasn't in the concept brief, question why it's in Stage 1.
 - **"Success criteria can be vague for now"** → No. "Users like it" is not measurable. Define the number.
 - **"I know what workflows they need"** → Ask. Your assumptions about user behavior are almost certainly wrong.
 
@@ -187,4 +187,4 @@ If you catch yourself thinking any of these, follow the process more strictly:
 - `/concept` — previous step: validate the idea is worth defining
 - `/strategy-create` — next step: generate strategy docs from this definition
 - `/startup` — orchestrates the full flow (concept → define → setup → ...)
-- `/roadmap-create` — turns this definition's phases into a structured roadmap
+- `/roadmap-create` — turns this definition's stages into a structured roadmap

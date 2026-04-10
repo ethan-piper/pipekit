@@ -34,10 +34,10 @@
 
 ## What's Planned
 
-[High-level view of what's coming in future phases. Distinguish clearly between "what exists today" and "what's planned."]
+[High-level view of what's coming in future stages. Distinguish clearly between "what exists today" and "what's planned."]
 
-| Phase | What It Adds |
+| Stage | What It Adds |
 |-------|-------------|
-| Phase 1 (current) | |
-| Phase 2 | |
+| Stage 1 (current) | |
+| Stage 2 | |
 | Future | |

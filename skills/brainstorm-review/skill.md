@@ -49,7 +49,7 @@ For each issue, present the analysis and force a decision:
 
 1. **Read the issue** via `mcp__linear-server__get_issue` with `includeRelations: true`
 2. **Assess** against current project state:
-   - Does it align with the current phase?
+   - Does it align with the current stage?
    - Are its dependencies met or close to met?
    - Is it duplicated by another issue?
    - Has the need changed since it was brainstormed?
@@ -62,7 +62,7 @@ Brainstormed: 3 days ago
 Complexity: Medium (~6-10h)
 Dependencies: RSV-3 (Basic search) — currently in Building
 
-Assessment: Aligns with Phase 1. Dependency will be met this wave.
+Assessment: Aligns with Stage 1. Dependency will be met this wave.
 Recommendation: Now — queue for next wave after RSV-3 ships.
 
 Disposition:
@@ -76,7 +76,7 @@ Disposition:
 ### Phase 4 — Execute Disposition
 
 **Now:**
-1. Ask which wave/phase
+1. Ask which wave/stage
 2. If the brainstorm is broad, run REDUCE: _"What's the smallest useful version? What can wait?"_
 3. Update description with `## v1 Scope` if reduced
 4. Move to "On Deck" or "Needs Spec" based on wave timing
@@ -85,10 +85,10 @@ Disposition:
 
 **Later:**
 1. Ask for trigger condition (e.g., "revisit when RSV-3 ships")
-2. Ask for target wave/phase
+2. Ask for target wave/stage
 3. Move to "Ideas" or "Future Waves"
 4. Add `Parked` label
-5. Post Linear comment: `"Parked: Revisit when {trigger}. Target: {wave/phase}."`
+5. Post Linear comment: `"Parked: Revisit when {trigger}. Target: {wave/stage}."`
 
 **Kill:**
 1. Ask for rationale
@@ -113,7 +113,7 @@ Reviewed: {N} issues
     - RSV-15 — Export to PDF → Wave 3
 
   Later: {N} (parked with triggers)
-    - RSV-18 — AI matching → revisit after Phase 1 UAT
+    - RSV-18 — AI matching → revisit after Stage 1 UAT
 
   Killed: {N}
     - RSV-20 — Real-time collaboration → out of scope for this product
@@ -135,7 +135,7 @@ Next steps:
 |-------|----------------|
 | `/brainstorm` | Creates the issues this skill triages. `/brainstorm` now includes immediate disposition (Phase 2), but older issues or batch-created issues still need `/brainstorm-review`. |
 | `/roadmap-review` | Surfaces "Later" items whose trigger conditions have fired. When a parked issue's trigger is met, `/roadmap-review` flags it for re-disposition. |
-| `/wave-plan` | "Now" dispositions feed into wave composition. Run `/wave-plan --rebalance` after a review session that adds issues to the current phase. |
+| `/wave-plan` | "Now" dispositions feed into wave composition. Run `/wave-plan --rebalance` after a review session that adds issues to the current stage. |
 | `/light-spec` | The next step for "Now" items that move to Needs Spec. |
 
 ## Red Flags
@@ -144,7 +144,7 @@ If you catch yourself thinking any of these, follow the process more strictly:
 
 - **"I'll keep it in Ideas for now"** → "Keep" without a trigger condition is how issues get forgotten. Force a Later (with trigger) or Kill decision.
 - **"This might be useful someday"** → "Someday" is not a trigger condition. Either define when to revisit or kill it.
-- **"Let me just prioritize it and move on"** → Setting priority without a wave/phase assignment is a half-disposition. Where does it ship?
+- **"Let me just prioritize it and move on"** → Setting priority without a wave/stage assignment is a half-disposition. Where does it ship?
 
 ## Related
 

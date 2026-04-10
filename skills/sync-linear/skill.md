@@ -113,7 +113,7 @@ State IDs are stored in `linear-map.json` under `states.*`. Always read from the
 #### Logic
 
 1. **Read** `linear-map.json` for state IDs and project mappings
-2. **For each Phase 2 project** (active phase), in order (P1 → P10):
+2. **For each Stage 2 project** (active stage), in order (P1 → P10):
    - Fetch all issues via `mcp__linear-server__list_issues`
    - Classify by status bucket:
      - **Done bucket:** Done, Canceled, Duplicate
@@ -133,7 +133,7 @@ State IDs are stored in `linear-map.json` under `states.*`. Always read from the
 
 #### Parallel Track Awareness
 
-Phase 2 has two tracks (from ROADMAP):
+Stage 2 has two tracks (from ROADMAP):
 - **Critical path:** WP-1 → WP-2 → WP-3 (Foundation → AG Grid → Editor Parity)
 - **Parallel track:** WP-4 → WP-5 → WP-6/WP-7 (Auth → Nav → Dashboard/Notifications)
 

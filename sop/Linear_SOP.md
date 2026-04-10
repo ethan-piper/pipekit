@@ -18,7 +18,7 @@ Initiative = VBW Phase                 <- "What phase does this ship in?"
 
 Labels = Cross-cutting metadata        <- Filterable on everything
   Domain:   [project-specific domain labels]
-  Tier:     [phase-numbered tier labels]
+  Tier:     [stage-numbered tier labels]
   Type:     Feature, Bug, Improvement, Research, Tech Debt, Chore
   Flag:     Quick Win, Blocked, Hotfix, Breaking Change
   Audience: Client Request
@@ -28,9 +28,9 @@ Labels = Cross-cutting metadata        <- Filterable on everything
 
 | Layer | Audience | Question | Lifespan |
 |---|---|---|---|
-| **Initiative** | Partner | "What phase?" | Permanent (one per phase) |
-| **Project** | Partner + You | "What feature area?" | Permanent within phase |
-| **Milestone** | You + VBW | "What execution batch?" | Per-phase |
+| **Initiative** | Partner | "What stage?" | Permanent (one per stage) |
+| **Project** | Partner + You | "What feature area?" | Permanent within stage |
+| **Milestone** | You + VBW | "What execution batch?" | Per-stage |
 | **Issue** | You + VBW | "What feature/task?" | Permanent (work item) |
 | **Labels** | Everyone | Domain? Tier? Type? | Permanent (taxonomy) |
 
@@ -84,7 +84,7 @@ Every status maps to a pipeline position. An issue's status tells you whose turn
 |---|---|---|---|---|
 | **Triage** | triage | You | Pre-pipeline | External input: bug reports, client requests, `/brainstorm` output. Sort into the right place. |
 | **Ideas** | backlog | -- | Pre-pipeline | Triaged items to act on at some point, but not now. Parking lot for evaluated ideas. |
-| **Future Waves** | backlog | -- | Pre-pipeline | Belongs to a known future phase. Not in scope for current or next wave. |
+| **Future Waves** | backlog | -- | Pre-pipeline | Belongs to a known future stage. Not in scope for current or next wave. |
 | **On Deck** | backlog | Scanning | Pre-pipeline | Next wave's batch. Start getting eyes on these, light-spec proactively if you get ahead. |
 | **Needs Spec** | backlog | You + Claude | Step 1 ready | Current wave. Needs `/light-spec` applied. |
 | **Specced** | unstarted | You | Steps 2-3 | Light spec applied, agent reviewed. Awaiting your sign-off. |
@@ -101,7 +101,7 @@ Every status maps to a pipeline position. An issue's status tells you whose turn
 | From | To | Trigger | Who |
 |---|---|---|---|
 | Triage | Ideas / Needs Spec / In Progress | You triage it | You |
-| Ideas | Future Waves / On Deck | Phase/wave assignment | You |
+| Ideas | Future Waves / On Deck | Stage/wave assignment | You |
 | Future Waves | On Deck | Promoted for next wave | You |
 | On Deck | Needs Spec | Current wave begins | You |
 | Needs Spec | Specced | `/light-spec` applied + agent reviewed | Claude + You |
@@ -149,7 +149,7 @@ When the current wave ships, promote On Deck → Needs Spec and refill On Deck f
 - **No sub-issues in Linear.** Task decomposition lives in `.vbw-planning/` only. Linear stays clean — one Issue per feature.
 - **Projects don't overlap.** Each issue lives in exactly one project at a time.
 - **Milestones = Work Packages.** Each issue belongs to one milestone (its WP).
-- **Tier labels are redundant with Initiatives** — intentional. Labels persist after phases complete.
+- **Tier labels are redundant with Initiatives** — intentional. Labels persist after stages complete.
 - **Urgent priority is reserved** for hotfixes and production emergencies only.
 - **VBW trigger:** VBW planning triggers when a batch of related features in a Work Package reach "Building" — not when individual features are approved.
 
@@ -194,7 +194,7 @@ The issue prefix is defined in your project's `method.config.md`.
 |---|---|
 | Client Request | Client/prospect asked for this |
 
-Domain and Tier labels are project-specific — define them in your Linear workspace to match your product areas and phase structure.
+Domain and Tier labels are project-specific — define them in your Linear workspace to match your product areas and stage structure.
 
 ---
 

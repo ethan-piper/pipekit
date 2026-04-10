@@ -15,19 +15,19 @@ Origin: extracted from the [Piper](https://github.com/ethan-piper/piper) product
 ## Pipeline
 
 ```
-Phase 0: Foundation (once per project)
+Stage 0: Foundation (once per project)
   /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /wave-plan
 
-Phase 1-5: Development (repeats per wave)
+Stages 1-5: Development (repeats per wave)
   [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
   VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
 ```
 
-Phase 0 takes a project from idea to first wave. Phases 1-5 repeat per wave/feature. Feedback loops send work backward when ambiguity is detected.
+Stage 0 takes a project from idea to first wave. Stages 1-5 repeat per wave/feature. Feedback loops send work backward when ambiguity is detected.
 
 ## Repo Structure
 
-- `method.md` — The full methodology (Phase 0 + 12-step pipeline, principles, tooling)
+- `method.md` — The full methodology (Stage 0 + 12-step pipeline, principles, tooling)
 - `method.config.template.md` — Template for project-specific config (Linear IDs, strategy docs, environments, pre-deploy gate)
 - `STARTUP.md` — Reference guide for project bootstrap (use `/startup` for the interactive flow)
 - `sop/` — Standard operating procedures (Git, Code Quality, Linear, Skills, VBW)
@@ -56,14 +56,14 @@ VBW agents don't call skills — they read the consuming project's CLAUDE.md dir
 
 ## Key Skills
 
-**Phase 0 (Foundation):**
+**Stage 0 (Foundation):**
 
 | Skill | Purpose |
 |-------|---------|
 | `/concept` | Project-level ideation — concept brief from ideas + existing docs |
 | `/define` | Distill concept into project definition (phases, roles, workflows) |
 | `/strategy-create` | Bootstrap strategy docs from project definition |
-| `/startup` | Full bootstrap orchestrator — chains all Phase 0 + setup steps |
+| `/startup` | Full bootstrap orchestrator — chains all Stage 0 + setup steps |
 | `/roadmap-create` | Create ROADMAP.md and populate Linear |
 | `/wave-plan` | Select execution waves, track progress |
 

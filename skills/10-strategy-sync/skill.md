@@ -89,7 +89,7 @@ For each affected section, use an Explore agent to:
      - Stakeholder docs: simple, conceptual, no code — a non-technical reader should understand
      - Developer docs: technical, schema-level detail, code patterns
      - All-audience docs: step-by-step scenarios with concrete examples
-   - Preserves descriptions of future-phase features that weren't built yet
+   - Preserves descriptions of future-stage features that weren't built yet
    - Clearly distinguishes "what exists today" from "what's planned"
 
 ### Phase 4 — New Sections
@@ -170,7 +170,7 @@ Next sync recommended after: [next wave ships]
 ## Cadence
 
 Run at these moments:
-- **After UAT passes** for a wave or phase — the primary trigger
+- **After UAT passes** for a wave or stage — the primary trigger
 - **Before stakeholder presentations** — ensure docs are current
 - **Before onboarding a new team member** — they'll read these docs first
 - **When `/roadmap-review` flags doc staleness**
@@ -178,7 +178,7 @@ Run at these moments:
 ## Rules
 
 - **Code is truth.** If the code differs from the light spec, the Strategy doc should match the code — not the spec.
-- **Preserve future-phase content.** Don't remove descriptions of features that haven't been built yet. Mark them clearly as planned.
+- **Preserve future-stage content.** Don't remove descriptions of features that haven't been built yet. Mark them clearly as planned.
 - **Maintain audience level.** Use the manifest's Audience field. Stakeholder docs stay simple even when the feature is complex.
 - **Never auto-apply.** Always present diffs for human approval before writing.
 - **Version discipline.** Every sync bumps the version. No silent edits.
