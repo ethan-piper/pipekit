@@ -1,11 +1,11 @@
 ---
 name: update-method
-description: Sync the latest piper-dev-method into the current project — pull skills, SOPs, and templates
+description: Sync the latest Pipekit method into the current project — pull skills, SOPs, and templates
 ---
 
 # Update Method Skill
 
-Pull the latest piper-dev-method repo content into the current project. Updates portable skills, SOPs, and templates without touching project-specific files.
+Pull the latest Pipekit method repo content into the current project. Updates portable skills, SOPs, and templates without touching project-specific files.
 
 ## Triggers
 
@@ -28,7 +28,7 @@ Pull the latest piper-dev-method repo content into the current project. Updates 
 ### Phase 1 — Pull Updates Into This Project
 
 1. Check if `scripts/sync-method.sh` exists in the current project
-   - If not: copy it from `~/Projects/piper-dev-method/scripts/sync-method.sh`
+   - If not: copy it from `~/Projects/pipekit/scripts/sync-method.sh`
 2. Run the sync script:
    ```bash
    ./scripts/sync-method.sh ${tag_or_branch}
@@ -50,7 +50,7 @@ Pull the latest piper-dev-method repo content into the current project. Updates 
 ```
 ## Method Sync Complete
 
-Updated from: piper-dev-method @ {ref}
+Updated from: pipekit @ {ref}
 
 Skills: {N} synced, {M} unchanged
 SOPs: {N} synced
@@ -65,21 +65,21 @@ Warnings:
 
 When invoked with `--push`, this mode captures improvements made to portable skills *in the current project* and pushes them back to the method repo.
 
-1. Compare each portable skill in `.claude/skills/` against the method repo version at `~/Projects/piper-dev-method/skills/`
+1. Compare each portable skill in `.claude/skills/` against the method repo version at `~/Projects/pipekit/skills/`
 2. For each skill that differs:
    - Show the diff
-   - Ask: "Push this change back to piper-dev-method? (y/n/edit)"
+   - Ask: "Push this change back to pipekit? (y/n/edit)"
 3. For approved changes:
-   - Copy the updated skill to `~/Projects/piper-dev-method/skills/`
+   - Copy the updated skill to `~/Projects/pipekit/skills/`
    - Stage the changes in the method repo
 4. Also check for changes to:
-   - `method/sop/` → `~/Projects/piper-dev-method/sop/`
-   - `method/templates/` → `~/Projects/piper-dev-method/templates/`
-   - `method/method.md` → `~/Projects/piper-dev-method/method.md`
-   - `method/STARTUP.md` → `~/Projects/piper-dev-method/STARTUP.md`
+   - `method/sop/` → `~/Projects/pipekit/sop/`
+   - `method/templates/` → `~/Projects/pipekit/templates/`
+   - `method/method.md` → `~/Projects/pipekit/method.md`
+   - `method/STARTUP.md` → `~/Projects/pipekit/STARTUP.md`
 5. After all changes are staged, offer to commit and push:
    ```
-   {N} files updated in piper-dev-method.
+   {N} files updated in pipekit.
 
    Commit and push? (y/n)
    ```
@@ -113,4 +113,4 @@ When invoked with `--push`, this mode captures improvements made to portable ski
 
 - `/startup` — initial project bootstrap (runs sync as part of Phase 3)
 - `scripts/sync-method.sh` — the underlying sync script
-- Method repo: `~/Projects/piper-dev-method/` or `github.com/YOUR_ORG/piper-dev-method`
+- Method repo: `~/Projects/pipekit/` or `github.com/YOUR_ORG/pipekit`

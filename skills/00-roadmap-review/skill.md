@@ -25,7 +25,7 @@ Validate that:
 6. Spec coverage is adequate for the next planned phase
 7. Strategy docs are flagged if stale
 
-This is the **gate between Stage 0 (Foundation) and Stage 1 (Definition)** in the Piper Method pipeline. Run it before starting a new phase of specs.
+This is the **gate between Stage 0 (Foundation) and Stage 1 (Definition)** in the Pipekit pipeline. Run it before starting a new phase of specs.
 
 ## Execution Steps
 
@@ -157,7 +157,7 @@ Present a summary dashboard:
 
 **Gaps (requirements without issues):**
 - Stage 02: "Persistent AI Memory (mem0)" — no matching issue
-- Stage 02: "Piper Slash Command Palette" — no matching issue
+- Stage 02: "Slash Command Palette" — no matching issue
 
 **Orphans (issues without matching requirements):**
 - PROJ-176: "Entities blocked from 2 budgets with same name" — bug, not in ROADMAP

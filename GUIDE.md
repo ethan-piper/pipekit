@@ -1,6 +1,6 @@
-# The Piper Dev Method — Instruction Manual
+# Pipekit — Instruction Manual
 
-A complete guide to using the Piper Dev Method from project inception through production delivery. This document covers every stage, every skill, and every decision point in the pipeline.
+A complete guide to using Pipekit from project inception through production delivery. This document covers every stage, every skill, and every decision point in the pipeline.
 
 **Last updated:** 2026-04-08
 
@@ -49,7 +49,7 @@ A complete guide to using the Piper Dev Method from project inception through pr
 
 ## What This Is
 
-The Piper Dev Method is a structured, AI-assisted software delivery system. It provides a deterministic pipeline from "I have an idea" to "it's in production" with quality gates at every stage.
+Pipekit is a structured, AI-assisted software delivery system. It provides a deterministic pipeline from "I have an idea" to "it's in production" with quality gates at every stage.
 
 It was extracted from the Piper production finance platform and is designed to be portable — you sync it into any project and it adapts via a project-specific config file.
 
@@ -936,7 +936,7 @@ The method repo is the source of truth. Projects pull from it using `scripts/syn
 
 ```bash
 # First time
-cp ~/Projects/piper-dev-method/scripts/sync-method.sh scripts/
+cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
 ./scripts/sync-method.sh
 
 # Update to latest

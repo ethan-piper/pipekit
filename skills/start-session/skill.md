@@ -57,7 +57,7 @@ Display as a **Linear Status** block:
 - ...
 
 **Current Phase (from STATE.md):**
-- Phase 1 — Piper Repo Setup: PROJ-160, PROJ-161, PROJ-162
+- Phase 1 — Repo Setup: PROJ-160, PROJ-161, PROJ-162
   - PROJ-160: [status]
   - PROJ-161: [status]
   - PROJ-162: [status]

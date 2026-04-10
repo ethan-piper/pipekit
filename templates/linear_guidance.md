@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Linear is Piper’s visible review layer for AI-assisted planning.
+Linear is {PROJECT_NAME}’s visible review layer for AI-assisted planning.
 
 It is used to:
 - surface ambiguity early

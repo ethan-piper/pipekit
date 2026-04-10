@@ -49,7 +49,7 @@ Format as a clean triage view:
 - **PROJ-252** — Basic Google OAuth Login [Onboarding & UX] P2
 
 ### In Progress (1)
-- **PROJ-187** — Piper Side Panel — Chrome Extension P3
+- **PROJ-187** — Side Panel — Chrome Extension P3
 
 ### UAT (1)
 - **PROJ-253** — Budget Locking & Editor Presence [Budget Editor] P2

@@ -285,7 +285,7 @@ If you catch yourself thinking any of these, follow the process more strictly:
 ```
 User: /launch PROJ-200
 
-## Gate Check: PROJ-200 — Apply Piper Design Tokens
+## Gate Check: PROJ-200 — Apply Design Tokens
 
   Spec: ✓ Light spec with AC (7 criteria)
   Dependencies: ✓ No blockers

@@ -5,7 +5,7 @@ description: Orchestrate full project bootstrap — concept through first phase,
 
 # Startup Skill
 
-Orchestrator for bootstrapping a new project using the Piper Dev Method. Chains pre-pipeline skills with infrastructure setup, creating a complete project from idea to first phase ready for speccing.
+Orchestrator for bootstrapping a new project using Pipekit. Chains pre-pipeline skills with infrastructure setup, creating a complete project from idea to first phase ready for speccing.
 
 ## Triggers
 
@@ -95,7 +95,7 @@ Walk through setup checklist from `STARTUP.md` Step 3, in order. Skip steps alre
 - If no: Copy and run sync script
 
 ```bash
-cp ~/Projects/piper-dev-method/scripts/sync-method.sh scripts/sync-method.sh
+cp ~/Projects/pipekit/scripts/sync-method.sh scripts/sync-method.sh
 ./scripts/sync-method.sh
 ```
 

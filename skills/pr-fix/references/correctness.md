@@ -162,7 +162,7 @@ Additional:
 | Constants | UPPER_SNAKE_CASE: `MAX_FILE_SIZE` | Medium |
 | Booleans | Prefix with `is`/`has`/`can`/`should` | Medium |
 | Exports | Named only — no `export default` | Medium |
-| Workspace imports | `@piper/ui`, `@piper/utils` | Medium |
+| Workspace imports | `@acme/ui`, `@acme/utils` | Medium |
 | TypeScript check task | `check-types` (not `typecheck`) | Medium |
 | DB tables | snake_case, plural | Medium |
 | RPC params | `p_` prefix | Critical (causes function-not-found) |

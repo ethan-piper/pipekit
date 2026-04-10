@@ -8,7 +8,7 @@
 
 ## Financial Calculation Tests (NON-NEGOTIABLE)
 
-Piper is a finance platform. Any code that produces, transforms, or displays monetary values MUST have tests. No financial number may reach a user without verified test coverage.
+{PROJECT_NAME} handles financial data. Any code that produces, transforms, or displays monetary values MUST have tests. No financial number may reach a user without verified test coverage.
 
 ### Mandatory Coverage Targets
 

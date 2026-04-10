@@ -5,7 +5,7 @@ description: Analyze a project idea — assess viability, capture context, and p
 
 # Concept Skill
 
-Take a raw project idea, ingest any existing documents, assess viability, and produce a structured concept brief. This is the first step in the Piper Dev Method — before definition, strategy docs, or roadmap.
+Take a raw project idea, ingest any existing documents, assess viability, and produce a structured concept brief. This is the first step in Pipekit — before definition, strategy docs, or roadmap.
 
 ## Triggers
 

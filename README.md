@@ -1,4 +1,4 @@
-# Piper Dev Method
+# Pipekit
 
 A structured AI-assisted software delivery system. Provides a deterministic pipeline from idea to production with quality gates at every stage.
 
@@ -22,7 +22,7 @@ Stage 0 takes a project from raw idea to first phase ready for speccing. Stages 
 ## What's Included
 
 ```
-piper-dev-method/
+pipekit/
   GUIDE.md                         # Complete instruction manual
   method.md                        # The methodology — pipeline, principles, tooling
   method.config.template.md        # Project config template (copy per project)
@@ -99,10 +99,10 @@ piper-dev-method/
 
 ```bash
 # 1. Clone the method repo
-git clone git@github.com:YOUR_ORG/piper-dev-method.git ~/Projects/piper-dev-method
+git clone git@github.com:YOUR_ORG/pipekit.git ~/Projects/pipekit
 
 # 2. Copy the sync script into your project
-cp ~/Projects/piper-dev-method/scripts/sync-method.sh your-project/scripts/
+cp ~/Projects/pipekit/scripts/sync-method.sh your-project/scripts/
 
 # 3. Run it
 cd your-project

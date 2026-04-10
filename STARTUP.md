@@ -2,7 +2,7 @@
 
 > **Reference document.** For the interactive flow, use `/startup` — it orchestrates the full bootstrap process, chaining `/concept`, `/define`, `/strategy-create`, `/roadmap-create`, `/phase-plan`, and infrastructure setup. This document provides background context and detailed checklists that the skills reference.
 
-A walkthrough for bootstrapping a new project using the Piper Dev Method. Covers goal definition, tech stack decisions, environment setup, and skill creation.
+A walkthrough for bootstrapping a new project using Pipekit. Covers goal definition, tech stack decisions, environment setup, and skill creation.
 
 **Audience:** You (the developer), working with Claude Code.
 
@@ -58,7 +58,7 @@ Every choice here has downstream implications for skills, deployment, and conven
 
 ### 2.1 Core Decisions
 
-| Decision | Options to Evaluate | Piper's Choice | Notes |
+| Decision | Options to Evaluate | Example Choice | Notes |
 |----------|-------------------|----------------|-------|
 | **Framework** | Next.js, Remix, SvelteKit, Astro | Next.js 15 (App Router) | Determines routing, SSR, component model |
 | **Language** | TypeScript, JavaScript | TypeScript (strict) | Always TypeScript for anything non-trivial |
@@ -78,7 +78,7 @@ Every choice here has downstream implications for skills, deployment, and conven
 |----------|---------|-------|
 | **Environments** | How many? (dev, beta, prod) | Minimum: dev + prod. Beta is valuable for UAT. |
 | **Domain** | Production domain | Buy early, configure DNS |
-| **DB per environment** | Shared dev/beta or separate | Piper shares dev/beta on one Supabase project — simpler but riskier for migrations |
+| **DB per environment** | Shared dev/beta or separate | Example: sharing dev/beta on one Supabase project — simpler but riskier for migrations |
 | **CI/CD** | GitHub Actions, Vercel built-in | Vercel auto-deploys on merge. GitHub Actions for DB migrations. |
 | **Secrets management** | Vercel env vars, Doppler, .env | Vercel env vars synced via `vercel env pull` |
 
@@ -177,7 +177,7 @@ Configure in `.mcp.json` with `${VAR}` interpolation for secrets.
 ### 3.7 Sync the Method
 
 ```
-[ ] Copy sync script: cp ~/Projects/piper-dev-method/scripts/sync-method.sh scripts/
+[ ] Copy sync script: cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
 [ ] Run: ./scripts/sync-method.sh
 [ ] Fill in method.config.md with project-specific values
 [ ] Commit synced method files
@@ -198,7 +198,7 @@ These are the skills that can't be portable because they depend on your specific
 | **Trigger** | `/g-promote-dev` |
 | **What it does** | Run pre-deploy gate, create PR to `dev`, extract issue refs from commits |
 | **Decisions** | What's your pre-deploy gate command? What's your default PR target branch? |
-| **Template from** | Piper's `g-promote-dev` — adapt target branch and gate commands |
+| **Template from** | The reference `g-promote-dev` — adapt target branch and gate commands |
 
 #### `g-promote-main` — PR to production
 
@@ -224,7 +224,7 @@ These are the skills that can't be portable because they depend on your specific
 |-------|-------|
 | **Trigger** | `/migrate` |
 | **What it does** | Create migration file, enforce idempotent patterns, lint, test locally |
-| **Decisions** | What are your idempotent rules? (See Piper's `patterns.md` for reference) |
+| **Decisions** | What are your idempotent rules? (See the reference `patterns.md`) |
 
 #### `g-deploy` — Deployment verification (if complex deploy pipeline)
 
