@@ -93,7 +93,7 @@ For each issue in the active and upcoming stages:
 
 ### Phase 4 — Dependency Validation
 
-1. Read light specs for issues that have them — extract dependency contracts (e.g., "WIT-8 is a hard blocker for WIT-7")
+1. Read light specs for issues that have them — extract dependency contracts (e.g., "PROJ-8 is a hard blocker for PROJ-7")
 2. Read the WP dependency graph from `method/sop/Linear SOP.md` (Dependency Graph section)
 3. For each declared dependency:
    - Fetch the issue via `mcp__linear-server__get_issue` with `includeRelations: true`
@@ -160,7 +160,7 @@ Present a summary dashboard:
 - Stage 02: "Piper Slash Command Palette" — no matching issue
 
 **Orphans (issues without matching requirements):**
-- WIT-176: "Entities blocked from 2 budgets with same name" — bug, not in ROADMAP
+- PROJ-176: "Entities blocked from 2 budgets with same name" — bug, not in ROADMAP
 
 ### Assignment
 - X issues verified in correct stage/project
@@ -180,8 +180,8 @@ Present a summary dashboard:
 | Planning-ready | X | X% |
 
 **Issues needing specs:**
-- WIT-XXX: [title]
-- WIT-XXX: [title]
+- PROJ-XXX: [title]
+- PROJ-XXX: [title]
 
 ### Parked Items (trigger check)
 

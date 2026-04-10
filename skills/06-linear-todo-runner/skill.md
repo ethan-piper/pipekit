@@ -59,14 +59,14 @@ Read all state IDs from your project's `method.config.md` under "Workflow State 
 ## Queue (12 issues ready, 3 blocked)
 
 Ready:
-  1. WIT-88  — AG Grid Enterprise Migration [Budget Editor] P1
-  2. WIT-252 — Basic Google OAuth Login [Onboarding & UX] P2
-  3. WIT-253 — Budget Locking & Editor Presence [Budget Editor] P2
+  1. PROJ-88  — AG Grid Enterprise Migration [Budget Editor] P1
+  2. PROJ-252 — Basic Google OAuth Login [Onboarding & UX] P2
+  3. PROJ-253 — Budget Locking & Editor Presence [Budget Editor] P2
   ...
 
 Blocked (waiting on dependencies):
-  - WIT-260 — Smart Edit Panel (blocked by WIT-88)
-  - WIT-265 — Intro Tour (blocked by WIT-255)
+  - PROJ-260 — Smart Edit Panel (blocked by PROJ-88)
+  - PROJ-265 — Intro Tour (blocked by PROJ-255)
   ...
 ```
 
@@ -83,7 +83,7 @@ When `--prep` is passed, the runner generates draft acceptance criteria for issu
    - `## Scope` or `**Scope:**` sections
    - `## What This Covers` sections
    - POC file references (e.g., `src_poc/app/js/auth.js`)
-   - Spec file references (e.g., `Strategy/Specs/WIT-24-Smart-Import.md`)
+   - Spec file references (e.g., `Strategy/Specs/PROJ-24-Smart-Import.md`)
    - Architecture decisions and constraints mentioned
 3. Generate a draft `## Acceptance Criteria` as a markdown checklist:
    - Each criterion must be **concrete and verifiable** (not "works well" — instead "Google OAuth sign-in creates a session and redirects to /dashboard")
@@ -105,16 +105,16 @@ When `--prep` is passed, the runner generates draft acceptance criteria for issu
 ```
 
 5. **Move issue to Approved** via `mcp__linear-server__save_issue` with `stateId: {Approved state ID from method.config.md}`
-6. Log the issue: `"WIT-XXX — draft AC posted, moved to Approved. Review in Linear."`
+6. Log the issue: `"PROJ-XXX — draft AC posted, moved to Approved. Review in Linear."`
 
-**Issues that already have `## Acceptance Criteria` are moved to Approved (if not already) and skipped with:** `"WIT-XXX — AC already present, moved to Approved, ready for queue."`
+**Issues that already have `## Acceptance Criteria` are moved to Approved (if not already) and skipped with:** `"PROJ-XXX — AC already present, moved to Approved, ready for queue."`
 
 **After all drafts are posted, prompt for approval:**
 
 For each issue with draft AC, ask the user:
 
 ```
-WIT-XXX — {title}
+PROJ-XXX — {title}
   Draft AC: {number} criteria posted as comment
   Approve and write to description? (y/n/edit)
 ```
@@ -147,7 +147,7 @@ For each issue at the front of the queue (up to max-agents):
 
 1. **Read full description** via `mcp__linear-server__get_issue`
 2. **Extract acceptance criteria** — look for `## Acceptance Criteria` section
-3. **If no AC found:** skip the issue, log: `"WIT-XXX skipped — no acceptance criteria. Add AC in Linear and re-run."`
+3. **If no AC found:** skip the issue, log: `"PROJ-XXX skipped — no acceptance criteria. Add AC in Linear and re-run."`
 4. **Store AC** as the verification checklist for the worker agent
 
 ### Phase 3 — Agent Spawn & Lifecycle
@@ -160,7 +160,7 @@ For each issue that passes the AC gate (up to max-agents concurrently):
 
 ```
 Agent(
-  description: "WIT-XXX: {issue title}",
+  description: "PROJ-XXX: {issue title}",
   isolation: "worktree",
   run_in_background: true,
   mode: "bypassPermissions",
@@ -170,7 +170,7 @@ Agent(
 
 4. **Track the agent** in an internal slot table:
    - Slot number (1-4)
-   - Issue identifier (WIT-XXX)
+   - Issue identifier (PROJ-XXX)
    - Agent ID/name
    - Status: `spawned` → `running` → `done` / `failed`
    - Worktree branch name
@@ -204,9 +204,9 @@ After each agent completion event, display a compact status table:
 
 | Slot | Issue | Title | Status | Branch |
 |------|-------|-------|--------|--------|
-| 1 | WIT-88 | AG Grid Enterprise Migration | Done | worktree/wit-88-ag-grid |
-| 2 | WIT-252 | Basic Google OAuth Login | Running | worktree/wit-252-oauth |
-| 3 | WIT-253 | Budget Locking & Editor Presence | Running | worktree/wit-253-locking |
+| 1 | PROJ-88 | AG Grid Enterprise Migration | Done | worktree/wit-88-ag-grid |
+| 2 | PROJ-252 | Basic Google OAuth Login | Running | worktree/wit-252-oauth |
+| 3 | PROJ-253 | Budget Locking & Editor Presence | Running | worktree/wit-253-locking |
 | 4 | — | — | Idle | — |
 
 Queue: 8 remaining | Done: 3 | Failed: 0 | Skipped (no AC): 1
@@ -227,11 +227,11 @@ Branches ready for PR:
   ...
 
 Failed (needs manual attention):
-  - WIT-260 — Smart Edit Panel: type-check failed (see Linear comment)
+  - PROJ-260 — Smart Edit Panel: type-check failed (see Linear comment)
 
 Next steps:
   - Create PRs for completed branches
-  - Fix failed issues manually with `/linear WIT-260`
+  - Fix failed issues manually with `/linear PROJ-260`
   - Re-run `/linear-todo-runner` for any remaining queue
 ```
 
@@ -245,7 +245,7 @@ Each spawned worker receives a self-contained prompt:
 You are implementing a Linear issue. Read CLAUDE.md and method.config.md for project context.
 
 ## Issue
-- **Identifier:** WIT-{XXX}
+- **Identifier:** PROJ-{XXX}
 - **Title:** {title}
 - **Project:** {project name}
 
@@ -265,8 +265,8 @@ You are implementing a Linear issue. Read CLAUDE.md and method.config.md for pro
    - kebab-case filenames, camelCase functions
    - RLS on every table, idempotent migrations
    - React Server Components by default; 'use client' only when needed
-4. All commits must include `WIT-{XXX}` in the message.
-   Format: `{type}({scope}): {description} (WIT-{XXX})`
+4. All commits must include `PROJ-{XXX}` in the message.
+   Format: `{type}({scope}): {description} (PROJ-{XXX})`
 5. Before finishing, run the pre-deploy gate:
    - `pnpm turbo run check-types`
    - `pnpm turbo run lint`
@@ -305,7 +305,7 @@ Set `blocked_by` relations in Linear to enforce the correct execution order.
 ## Relationship to Other Skills
 
 - **`/task-processor`** — Single-issue interactive pickup. Use for hands-on work. The runner is for batch automation.
-- **`/linear WIT-XXX`** — Full end-to-end lifecycle for one issue. Use for failed issues that need manual attention.
+- **`/linear PROJ-XXX`** — Full end-to-end lifecycle for one issue. Use for failed issues that need manual attention.
 - **`/linear-status`** — Quick board view. Run before the runner to see what's queued.
 - **`/sync-linear`** — Sync VBW ↔ Linear. Run after the runner to update VBW state.
 - **`/branch`** — The runner uses `isolation: "worktree"` (Claude Code temporary worktrees), not the `/branch` skill's `{worktree prefix from method.config.md}<description>/` pattern.
@@ -319,12 +319,12 @@ User: /linear-todo-runner --prep --project "Onboarding & UX"
 
 ## Prep: Generating draft AC for 6 issues...
 
-  WIT-252 — Basic Google OAuth Login → draft AC posted as comment
-  WIT-256 — Project Creation Wizard → draft AC posted as comment
-  WIT-254 — Entity Switcher (Parity) → draft AC posted as comment
-  WIT-251 — Admin & Super Admin Section → draft AC posted as comment
-  WIT-255 — Dark/Light Theme Toggle → draft AC posted as comment
-  WIT-257 — What's New Modal → draft AC posted as comment
+  PROJ-252 — Basic Google OAuth Login → draft AC posted as comment
+  PROJ-256 — Project Creation Wizard → draft AC posted as comment
+  PROJ-254 — Entity Switcher (Parity) → draft AC posted as comment
+  PROJ-251 — Admin & Super Admin Section → draft AC posted as comment
+  PROJ-255 — Dark/Light Theme Toggle → draft AC posted as comment
+  PROJ-257 — What's New Modal → draft AC posted as comment
 
 ## Prep Complete
 
@@ -343,16 +343,16 @@ User: /linear-todo-runner --dry-run
 ## Queue (8 issues ready, 2 blocked)
 
 Ready:
-  1. WIT-88  — AG Grid Enterprise Migration [Budget Editor] P1
-  2. WIT-252 — Basic Google OAuth Login [Onboarding & UX] P2
-  3. WIT-253 — Budget Locking & Editor Presence [Budget Editor] P2
-  4. WIT-254 — Entity Switcher (Parity) [Onboarding & UX] P2
-  5. WIT-255 — Dark/Light Theme Toggle [Onboarding & UX] P3
+  1. PROJ-88  — AG Grid Enterprise Migration [Budget Editor] P1
+  2. PROJ-252 — Basic Google OAuth Login [Onboarding & UX] P2
+  3. PROJ-253 — Budget Locking & Editor Presence [Budget Editor] P2
+  4. PROJ-254 — Entity Switcher (Parity) [Onboarding & UX] P2
+  5. PROJ-255 — Dark/Light Theme Toggle [Onboarding & UX] P3
   ...
 
 Blocked:
-  - WIT-260 — Smart Edit Panel (blocked by WIT-88)
-  - WIT-265 — Intro Tour (blocked by WIT-255)
+  - PROJ-260 — Smart Edit Panel (blocked by PROJ-88)
+  - PROJ-265 — Intro Tour (blocked by PROJ-255)
 
 Actions:
   Remove --dry-run to start processing
@@ -368,10 +368,10 @@ Spawning 4 agents...
 ## Runner Status
 | Slot | Issue | Title | Status | Branch |
 |------|-------|-------|--------|--------|
-| 1 | WIT-88 | AG Grid Enterprise | Running | (worktree) |
-| 2 | WIT-252 | Google OAuth | Running | (worktree) |
-| 3 | WIT-253 | Budget Locking | Running | (worktree) |
-| 4 | WIT-254 | Entity Switcher | Running | (worktree) |
+| 1 | PROJ-88 | AG Grid Enterprise | Running | (worktree) |
+| 2 | PROJ-252 | Google OAuth | Running | (worktree) |
+| 3 | PROJ-253 | Budget Locking | Running | (worktree) |
+| 4 | PROJ-254 | Entity Switcher | Running | (worktree) |
 
 Queue: 0 remaining | Done: 0 | Running: 4
 

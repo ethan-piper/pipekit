@@ -53,7 +53,7 @@ Immediately after creating the issue, force a disposition decision:
 - Inform: _"Ready for `/light-spec {issue}` when you start the phase."_
 
 **If Later:**
-- Ask for a **trigger condition** — what must be true before revisiting? (e.g., "revisit when RSV-56 ships", "revisit after Stage 1 UAT")
+- Ask for a **trigger condition** — what must be true before revisiting? (e.g., "revisit when PROJ-56 ships", "revisit after Stage 1 UAT")
 - Ask for a **target phase/stage** (e.g., "Phase 4+", "Stage 2")
 - Move issue to "Ideas" or "Future Phases" based on target
 - Add a `Parked` label if available

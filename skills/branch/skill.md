@@ -22,7 +22,7 @@ Create a worktree-based branch for the project. Handles features, fixes, and hot
 /branch <name>              -> feature/ branch from dev
 /branch --fix <name>        -> fix/ branch from dev
 /branch --hotfix <name>     -> hotfix/ branch from main
-/branch --linear WIT-XX     -> link to Linear issue
+/branch --linear PROJ-XX     -> link to Linear issue
 /branch finish              -> clean up current worktree + branch
 /branch list                -> show active worktrees
 ```
@@ -42,7 +42,7 @@ Create a worktree-based branch for the project. Handles features, fixes, and hot
 - Determine branch type from flags (default: feature)
 - Extract name from remaining arguments
 - Convert to kebab-case: lowercase, spaces to hyphens, strip special characters
-- Check for `--linear WIT-XX` flag
+- Check for `--linear PROJ-XX` flag
 
 Example parsing:
 - `/branch smart-add-panel` -> `feature/smart-add-panel` from `dev`
@@ -97,7 +97,7 @@ ln -sf "$MAIN_REPO/.env" "$WORKTREE_PATH/.env"
 
 ### 5. Optional Linear Link
 
-If `--linear WIT-XX` was specified, update the Linear issue status to "In Progress".
+If `--linear PROJ-XX` was specified, update the Linear issue status to "In Progress".
 
 ### 6. Rename cmux Workspace
 

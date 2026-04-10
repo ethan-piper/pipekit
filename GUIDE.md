@@ -51,7 +51,7 @@ A complete guide to using the Piper Dev Method from project inception through pr
 
 The Piper Dev Method is a structured, AI-assisted software delivery system. It provides a deterministic pipeline from "I have an idea" to "it's in production" with quality gates at every stage.
 
-It was extracted from the [Piper](https://github.com/ethan-piper/piper) production finance platform and is designed to be portable — you sync it into any project and it adapts via a project-specific config file.
+It was extracted from the Piper production finance platform and is designed to be portable — you sync it into any project and it adapts via a project-specific config file.
 
 The method is opinionated about process but flexible about technology. It doesn't care if you use React or Svelte, Postgres or MongoDB. It cares that you spec before you plan, plan before you execute, and review before you ship.
 
@@ -148,14 +148,14 @@ This is the starting point. You have an idea — maybe just a sentence, maybe a 
 
 **Example:**
 ```
-/concept --docs ~/Projects/rs-vault/proposal/
+/concept --docs ~/Projects/my-project/proposal/
 
-Reading 6 documents from ~/Projects/rs-vault/proposal/...
+Reading 6 documents from ~/Projects/my-project/proposal/...
 
 Extracted:
-  - Problem: shared Excel for property data leaks info, corrupts formulas
-  - Users: ~40 internal property brokers
-  - Solution: internal search tool for off-market sales
+  - Problem: shared spreadsheet leaks data, corrupts formulas
+  - Users: ~40 internal team members
+  - Solution: internal tool for structured data management
   - Missing: revenue model, competitive landscape, risk assessment
 
 Let me ask about the gaps...
@@ -194,24 +194,24 @@ The concept brief says "should I build this?" The project definition says "what 
 Reading concept-brief.md...
 
 ## Project Identity
-  Name: RS Vault
-  One-liner: Internal search tool for off-market property sales
-  Users: ~40 property brokers
-  Problem: Shared Excel leaks data, corrupts formulas, no search
+  Name: My Project
+  One-liner: Internal tool for team data management
+  Users: ~40 team members
+  Problem: Shared spreadsheet leaks data, corrupts formulas, no search
 
 ## Stage Breakdown
 
 Stage 1 (MVP):
-  - Property data import and storage
-  - Search by criteria (location, price range, type)
+  - Data import and storage
+  - Search by criteria (category, status, type)
   - Basic CRUD operations
-  Exit: 10 brokers can search and find properties without Excel
+  Exit: 10 users can search and find records without spreadsheets
 
 Stage 2 (Growth):
   - Advanced filters and saved searches
   - Activity tracking and audit log
   - Reporting dashboard
-  Exit: All 40 brokers migrated off Excel
+  Exit: All 40 users migrated off spreadsheets
 
 Is this accurate? Want to adjust anything?
 ```
@@ -371,9 +371,9 @@ A phase is a batch of issues selected for the current execution cycle. This skil
 - Theme: Foundation
 - Milestone(s): WP-1 Data Foundation, WP-2 Search
 - Issues:
-  - RSV-1 — Property data model [Needs Spec]
-  - RSV-2 — Basic search [Needs Spec]
-  - RSV-3 — User authentication [Needs Spec]
+  - PROJ-1 — Core data model [Needs Spec]
+  - PROJ-2 — Basic search [Needs Spec]
+  - PROJ-3 — User authentication [Needs Spec]
 
 ## Completed Phases
 - (none yet)
@@ -418,7 +418,7 @@ Stage 1 turns raw issues into planning-safe specs. This is where the "no guesswo
 
 ### Light Spec
 
-**Skill:** `/light-spec` or `/light-spec RSV-1`
+**Skill:** `/light-spec` or `/light-spec PROJ-1`
 **Input:** Feature idea or existing Linear issue
 **Output:** Structured spec in the Linear issue description
 
@@ -484,7 +484,7 @@ After agent review passes, you review the spec in Linear. This is where product 
 
 ### Launch
 
-**Skill:** `/launch RSV-1` or `/launch --milestone WP-1`
+**Skill:** `/launch PROJ-1` or `/launch --milestone WP-1`
 **Input:** Approved spec
 **Output:** Issue moved to "Building," execution route determined
 
@@ -544,7 +544,7 @@ If the plan fails review, it goes back to the Lead Agent for rework. Once the pl
 **Input:** Approved plan (or AC for Low complexity)
 **Output:** Atomic commits per task
 
-**For VBW-planned work:** The Dev Agent executes each task in the plan sequentially, making one commit per task. All commits include the issue ID in the message format: `feat(scope): description (RSV-1)`.
+**For VBW-planned work:** The Dev Agent executes each task in the plan sequentially, making one commit per task. All commits include the issue ID in the message format: `feat(scope): description (PROJ-1)`.
 
 **For batch-runner work:** `/linear-todo-runner` processes multiple Low-complexity issues in parallel, spawning up to 4 worker agents in isolated worktrees. Each agent reads the issue's AC and implements independently.
 
@@ -655,13 +655,13 @@ Phase 2 Status — 2026-04-15
 
 | Issue | Title | Status | Days |
 |-------|-------|--------|------|
-| RSV-4 | Advanced search | Done | — |
-| RSV-5 | Saved searches | Building | 2d |
-| RSV-6 | Activity log | UAT | 0d |
-| RSV-7 | Export reports | Needs Spec | 4d |
+| PROJ-4 | Advanced search | Done | — |
+| PROJ-5 | Saved searches | Building | 2d |
+| PROJ-6 | Activity log | UAT | 0d |
+| PROJ-7 | Export reports | Needs Spec | 4d |
 
 Progress: 1/4 Done (25%)
-Alert: RSV-7 in "Needs Spec" for 4 days — run /light-spec RSV-7
+Alert: PROJ-7 in "Needs Spec" for 4 days — run /light-spec PROJ-7
 ```
 
 **`/phase-plan --rebalance`** adjusts the current phase if priorities shift — add, remove, or swap issues.
@@ -687,17 +687,17 @@ Phases, milestones, and cycles serve different purposes. Understanding their rel
 A phase may pull from multiple milestones:
 ```
 Phase 1:
-  - RSV-1 from WP-1 (Foundation)
-  - RSV-2 from WP-1 (Foundation)
-  - RSV-3 from WP-2 (Search)
+  - PROJ-1 from WP-1 (Foundation)
+  - PROJ-2 from WP-1 (Foundation)
+  - PROJ-3 from WP-2 (Search)
 ```
 
 A large milestone may span multiple phases:
 ```
 WP-2 (Search) — 8 issues:
-  - Phase 1: RSV-3, RSV-4 (core search)
-  - Phase 2: RSV-7, RSV-8 (advanced search, export)
-  - Phase 3: RSV-11, RSV-12, RSV-13, RSV-14 (filters, saved searches)
+  - Phase 1: PROJ-3, PROJ-4 (core search)
+  - Phase 2: PROJ-7, PROJ-8 (advanced search, export)
+  - Phase 3: PROJ-11, PROJ-12, PROJ-13, PROJ-14 (filters, saved searches)
 ```
 
 ### Milestone Gating
@@ -1026,10 +1026,10 @@ Add to `.git/hooks/post-commit` or your project's hook system:
 |-------|---------|-------------|
 | Roadmap Review | `/roadmap-review` | Full health check (Stage 0 gate) |
 | Brainstorm | `/brainstorm` | Feature-level ideation |
-| Light Spec | `/light-spec RSV-1` | Create spec for an issue |
-| Launch | `/launch RSV-1` | Validate gates → route → execute |
+| Light Spec | `/light-spec PROJ-1` | Create spec for an issue |
+| Launch | `/launch PROJ-1` | Validate gates → route → execute |
 | Launch Batch | `/launch --milestone WP-1` | Launch all ready issues in a WP |
-| Launch Dry Run | `/launch --dry-run RSV-1` | Check gates without executing |
+| Launch Dry Run | `/launch --dry-run PROJ-1` | Check gates without executing |
 | Todo Runner | `/linear-todo-runner` | Batch execute Low-complexity issues |
 | Todo Prep | `/linear-todo-runner --prep` | Generate draft AC for unspecced issues |
 
@@ -1120,7 +1120,7 @@ Immediately after creating the issue, force one of three decisions:
 | **Kill** | Archive with rationale. Move to Canceled. |
 
 **Parking rules for "Later" items:**
-- Must have a trigger condition (e.g., "revisit when RSV-56 ships")
+- Must have a trigger condition (e.g., "revisit when PROJ-56 ships")
 - Must have a target phase/stage (e.g., "Phase 4+")
 - Surfaced by `/roadmap-review` when trigger conditions are met
 

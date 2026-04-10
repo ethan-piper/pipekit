@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the **Piper Dev Method** — a portable, structured AI-assisted software delivery system. It is NOT a software project itself. It contains methodology docs, SOPs, templates, and Claude Code skills that get synced into consuming projects via `scripts/sync-method.sh`.
 
-Origin: extracted from the [Piper](https://github.com/ethan-piper/piper) production finance platform.
+Origin: extracted from the Piper production finance platform.
 
 ## Core Principle
 

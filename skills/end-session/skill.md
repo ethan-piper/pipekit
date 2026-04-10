@@ -132,7 +132,7 @@ Format: "Xh XXm" (e.g., "2h 15m")
 
 ### Step 6 — Update Linear Issues
 
-Scan the conversation for `WIT-{N}` references and work completed. For each referenced issue:
+Scan the conversation for `PROJ-{N}` references and work completed. For each referenced issue:
 
 1. **Completed this session** → move to Done using `mcp__linear-server__save_issue` with the Done state ID from `method.config.md`
 2. **Worked on but not finished** → ensure In Progress using `mcp__linear-server__save_issue` with the In Progress state ID from `method.config.md`

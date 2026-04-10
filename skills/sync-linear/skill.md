@@ -165,7 +165,7 @@ The promote logic treats each track independently. A project on the parallel tra
 ### Recommended Promotions
 | Issue | Title | Current | Proposed |
 |-------|-------|---------|----------|
-| WIT-XXX | ... | Future Phases | On Deck |
+| PROJ-XXX | ... | Future Phases | On Deck |
 
 Approve? (y/n)
 ```
@@ -219,4 +219,4 @@ After sync, display a summary table:
 - **Project descriptions** use Markdown format with `## Project Name`, `### Scope`, `### Success Criteria` headers
 - The user edits in Linear's rich text editor, which converts Markdown to its internal format — when pulling back, normalize formatting
 - Always update `linear-map.json` after any sync operation
-- Include `WIT-{number}` in commit messages when completing tasks linked to Linear issues
+- Include `PROJ-{number}` in commit messages when completing tasks linked to Linear issues

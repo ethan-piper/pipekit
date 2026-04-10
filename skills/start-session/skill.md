@@ -45,22 +45,22 @@ Display as a **Linear Status** block:
 ## Linear Status
 
 **Building:**
-- WIT-42 — Feature title (priority, project)
+- PROJ-42 — Feature title (priority, project)
 - ...
 
 **In Progress:**
-- WIT-38 — Feature title (ad-hoc/manual)
+- PROJ-38 — Feature title (ad-hoc/manual)
 - ...
 
 **UAT:**
-- WIT-39 — Feature title
+- PROJ-39 — Feature title
 - ...
 
 **Current Phase (from STATE.md):**
-- Phase 1 — Piper Repo Setup: WIT-160, WIT-161, WIT-162
-  - WIT-160: [status]
-  - WIT-161: [status]
-  - WIT-162: [status]
+- Phase 1 — Piper Repo Setup: PROJ-160, PROJ-161, PROJ-162
+  - PROJ-160: [status]
+  - PROJ-161: [status]
+  - PROJ-162: [status]
 ```
 
 If no issues are in progress or review, note that — it means the queue is clear.
@@ -80,7 +80,7 @@ bash ~/.claude/scripts/cmux-workspace-name.sh
 If the user mentioned a specific Linear issue or task, pass it as an argument:
 
 ```bash
-bash ~/.claude/scripts/cmux-workspace-name.sh "WIT-XXX"
+bash ~/.claude/scripts/cmux-workspace-name.sh "PROJ-XXX"
 ```
 
 Skip silently if cmux is unavailable.

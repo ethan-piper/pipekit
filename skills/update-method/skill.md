@@ -113,4 +113,4 @@ When invoked with `--push`, this mode captures improvements made to portable ski
 
 - `/startup` — initial project bootstrap (runs sync as part of Phase 3)
 - `scripts/sync-method.sh` — the underlying sync script
-- Method repo: `~/Projects/piper-dev-method/` or `github.com/ethan-piper/piper-dev-method`
+- Method repo: `~/Projects/piper-dev-method/` or `github.com/YOUR_ORG/piper-dev-method`

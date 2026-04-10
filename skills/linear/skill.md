@@ -5,12 +5,12 @@ You guide the user through working on a Linear issue end-to-end, updating the is
 ## Triggers
 
 This skill is invoked when the user says:
-- `/linear WIT-123`
+- `/linear PROJ-123`
 - `/linear https://linear.app/{workspace}/issue/{PREFIX}-123/...`
 
 ## Arguments
 
-The argument is a Linear issue identifier (e.g., `WIT-178`) or a full Linear URL. Extract the identifier from the URL if needed. Read `method.config.md` for the issue prefix and workspace slug.
+The argument is a Linear issue identifier (e.g., `PROJ-178`) or a full Linear URL. Extract the identifier from the URL if needed. Read `method.config.md` for the issue prefix and workspace slug.
 
 ## Linear State IDs
 
@@ -48,7 +48,7 @@ The workflow has 5 phases. At each phase transition, update the Linear issue sta
    - Use kebab-case, keep it short and descriptive
    - Include the issue ID if natural (e.g., `feature/wit-178-markup-tooltip`)
 2. **Do the work** — implement the changes as discussed.
-3. **Commit** with conventional commit format: `{type}({scope}): {description}` and include `Closes WIT-XXX` in the body.
+3. **Commit** with conventional commit format: `{type}({scope}): {description}` and include `Closes PROJ-XXX` in the body.
 4. **Push the branch** and verify the Vercel preview deployment succeeds.
 5. **Post a comment** to the Linear issue summarizing what was done and the Vercel preview URL.
 
@@ -62,7 +62,7 @@ The workflow has 5 phases. At each phase transition, update the Linear issue sta
    - **Create a PR** to `dev` (or `main` for hotfixes) using `gh pr create` with:
      - Short title (under 70 chars)
      - Body with Summary bullets + Test plan checklist
-     - `Closes WIT-XXX` in the body
+     - `Closes PROJ-XXX` in the body
    - **Move to UAT** using `mcp__linear-server__save_issue` with `stateId: {UAT state ID from method.config.md}`.
    - **Post a comment** with the PR link.
 

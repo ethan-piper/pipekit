@@ -34,7 +34,7 @@ Then repeat for `state: "Needs Spec"` and `state: "On Deck"`.
 ### 2. Present Task Queue
 
 Group by priority and project. Show:
-- Issue identifier (e.g., WIT-42)
+- Issue identifier (e.g., PROJ-42)
 - Title
 - Priority (Urgent/High/Normal/Low)
 - Project name
@@ -72,7 +72,7 @@ Read all state IDs from your project's `method.config.md` under "Workflow State 
 
 ## Related
 
-- Linear issue workflow: `/linear WIT-123` — full end-to-end issue workflow
+- Linear issue workflow: `/linear PROJ-123` — full end-to-end issue workflow
 - Parallel batch execution: `/linear-todo-runner` — rolling queue with up to 4 concurrent agents
 - Branch skill: `/branch` — creates worktree + branch
 - Start/end session: `/start-session`, `/end-session`

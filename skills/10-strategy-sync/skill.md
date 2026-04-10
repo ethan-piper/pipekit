@@ -72,8 +72,8 @@ For each shipped feature with doc impact:
 ```
 | Feature | Affected Docs | Sections |
 |---------|--------------|----------|
-| RSV-7 Rate Cards | Conceptual Overview §3.4, Technical Architecture §5.x | Update + new |
-| RSV-8 Block Types | Conceptual Overview §3.3 | Update |
+| PROJ-7 Rate Cards | Conceptual Overview §3.4, Technical Architecture §5.x | Update + new |
+| PROJ-8 Block Types | Conceptual Overview §3.3 | Update |
 ```
 
 ### Phase 3 — Compare and Draft
@@ -111,7 +111,7 @@ Show each proposed change as a before/after comparison:
 **Current (v2.6.1, Feb 2026):**
 > Rate cards provide standard pricing templates at the entity level.
 
-**Proposed (reflects RSV-7 + RSV-8 implementation):**
+**Proposed (reflects PROJ-7 + PROJ-8 implementation):**
 > Rate cards provide standard pricing at Entity, Client, or Project
 > scope with optional lineage inheritance.
 
@@ -152,11 +152,11 @@ After updating primary docs, check consistency across all docs in the manifest:
 | Permissions | §2.3 | — | v2.7.0 |
 
 ### Features Synced
-- RSV-7: Rate Cards → Conceptual Overview §3.4, Technical Architecture §5.x
-- RSV-8: Block Types → Conceptual Overview §3.3
+- PROJ-7: Rate Cards → Conceptual Overview §3.4, Technical Architecture §5.x
+- PROJ-8: Block Types → Conceptual Overview §3.3
 
 ### Skipped (no Strategy doc impact)
-- RSV-261: Foundation fix (internal only)
+- PROJ-261: Foundation fix (internal only)
 
 ### Cross-Sync
 - 0 terminology mismatches

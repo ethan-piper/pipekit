@@ -35,9 +35,9 @@ Issues created by `/brainstorm` land in Triage or Ideas with no disposition. The
 
 | # | Issue | Title | Created | Complexity |
 |---|-------|-------|---------|-----------|
-| 1 | RSV-12 | Advanced search filters | 3 days ago | Medium |
-| 2 | RSV-15 | Export to PDF | 1 week ago | Low |
-| 3 | RSV-18 | AI-powered property matching | 2 weeks ago | High |
+| 1 | PROJ-12 | Advanced search filters | 3 days ago | Medium |
+| 2 | PROJ-15 | Export to PDF | 1 week ago | Low |
+| 3 | PROJ-18 | AI-powered search matching | 2 weeks ago | High |
 | ...
 
 Review each? Or filter by project/age?
@@ -56,14 +56,14 @@ For each issue, present the analysis and force a decision:
 3. **Present disposition options:**
 
 ```
-## RSV-12 — Advanced Search Filters
+## PROJ-12 — Advanced Search Filters
 
 Brainstormed: 3 days ago
 Complexity: Medium (~6-10h)
-Dependencies: RSV-3 (Basic search) — currently in Building
+Dependencies: PROJ-3 (Basic search) — currently in Building
 
 Assessment: Aligns with Stage 1. Dependency will be met this phase.
-Recommendation: Now — queue for next phase after RSV-3 ships.
+Recommendation: Now — queue for next phase after PROJ-3 ships.
 
 Disposition:
   1. Now → route to pipeline (assign phase, move to Needs Spec)
@@ -84,7 +84,7 @@ Disposition:
 6. Assign to correct project/initiative
 
 **Later:**
-1. Ask for trigger condition (e.g., "revisit when RSV-3 ships")
+1. Ask for trigger condition (e.g., "revisit when PROJ-3 ships")
 2. Ask for target phase/stage
 3. Move to "Ideas" or "Future Phases"
 4. Add `Parked` label
@@ -109,17 +109,17 @@ Disposition:
 Reviewed: {N} issues
 
   Now: {N} (moved to On Deck / Needs Spec)
-    - RSV-12 — Advanced search filters → Phase 2
-    - RSV-15 — Export to PDF → Phase 3
+    - PROJ-12 — Advanced search filters → Phase 2
+    - PROJ-15 — Export to PDF → Phase 3
 
   Later: {N} (parked with triggers)
-    - RSV-18 — AI matching → revisit after Stage 1 UAT
+    - PROJ-18 — AI matching → revisit after Stage 1 UAT
 
   Killed: {N}
-    - RSV-20 — Real-time collaboration → out of scope for this product
+    - PROJ-20 — Real-time collaboration → out of scope for this product
 
   Merged: {N}
-    - RSV-22 → merged into RSV-12
+    - PROJ-22 → merged into PROJ-12
 
   Skipped: {N}
 

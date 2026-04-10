@@ -45,14 +45,14 @@ Format as a clean triage view:
 ## Board — {team from method.config.md} ({date})
 
 ### Building (2)
-- **WIT-88** — AG Grid Enterprise Migration [Budget Editor] P1
-- **WIT-252** — Basic Google OAuth Login [Onboarding & UX] P2
+- **PROJ-88** — AG Grid Enterprise Migration [Budget Editor] P1
+- **PROJ-252** — Basic Google OAuth Login [Onboarding & UX] P2
 
 ### In Progress (1)
-- **WIT-187** — Piper Side Panel — Chrome Extension P3
+- **PROJ-187** — Piper Side Panel — Chrome Extension P3
 
 ### UAT (1)
-- **WIT-253** — Budget Locking & Editor Presence [Budget Editor] P2
+- **PROJ-253** — Budget Locking & Editor Presence [Budget Editor] P2
 
 ---
 Total active: 6 | Queue depth: 12 | Done this week: 3
@@ -64,7 +64,7 @@ After the board, suggest actions:
 
 ```
 Actions:
-  /linear WIT-88     — pick up an issue
+  /linear PROJ-88     — pick up an issue
   /task-processor     — auto-select next task
   /sync-linear        — sync VBW ↔ Linear
 ```
@@ -80,7 +80,7 @@ Actions:
 
 ## Related
 
-- `/linear WIT-123` — full issue workflow
+- `/linear PROJ-123` — full issue workflow
 - `/task-processor` — auto-select and execute tasks
 - `/linear-todo-runner` — rolling parallel agent queue for batch execution
 - `/start-session` — full session setup with board context

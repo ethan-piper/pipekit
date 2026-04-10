@@ -99,7 +99,7 @@ piper-dev-method/
 
 ```bash
 # 1. Clone the method repo
-git clone git@github.com:ethan-piper/piper-dev-method.git ~/Projects/piper-dev-method
+git clone git@github.com:YOUR_ORG/piper-dev-method.git ~/Projects/piper-dev-method
 
 # 2. Copy the sync script into your project
 cp ~/Projects/piper-dev-method/scripts/sync-method.sh your-project/scripts/
@@ -152,4 +152,4 @@ Tag releases when stable: `git tag v1.0`. Projects can pin to a version:
 
 ## Origin
 
-Extracted from the [Piper](https://github.com/ethan-piper/piper) production finance platform. See `method.md` for the full methodology and `GUIDE.md` for the complete instruction manual.
+Extracted from the Piper production finance platform. See `method.md` for the full methodology and `GUIDE.md` for the complete instruction manual.

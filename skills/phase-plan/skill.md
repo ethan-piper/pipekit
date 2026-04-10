@@ -92,20 +92,20 @@ Present the proposal:
 ## Proposed Phase {N}: {Theme or Phase Name}
 
 Issues (6):
-  1. RSV-1  — User authentication [Low] (WP-1: Foundation)
-  2. RSV-2  — Core data model [Medium] (WP-1: Foundation)
-  3. RSV-3  — Basic search [Medium] (WP-2: Search)
-  4. RSV-4  — Search filters [Low] (WP-2: Search)
-  5. RSV-5  — Property detail view [Medium] (WP-2: Search)
-  6. RSV-6  — Admin dashboard [Low] (WP-3: Admin)
+  1. PROJ-1  — User authentication [Low] (WP-1: Foundation)
+  2. PROJ-2  — Core data model [Medium] (WP-1: Foundation)
+  3. PROJ-3  — Basic search [Medium] (WP-2: Search)
+  4. PROJ-4  — Search filters [Low] (WP-2: Search)
+  5. PROJ-5  — Record detail view [Medium] (WP-2: Search)
+  6. PROJ-6  — Admin dashboard [Low] (WP-3: Admin)
 
 Milestones touched: WP-1 (2/4 issues), WP-2 (3/5 issues), WP-3 (1/6 issues)
 Complexity: 3 Low, 3 Medium, 0 High
-Dependencies: RSV-3 depends on RSV-2 (both in phase — OK)
+Dependencies: PROJ-3 depends on PROJ-2 (both in phase — OK)
 
 Not included (blocked):
-  - RSV-7 — Advanced search (blocked by RSV-3)
-  - RSV-8 — Export reports (blocked by RSV-5)
+  - PROJ-7 — Advanced search (blocked by PROJ-3)
+  - PROJ-8 — Export reports (blocked by PROJ-5)
 
 Remaining On Deck: 4 issues for future phases
 
@@ -133,16 +133,16 @@ Create or update `.vbw-planning/PHASES.md`:
 - **Theme:** {theme or phase name}
 - **Milestone(s):** {list}
 - **Issues:**
-  - RSV-1 — User authentication [Needs Spec]
-  - RSV-2 — Core data model [Needs Spec]
-  - RSV-3 — Basic search [Needs Spec]
-  - RSV-4 — Search filters [Needs Spec]
-  - RSV-5 — Property detail view [Needs Spec]
-  - RSV-6 — Admin dashboard [Needs Spec]
+  - PROJ-1 — User authentication [Needs Spec]
+  - PROJ-2 — Core data model [Needs Spec]
+  - PROJ-3 — Basic search [Needs Spec]
+  - PROJ-4 — Search filters [Needs Spec]
+  - PROJ-5 — Record detail view [Needs Spec]
+  - PROJ-6 — Admin dashboard [Needs Spec]
 
 ## Next Phase (proposed)
-- **Issues (On Deck):** RSV-9, RSV-10, RSV-11, RSV-12
-- **Blocked until Phase {N} completes:** RSV-7, RSV-8
+- **Issues (On Deck):** PROJ-9, PROJ-10, PROJ-11, PROJ-12
+- **Blocked until Phase {N} completes:** PROJ-7, PROJ-8
 
 ## Completed Phases
 (none yet)
@@ -158,7 +158,7 @@ On Deck refilled: {N} issues promoted from Future Phases
 
 Next steps:
   - /roadmap-review — validate the phase before speccing
-  - /light-spec RSV-1 — start speccing the first issue
+  - /light-spec PROJ-1 — start speccing the first issue
   - /phase-plan --status — check progress anytime
 ```
 
@@ -175,19 +175,19 @@ Next steps:
 
 | Issue | Title | Status | Days in Status |
 |-------|-------|--------|---------------|
-| RSV-1 | User authentication | Done | — |
-| RSV-2 | Core data model | Building | 2d |
-| RSV-3 | Basic search | Specced | 1d |
-| RSV-4 | Search filters | Needs Spec | 3d |
-| RSV-5 | Property detail view | UAT | 0d |
-| RSV-6 | Admin dashboard | Approved | 1d |
+| PROJ-1 | User authentication | Done | — |
+| PROJ-2 | Core data model | Building | 2d |
+| PROJ-3 | Basic search | Specced | 1d |
+| PROJ-4 | Search filters | Needs Spec | 3d |
+| PROJ-5 | Record detail view | UAT | 0d |
+| PROJ-6 | Admin dashboard | Approved | 1d |
 
 Progress: 1/6 Done (17%)
 Pipeline: 1 Needs Spec → 1 Specced → 1 Approved → 1 Building → 1 UAT → 1 Done
 
 Alerts:
-  - RSV-4 has been in "Needs Spec" for 3 days — run /light-spec RSV-4
-  - RSV-2 has been in "Building" for 2 days — check progress
+  - PROJ-4 has been in "Needs Spec" for 3 days — run /light-spec PROJ-4
+  - PROJ-2 has been in "Building" for 2 days — check progress
 
 Phase started: {date} ({N} days ago)
 ```
@@ -229,7 +229,7 @@ Complexity accuracy:
 ## Rules
 
 - **3-8 issues per phase.** Fewer is fine for a first phase or complex work. More creates coordination overhead.
-- **Dependencies within the phase must be satisfiable.** If RSV-3 depends on RSV-2, both must be in the phase (or RSV-2 must already be Done).
+- **Dependencies within the phase must be satisfiable.** If PROJ-3 depends on PROJ-2, both must be in the phase (or PROJ-2 must already be Done).
 - **Don't split milestones unless necessary.** Prefer completing a WP in one phase. Split only when the WP is too large (>8 issues) or has mixed priorities.
 - **On Deck is the staging area.** Issues move: Future Phases → On Deck → Needs Spec. `/phase-plan` manages the On Deck → Needs Spec promotion. Refilling On Deck from Future Phases happens automatically.
 - **PHASES.md is the phase registry.** Linear tracks individual issue status. PHASES.md tracks phase composition and history.

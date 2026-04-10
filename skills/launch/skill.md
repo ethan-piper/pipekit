@@ -9,7 +9,7 @@ Transitions a human-approved Linear issue from spec to execution. Validates read
 
 ## Triggers
 
-- `/launch WIT-XXX`
+- `/launch PROJ-XXX`
 - `/launch --milestone WP-1`
 - `/launch --project "P1. Foundation Fixes"`
 
@@ -17,7 +17,7 @@ Transitions a human-approved Linear issue from spec to execution. Validates read
 
 | Argument | What it does |
 |----------|--------------|
-| `WIT-XXX` | Launch a single issue |
+| `PROJ-XXX` | Launch a single issue |
 | `--milestone <name>` | Launch all ready issues in a milestone |
 | `--project <name>` | Launch all ready issues in a project |
 | `--dry-run` | Validate gates and show routing plan without executing |
@@ -41,14 +41,14 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
 2. Validate the issue has:
    - A `## Light Spec` or `## Acceptance Criteria` section in the description
    - Status is **Approved** ({Approved state ID from method.config.md}) or **Specced** with human approval noted
-3. If no spec/AC found: **STOP** with `"WIT-XXX has no spec or AC. Run /light-spec WIT-XXX first."`
-4. If status is before Approved: **STOP** with `"WIT-XXX is in {status}. Move to Approved in Linear before launching."`
+3. If no spec/AC found: **STOP** with `"PROJ-XXX has no spec or AC. Run /light-spec PROJ-XXX first."`
+4. If status is before Approved: **STOP** with `"PROJ-XXX is in {status}. Move to Approved in Linear before launching."`
 
 ### Step 2 — Check Dependencies
 
 1. Read `blocked_by` relations from the issue
 2. For each blocker, check its status via `mcp__linear-server__get_issue`
-3. If any blocker is NOT in **Done** ({Done state ID from method.config.md}): **STOP** with `"WIT-XXX is blocked by WIT-YYY ({status}). Resolve blockers first."`
+3. If any blocker is NOT in **Done** ({Done state ID from method.config.md}): **STOP** with `"PROJ-XXX is blocked by PROJ-YYY ({status}). Resolve blockers first."`
 
 ### Step 3 — Milestone Readiness Gate
 
@@ -61,8 +61,8 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
      Milestone gate failed: {milestone name}
      
      Not yet specced:
-       - WIT-YYY — {title} ({status})
-       - WIT-ZZZ — {title} ({status})
+       - PROJ-YYY — {title} ({status})
+       - PROJ-ZZZ — {title} ({status})
      
      All issues in a milestone must be at least Specced before any can launch.
      Run /light-spec on the above issues, or use --force to bypass.
@@ -88,10 +88,10 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
 Rename the current cmux workspace to reflect the launched issue:
 
 ```bash
-bash ~/.claude/scripts/cmux-workspace-name.sh "WIT-XXX"
+bash ~/.claude/scripts/cmux-workspace-name.sh "PROJ-XXX"
 ```
 
-This sets the workspace title to `{project} - WIT-XXX` (read project name from `method.config.md`). Skip silently if cmux is unavailable.
+This sets the workspace title to `{project} - PROJ-XXX` (read project name from `method.config.md`). Skip silently if cmux is unavailable.
 
 ### Step 6 — Move to Building
 
@@ -107,7 +107,7 @@ This sets the workspace title to `{project} - WIT-XXX` (read project name from `
 ### Step 7a — Low Complexity: Queue for Batch Runner
 
 1. Confirm the issue has a complete `## Acceptance Criteria` section
-2. Inform the user: `"WIT-XXX queued for batch execution. Run /linear-todo-runner to process, or it will be picked up on next runner invocation."`
+2. Inform the user: `"PROJ-XXX queued for batch execution. Run /linear-todo-runner to process, or it will be picked up on next runner invocation."`
 3. **Done.** The `/linear-todo-runner` skill handles execution from here.
 
 ### Step 7b — Medium/High Complexity: VBW Planning
@@ -117,8 +117,8 @@ This sets the workspace title to `{project} - WIT-XXX` (read project name from `
    ```
    Agent(
      subagent_type: "vbw:vbw-lead",
-     description: "Plan WIT-XXX: {title}",
-     prompt: "Create a PLAN.md for WIT-XXX based on the following approved spec from Linear:
+     description: "Plan PROJ-XXX: {title}",
+     prompt: "Create a PLAN.md for PROJ-XXX based on the following approved spec from Linear:
      
      {full issue description}
      
@@ -131,8 +131,8 @@ This sets the workspace title to `{project} - WIT-XXX` (read project name from `
    ```
    Agent(
      subagent_type: "plan-reviewer",
-     description: "Review plan for WIT-XXX",
-     prompt: "Review the PLAN.md just created for WIT-XXX. 
+     description: "Review plan for PROJ-XXX",
+     prompt: "Review the PLAN.md just created for PROJ-XXX. 
      Stress-test scope, dependencies, success criteria, and risks.
      The spec is: {brief spec summary}"
    )
@@ -147,10 +147,10 @@ This sets the workspace title to `{project} - WIT-XXX` (read project name from `
    ```
    Agent(
      subagent_type: "vbw:vbw-dev",
-     description: "WIT-XXX task N: {task title}",
+     description: "PROJ-XXX task N: {task title}",
      prompt: "Execute task N from the plan at {plan path}.
      Read CLAUDE.md for conventions. Atomic commit per task.
-     Include WIT-XXX in all commit messages."
+     Include PROJ-XXX in all commit messages."
    )
    ```
 2. After each task completes, post a Linear comment with progress:
@@ -164,8 +164,8 @@ This sets the workspace title to `{project} - WIT-XXX` (read project name from `
    ```
    Agent(
      subagent_type: "vbw:vbw-qa",
-     description: "Verify WIT-XXX: {title}",
-     prompt: "Verify WIT-XXX against the acceptance criteria in the spec.
+     description: "Verify PROJ-XXX: {title}",
+     prompt: "Verify PROJ-XXX against the acceptance criteria in the spec.
      Use goal-backward methodology. Check each AC item.
      Run the pre-deploy gate: pnpm turbo run check-types && pnpm turbo run lint && pnpm turbo run test"
    )
@@ -188,7 +188,7 @@ This sets the workspace title to `{project} - WIT-XXX` (read project name from `
    ```
 3. Inform the user:
    ```
-   WIT-XXX is ready for UAT.
+   PROJ-XXX is ready for UAT.
    
    Test with: /g-test-vercel (pushes branch, returns preview URL)
    Accept with: move to Done in Linear, then /g-promote-dev
@@ -210,16 +210,16 @@ When invoked with `--milestone` or `--project`:
    ## Launch Plan: WP-1 Foundation Fixes
    
    Ready to launch (3 issues):
-     1. WIT-200 — Design tokens [Low] → Batch Runner
-     2. WIT-201 — Supabase types [Low] → Batch Runner
-     3. WIT-202 — Calculation tests [Medium] → VBW
+     1. PROJ-200 — Design tokens [Low] → Batch Runner
+     2. PROJ-201 — Supabase types [Low] → Batch Runner
+     3. PROJ-202 — Calculation tests [Medium] → VBW
    
    Blocked (1 issue):
-     - WIT-203 — Realtime strategy (blocked by WIT-200)
+     - PROJ-203 — Realtime strategy (blocked by PROJ-200)
    
    Not approved (2 issues):
-     - WIT-204 — AI cost monitoring (Specced, awaiting approval)
-     - WIT-205 — Cache strategy (Needs Spec)
+     - PROJ-204 — AI cost monitoring (Specced, awaiting approval)
+     - PROJ-205 — Cache strategy (Needs Spec)
    
    Proceed? (y/n)
    ```
@@ -283,9 +283,9 @@ If you catch yourself thinking any of these, follow the process more strictly:
 ## Example Session
 
 ```
-User: /launch WIT-200
+User: /launch PROJ-200
 
-## Gate Check: WIT-200 — Apply Piper Design Tokens
+## Gate Check: PROJ-200 — Apply Piper Design Tokens
 
   Spec: ✓ Light spec with AC (7 criteria)
   Dependencies: ✓ No blockers
@@ -294,17 +294,17 @@ User: /launch WIT-200
   Route: Batch Runner
 
 Moving to Building...
-WIT-200 queued for batch execution.
+PROJ-200 queued for batch execution.
 Run /linear-todo-runner to process.
 
 ---
 
-User: /launch WIT-88
+User: /launch PROJ-88
 
-## Gate Check: WIT-88 — AG Grid Enterprise Migration
+## Gate Check: PROJ-88 — AG Grid Enterprise Migration
 
   Spec: ✓ Light spec with AC (12 criteria)
-  Dependencies: ✓ WIT-200 (Done), WIT-201 (Done)
+  Dependencies: ✓ PROJ-200 (Done), PROJ-201 (Done)
   Milestone: ✓ WP-2 AG Grid Migration — all 4 siblings specced
   Complexity: High (~16h)
   Route: VBW (Lead → Plan → Dev → QA)
@@ -314,7 +314,7 @@ Spinning up VBW Lead Agent...
 
 [Plan created, reviewed, approved, executed, QA passed]
 
-## WIT-88 Build Complete — Moved to UAT
+## PROJ-88 Build Complete — Moved to UAT
 
   Tasks: 8/8 complete
   QA: passed
@@ -331,13 +331,13 @@ User: /launch --milestone "WP-1: Foundation Fixes"
 ## Launch Plan: WP-1 Foundation Fixes
 
 Ready to launch (4 issues):
-  1. WIT-200 — Design tokens [Low] → Batch Runner
-  2. WIT-201 — Supabase types [Low] → Batch Runner
-  3. WIT-202 — Calculation tests [Low] → Batch Runner
-  4. WIT-203 — Realtime strategy [Medium] → VBW
+  1. PROJ-200 — Design tokens [Low] → Batch Runner
+  2. PROJ-201 — Supabase types [Low] → Batch Runner
+  3. PROJ-202 — Calculation tests [Low] → Batch Runner
+  4. PROJ-203 — Realtime strategy [Medium] → VBW
 
 Not approved (1 issue):
-  - WIT-204 — AI cost monitoring (Specced)
+  - PROJ-204 — AI cost monitoring (Specced)
 
 Proceed? (y/n)
 ```

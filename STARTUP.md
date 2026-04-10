@@ -14,10 +14,10 @@ Before touching any code, answer these questions. They inform every decision dow
 
 ### 1.1 Project Identity
 
-| Question | Example (Piper) | Example (RS Vault) |
+| Question | Example (Project A) | Example (Project B) |
 |----------|-----------------|-------------------|
-| What is this? (one sentence) | Production finance platform for event professionals | Internal search tool for off-market property sales |
-| Who uses it? | Producers, accountants, project managers | Property brokers (~40 internal users) |
+| What is this? (one sentence) | Production finance platform for event professionals | Internal tool for team data management |
+| Who uses it? | Producers, accountants, project managers | End users (~40) |
 | What problem does it solve? | Spreadsheet budgets don't scale, can't collaborate, no audit trail | Shared Excel leaks data, corrupts formulas, no search |
 | How many users at launch? | 10-50 | ~40 |
 | Revenue model? | SaaS subscription | Annual hosting fee + future success-based pricing |
@@ -41,8 +41,8 @@ Break the build into stages. Each stage should be independently deployable and t
 | Decision | Options | Notes |
 |----------|---------|-------|
 | **Workspace name** | New workspace or add a team to existing | Separate workspace = cleaner. Same workspace = shared labels/views. |
-| **Team name** | e.g., `RSVault`, `Piper` | Determines issue prefix (RSV-1, WIT-1) |
-| **Issue prefix** | e.g., `RSV`, `WIT` | Short, unique, used in commit messages and branch names |
+| **Team name** | e.g., `MyProject`, `Acme` | Determines issue prefix (PROJ-1, ACME-1) |
+| **Issue prefix** | e.g., `PROJ`, `ACME` | Short, unique, used in commit messages and branch names |
 | **Workflow states** | Use the method standard (13 states) or simplify | Recommendation: start with the full set. You can always skip states, but adding them later means migrating issues. |
 | **Initiatives** | One per stage | Maps 1:1 to VBW phases |
 | **Projects** | Feature clusters within each stage | e.g., "Data Foundation", "Search & CRUD", "Reports" |

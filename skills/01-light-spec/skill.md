@@ -11,7 +11,7 @@ Draft a structured, VBW-ingestible specification for a Linear issue. Bridges the
 ## Triggers
 
 - `/light-spec` — start from scratch or provide an issue ID
-- `/light-spec WIT-123` — spec an existing issue
+- `/light-spec PROJ-123` — spec an existing issue
 
 ## Purpose
 
@@ -31,7 +31,7 @@ A light spec is an **AI→AI contract**: Generator → Reviewer → Planner. You
 
 | Input | Source | Required |
 |-------|--------|----------|
-| Issue ID (e.g., `WIT-123`) | Argument or prompt | No — creates new issue if omitted |
+| Issue ID (e.g., `PROJ-123`) | Argument or prompt | No — creates new issue if omitted |
 | Idea description | User prompt | Yes, if no issue ID |
 
 ## Execution Steps
@@ -115,7 +115,7 @@ If yes, post a comment via `mcp__linear-server__save_comment` that triggers the 
    Then update the issue description by replacing the existing ## Agent Review section with the new review.
    ```
 
-Tell the user: _"Linear's agent is reviewing. Once it updates the description, run `/light-spec WIT-XXX` again to pull in its feedback, or go straight to planning mode."_
+Tell the user: _"Linear's agent is reviewing. Once it updates the description, run `/light-spec PROJ-XXX` again to pull in its feedback, or go straight to planning mode."_
 
 ### Phase 7 — VBW Ingestion Pointer
 
@@ -124,7 +124,7 @@ Tell the user how to proceed:
 > **Next steps:**
 > - To flesh this out into a full VBW plan: enter planning mode and reference this issue
 > - To batch-process with other specced issues: `/linear-todo-runner` (requires Acceptance Criteria section)
-> - To refine further: `/light-spec WIT-XXX` to iterate
+> - To refine further: `/light-spec PROJ-XXX` to iterate
 
 ---
 
@@ -151,7 +151,7 @@ The light spec is designed so VBW's planning agents can consume it directly:
 | Complexity | `effort_override` (Low→expedited, Med→standard, High→thorough) |
 
 When entering planning mode, reference the issue:
-> "Plan WIT-XXX using the light spec in its description. Resolve open questions, break into tasks, and generate a PLAN.md."
+> "Plan PROJ-XXX using the light spec in its description. Resolve open questions, break into tasks, and generate a PLAN.md."
 
 The VBW lead agent will read the Linear issue, extract the spec, and use it as the foundation for task decomposition.
 
