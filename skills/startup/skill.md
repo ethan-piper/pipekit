@@ -1,11 +1,11 @@
 ---
 name: startup
-description: Orchestrate full project bootstrap — concept through first wave, with infrastructure setup
+description: Orchestrate full project bootstrap — concept through first phase, with infrastructure setup
 ---
 
 # Startup Skill
 
-Orchestrator for bootstrapping a new project using the Piper Dev Method. Chains pre-pipeline skills with infrastructure setup, creating a complete project from idea to first wave ready for speccing.
+Orchestrator for bootstrapping a new project using the Piper Dev Method. Chains pre-pipeline skills with infrastructure setup, creating a complete project from idea to first phase ready for speccing.
 
 ## Triggers
 
@@ -151,13 +151,13 @@ Create `.claude/rules/` files based on the stack:
 
 **Output:** CLAUDE.md and rules configured
 
-### Step 11 — Wave Plan
+### Step 11 — Phase Plan
 
-**Check:** Does `.vbw-planning/WAVES.md` exist?
-- If yes: _"Wave already planned. Skip or replan?"_
-- If no: Run `/wave-plan`
+**Check:** Does `.vbw-planning/PHASES.md` exist?
+- If yes: _"Phase already planned. Skip or replan?"_
+- If no: Run `/phase-plan`
 
-**Output:** First wave defined, issues in "Needs Spec"
+**Output:** First phase defined, issues in "Needs Spec"
 
 ### Step 12 — Validate
 
@@ -167,7 +167,7 @@ Run `/roadmap-review` to validate the full setup:
 - Strategy docs match config
 - ROADMAP.md populated
 - Linear board seeded
-- Current wave defined
+- Current phase defined
 - All checks pass
 
 If any check fails, diagnose and fix before declaring setup complete.
@@ -181,7 +181,7 @@ All steps passed. Your project is ready for the development pipeline.
 
 Next steps:
   - /light-spec {PREFIX}-1 — start speccing the first issue
-  - /wave-plan --status — check wave progress
+  - /phase-plan --status — check phase progress
   - /roadmap-review — full health check anytime
 ```
 

@@ -5,7 +5,7 @@ description: Validate roadmap health — issue completeness, dependency ordering
 
 # Roadmap Review Skill
 
-Comprehensive health check of the overall plan. Run before speccing a new wave to ensure the roadmap is coherent and complete.
+Comprehensive health check of the overall plan. Run before speccing a new phase to ensure the roadmap is coherent and complete.
 
 ## Triggers
 
@@ -17,15 +17,15 @@ Comprehensive health check of the overall plan. Run before speccing a new wave t
 ## Purpose
 
 Validate that:
-1. **Stage 0 outputs exist** — concept, definition, strategy docs, roadmap, wave
+1. **Stage 0 outputs exist** — concept, definition, strategy docs, roadmap, phase
 2. Every ROADMAP requirement has corresponding Linear issues
 3. Issues are in the correct stage/project
 4. Dependencies and blockers are set correctly
 5. Workflow states are consistent with dependency ordering
-6. Spec coverage is adequate for the next planned wave
+6. Spec coverage is adequate for the next planned phase
 7. Strategy docs are flagged if stale
 
-This is the **gate between Stage 0 (Foundation) and Stage 1 (Definition)** in the Piper Method pipeline. Run it before starting a new wave of specs.
+This is the **gate between Stage 0 (Foundation) and Stage 1 (Definition)** in the Piper Method pipeline. Run it before starting a new phase of specs.
 
 ## Execution Steps
 
@@ -41,7 +41,7 @@ Validate that pre-pipeline outputs exist. If any are missing, report which skill
 | VBW scaffold | `.vbw-planning/` directory | Run `/vbw:init` |
 | Roadmap | `.vbw-planning/ROADMAP.md` with content | Run `/roadmap-create` |
 | Linear board | Issues exist for roadmap requirements | Run `/roadmap-create` |
-| Wave defined | `.vbw-planning/WAVES.md` with current wave | Run `/wave-plan` |
+| Phase defined | `.vbw-planning/PHASES.md` with current phase | Run `/phase-plan` |
 
 If any Stage 0 check fails, report it prominently at the top of the health report:
 
@@ -50,7 +50,7 @@ If any Stage 0 check fails, report it prominently at the top of the health repor
 
 Missing:
   - concept-brief.md → run /concept
-  - .vbw-planning/WAVES.md → run /wave-plan
+  - .vbw-planning/PHASES.md → run /phase-plan
 
 Stage 0 must be complete before entering the spec pipeline.
 ```
@@ -62,7 +62,7 @@ If all Stage 0 checks pass, continue to the next check.
 1. Read `.vbw-planning/ROADMAP.md` for requirements by stage
 2. Read `.vbw-planning/linear-map.json` for ID mappings
 3. Read `.vbw-planning/STATE.md` for current progress
-4. Read `.vbw-planning/WAVES.md` for current wave composition
+4. Read `.vbw-planning/PHASES.md` for current phase composition
 5. Fetch all initiatives via `mcp__linear-server__list_initiatives`
 6. For each active and next-up initiative, fetch projects via `mcp__linear-server__list_projects`
 7. For each project, fetch issues via `mcp__linear-server__list_issues`
@@ -107,14 +107,14 @@ For each issue that has blockers:
 
 1. Fetch blocker issue status
 2. Apply ordering rules:
-   - If blocker is in Ideas/Future Waves/On Deck/Needs Spec → blocked issue should NOT be in Approved/Building/In Progress
+   - If blocker is in Ideas/Future Phases/On Deck/Needs Spec → blocked issue should NOT be in Approved/Building/In Progress
    - If blocker is in Done → the blocked issue is free to progress
    - If blocker is in Canceled → flag for review (is the dependency still relevant?)
 3. Flag ordering violations with recommended state changes
 
 ### Phase 6 — Spec Coverage
 
-For the next planned wave (issues in On Deck/Needs Spec/Specced for the active stage):
+For the next planned phase (issues in On Deck/Needs Spec/Specced for the active stage):
 
 1. List all issues that would enter the pipeline
 2. For each issue, check spec status:
@@ -124,11 +124,11 @@ For the next planned wave (issues in On Deck/Needs Spec/Specced for the active s
    - **Agent passed:** Agent Review verdict is "Pass"
    - **Human approved:** issue is in Approved (past Specced)
 3. Calculate readiness:
-   - Total issues in wave
+   - Total issues in phase
    - Issues with specs
    - Issues with passing agent review
    - Issues ready for planning (specced + approved)
-4. List issues needing specs before the wave can start
+4. List issues needing specs before the phase can start
 
 ### Phase 7 — Doc Freshness (Light Check)
 
@@ -171,7 +171,7 @@ Present a summary dashboard:
 - Y missing relations (list with exact `blockedBy` to add)
 - Z ordering violations (list with recommended state changes)
 
-### Spec Coverage (next wave: [wave name])
+### Spec Coverage (next phase: [phase name])
 | Status | Count | % |
 |--------|-------|---|
 | No spec | X | X% |
@@ -189,10 +189,10 @@ Parked items are brainstorm dispositions marked "Later" with trigger conditions.
 
 | Issue | Trigger Condition | Target | Triggered? |
 |-------|------------------|--------|-----------|
-| {issue} | "revisit when {X} ships" | Wave {N} | ✓ {X} is Done |
+| {issue} | "revisit when {X} ships" | Phase {N} | ✓ {X} is Done |
 | {issue} | "revisit after Stage 1 UAT" | Stage 2 | ✗ Stage 1 in progress |
 
-**Triggered items need re-disposition** — run `/brainstorm-review` on them or add to the current wave via `/wave-plan --rebalance`.
+**Triggered items need re-disposition** — run `/brainstorm-review` on them or add to the current phase via `/phase-plan --rebalance`.
 
 To find parked items: fetch issues with `Parked` label, read the trigger condition from their Linear comments.
 
@@ -215,7 +215,7 @@ Ask the user: _"Want me to fix any of these issues now? I can create missing iss
 ## Cadence
 
 Run at these moments:
-- **Before speccing a new wave** — ensures the plan is sound before you invest in specs
+- **Before speccing a new phase** — ensures the plan is sound before you invest in specs
 - **At the start of a new stage** — validates stage setup is complete
 - **Monthly** — routine health check
 - **After major scope changes** — re-validate after adding/removing features

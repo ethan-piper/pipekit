@@ -98,7 +98,7 @@ Determine what can be automated vs. what needs manual setup.
    - `team`: from `method.config.md`
    - `title`: requirement title
    - `description`: requirement detail + strategy doc reference
-   - `state`: Stage 1 → "On Deck" | Stage 2+ → "Future Waves" | Parking lot → "Ideas"
+   - `state`: Stage 1 → "On Deck" | Stage 2+ → "Future Phases" | Parking lot → "Ideas"
    - `priority`: 0 (None) — triage sets real priority
 
 2. **Set Dependency Relations** — for each dependency in the roadmap:
@@ -201,7 +201,7 @@ File: .vbw-planning/ROADMAP.md
 Issues created: {N} across {M} feature clusters
 
 Stage 1: {N} requirements → {M} issues (On Deck)
-Stage 2: {N} requirements → {M} issues (Future Waves)
+Stage 2: {N} requirements → {M} issues (Future Phases)
 Parking lot: {N} items (Ideas)
 
 Dependencies: {N} relations set
@@ -211,7 +211,7 @@ Manual setup needed: {list of manual steps}
 
 Next steps:
   - Complete manual Linear setup (see instructions above)
-  - /wave-plan — select the first execution wave
+  - /phase-plan — select the first execution phase
   - /roadmap-review — validate everything before speccing
 ```
 
@@ -229,7 +229,7 @@ Next steps:
 - **Trace everything.** Every requirement references a strategy doc section. Untraced requirements are orphans — they need a strategy doc home or they shouldn't be in the roadmap.
 - **Automate what you can.** Create issues, set relations, apply labels via MCP. Give clear manual instructions for the rest.
 - **Human approves the roadmap before Linear population.** Don't create issues until the roadmap structure is approved.
-- **Stage 1 issues go to On Deck.** Not "Needs Spec" — that happens when `/wave-plan` selects them for the first wave.
+- **Stage 1 issues go to On Deck.** Not "Needs Spec" — that happens when `/phase-plan` selects them for the first phase.
 
 ## Red Flags
 
@@ -245,6 +245,6 @@ If you catch yourself thinking any of these, follow the process more strictly:
 - `/define` — previous step: creates the project definition
 - `/strategy-create` — creates the strategy docs this skill reads
 - `/vbw:init` — scaffolds `.vbw-planning/` (run before this skill)
-- `/wave-plan` — next step: select issues for the first execution wave
+- `/phase-plan` — next step: select issues for the first execution phase
 - `/roadmap-review` — validates the roadmap after creation
 - This skill IS the Linear seeding step (no separate seed skill needed)

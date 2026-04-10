@@ -30,7 +30,7 @@ Skills use these IDs to transition issues. Get them from Linear API or the Linea
 |-------|-----|
 | Triage | `` |
 | Ideas | `` |
-| Future Waves | `` |
+| Future Phases | `` |
 | On Deck | `` |
 | Needs Spec | `` |
 | Specced | `` |

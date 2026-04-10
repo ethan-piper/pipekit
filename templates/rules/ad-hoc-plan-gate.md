@@ -1,6 +1,6 @@
 # Rule: Ad-hoc Plan Gate
 
-For non-VBW interactive work (quick fixes, exploratory changes, bug fixes outside a wave), present a 3-5 bullet plan and get user approval **before writing any code**.
+For non-VBW interactive work (quick fixes, exploratory changes, bug fixes outside a phase), present a 3-5 bullet plan and get user approval **before writing any code**.
 
 ## Plan Format
 

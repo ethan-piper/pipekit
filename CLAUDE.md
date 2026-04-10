@@ -16,14 +16,14 @@ Origin: extracted from the [Piper](https://github.com/ethan-piper/piper) product
 
 ```
 Stage 0: Foundation (once per project)
-  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /wave-plan
+  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /phase-plan
 
-Stages 1-5: Development (repeats per wave)
+Stages 1-5: Development (repeats per phase)
   [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
   VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
 ```
 
-Stage 0 takes a project from idea to first wave. Stages 1-5 repeat per wave/feature. Feedback loops send work backward when ambiguity is detected.
+Stage 0 takes a project from idea to first phase. Stages 1-5 repeat per phase/feature. Feedback loops send work backward when ambiguity is detected.
 
 ## Repo Structure
 
@@ -65,7 +65,7 @@ VBW agents don't call skills — they read the consuming project's CLAUDE.md dir
 | `/strategy-create` | Bootstrap strategy docs from project definition |
 | `/startup` | Full bootstrap orchestrator — chains all Stage 0 + setup steps |
 | `/roadmap-create` | Create ROADMAP.md and populate Linear |
-| `/wave-plan` | Select execution waves, track progress |
+| `/phase-plan` | Select execution phases, track progress |
 
 **Development Pipeline:**
 

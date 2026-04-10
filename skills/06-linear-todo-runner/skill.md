@@ -283,7 +283,7 @@ You are implementing a Linear issue. Read CLAUDE.md and method.config.md for pro
 
 ## Dependency Scheduling Notes
 
-The runner does NOT hardcode dependency chains. It reads `blocked_by` relations from Linear issues. For Wave 2 context, the typical dependency graph is:
+The runner does NOT hardcode dependency chains. It reads `blocked_by` relations from Linear issues. For Phase 2 context, the typical dependency graph is:
 
 - WP-1 (Foundation Fixes) blocks most downstream work
 - After WP-1: WP-2 (AG Grid) and WP-4 (Auth/Nav) can run in parallel

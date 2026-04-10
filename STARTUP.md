@@ -1,6 +1,6 @@
 # Project Startup Guide
 
-> **Reference document.** For the interactive flow, use `/startup` — it orchestrates the full bootstrap process, chaining `/concept`, `/define`, `/strategy-create`, `/roadmap-create`, `/wave-plan`, and infrastructure setup. This document provides background context and detailed checklists that the skills reference.
+> **Reference document.** For the interactive flow, use `/startup` — it orchestrates the full bootstrap process, chaining `/concept`, `/define`, `/strategy-create`, `/roadmap-create`, `/phase-plan`, and infrastructure setup. This document provides background context and detailed checklists that the skills reference.
 
 A walkthrough for bootstrapping a new project using the Piper Dev Method. Covers goal definition, tech stack decisions, environment setup, and skill creation.
 

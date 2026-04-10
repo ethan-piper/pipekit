@@ -43,23 +43,23 @@ Immediately after creating the issue, force a disposition decision:
 
 > **What should happen with this idea?**
 >
-> 1. **Now** → Route to pipeline. Assign to a wave/stage, move to Needs Spec.
-> 2. **Later** → Park with a trigger condition and target wave.
+> 1. **Now** → Route to pipeline. Assign to a phase/stage, move to Needs Spec.
+> 2. **Later** → Park with a trigger condition and target phase.
 > 3. **Kill** → Archive with rationale.
 
 **If Now:**
-- Ask which stage/wave this belongs to
+- Ask which stage/phase this belongs to
 - Move issue to "Needs Spec" via `mcp__linear-server__save_issue`
-- Inform: _"Ready for `/light-spec {issue}` when you start the wave."_
+- Inform: _"Ready for `/light-spec {issue}` when you start the phase."_
 
 **If Later:**
 - Ask for a **trigger condition** — what must be true before revisiting? (e.g., "revisit when RSV-56 ships", "revisit after Stage 1 UAT")
-- Ask for a **target wave/stage** (e.g., "Wave 4+", "Stage 2")
-- Move issue to "Ideas" or "Future Waves" based on target
+- Ask for a **target phase/stage** (e.g., "Phase 4+", "Stage 2")
+- Move issue to "Ideas" or "Future Phases" based on target
 - Add a `Parked` label if available
 - Post a Linear comment with the trigger condition:
   ```
-  **Parked:** Revisit when {trigger condition}. Target: {wave/stage}.
+  **Parked:** Revisit when {trigger condition}. Target: {phase/stage}.
   ```
 - These are surfaced by `/roadmap-review` when trigger conditions are met.
 
@@ -124,4 +124,4 @@ If you catch yourself thinking any of these, follow the process more strictly:
 - `/brainstorm-review` — triage untriaged Linear issues with disposition
 - `/concept` — project-level ideation (for new projects, not features)
 - `/light-spec` — next step for ideas that move forward
-- `/wave-plan` — "Now" dispositions feed into wave planning
+- `/phase-plan` — "Now" dispositions feed into phase planning

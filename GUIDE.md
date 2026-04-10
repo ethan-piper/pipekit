@@ -18,7 +18,7 @@ A complete guide to using the Piper Dev Method from project inception through pr
    - [Step 0.4: Infrastructure Setup](#step-04-infrastructure-setup)
    - [Step 0.5: VBW Init](#step-05-vbw-init)
    - [Step 0.6: Roadmap Create](#step-06-roadmap-create)
-   - [Step 0.7: Wave Plan](#step-07-wave-plan)
+   - [Step 0.7: Phase Plan](#step-07-phase-plan)
 5. [Stage 0 Gate: Roadmap Review](#stage-0-gate-roadmap-review)
 6. [Stage 1: Definition](#stage-1-definition)
    - [Light Spec](#light-spec)
@@ -34,8 +34,8 @@ A complete guide to using the Piper Dev Method from project inception through pr
    - [UAT](#uat)
 9. [Stage 4: Release](#stage-4-release)
 10. [Stage 5: Documentation Loop](#stage-5-documentation-loop)
-11. [Between Waves](#between-waves)
-12. [The Wave Model](#the-wave-model)
+11. [Between Phases](#between-phases)
+12. [The Phase Model](#the-phase-model)
 13. [The Strategy Doc Framework](#the-strategy-doc-framework)
 14. [The Linear Model](#the-linear-model)
 15. [VBW Integration](#vbw-integration)
@@ -82,14 +82,14 @@ STAGE 0: FOUNDATION (runs once per project)
   concept-     project-       Strategy/         repo, DB,    .vbw-planning/
   brief.md    definition.md    docs           deploy, MCP     scaffold
 
-      ──→ /roadmap-create ──→ /wave-plan ──→ /roadmap-review (GATE)
+      ──→ /roadmap-create ──→ /phase-plan ──→ /roadmap-review (GATE)
                 │                   │                │
-          ROADMAP.md +          WAVES.md         Stage 0
-          Linear board      (first wave in     validated ✓
+          ROADMAP.md +          PHASES.md        Stage 0
+          Linear board      (first phase in    validated ✓
           populated         "Needs Spec")
 
 
-STAGES 1-5: DEVELOPMENT PIPELINE (repeats per wave/feature)
+STAGES 1-5: DEVELOPMENT PIPELINE (repeats per phase/feature)
 ──────────────────────────────────────────────────────────────────────
 
   /light-spec ──→ Agent Review ──→ Human Review ──→ /launch
@@ -109,19 +109,19 @@ STAGES 1-5: DEVELOPMENT PIPELINE (repeats per wave/feature)
        release        updated to match
                       what was built
 
-BETWEEN WAVES:
+BETWEEN PHASES:
 ──────────────────────────────────────────────────────────────────────
 
-  /wave-plan --next ──→ /roadmap-review ──→ /light-spec (next wave begins)
+  /phase-plan --next ──→ /roadmap-review ──→ /light-spec (next phase begins)
 ```
 
-**Stage 0** runs once when the project starts. Everything after that repeats for each wave of features. Between waves, `/wave-plan --next` selects the next batch and `/roadmap-review` validates before speccing begins again.
+**Stage 0** runs once when the project starts. Everything after that repeats for each phase of features. Between phases, `/phase-plan --next` selects the next batch and `/roadmap-review` validates before speccing begins again.
 
 ---
 
 ## Stage 0: Foundation
 
-Stage 0 takes a project from raw idea to first wave ready for speccing. It runs once per project. The `/startup` skill orchestrates the full flow — you can run each step individually or let `/startup` chain them.
+Stage 0 takes a project from raw idea to first phase ready for speccing. It runs once per project. The `/startup` skill orchestrates the full flow — you can run each step individually or let `/startup` chain them.
 
 ### Step 0.1: Concept
 
@@ -326,7 +326,7 @@ This is where strategy becomes work items. The skill reads your strategy docs an
 
 1. **ROADMAP.md** — requirements organized by stage, grouped into feature clusters, with dependency mapping and strategy doc traceability
 2. **Linear Issues** — one issue per requirement, with:
-   - Correct status (On Deck for Stage 1, Future Waves for Stage 2+, Ideas for parking lot)
+   - Correct status (On Deck for Stage 1, Future Phases for Stage 2+, Ideas for parking lot)
    - Dependency relations (`blocked_by`)
    - Type and domain labels
    - Milestone (Work Package) assignment
@@ -340,33 +340,33 @@ This is where strategy becomes work items. The skill reads your strategy docs an
 
 ---
 
-### Step 0.7: Wave Plan
+### Step 0.7: Phase Plan
 
-**Skill:** `/wave-plan`
+**Skill:** `/phase-plan`
 **Input:** Populated Linear board + `.vbw-planning/ROADMAP.md`
-**Output:** `.vbw-planning/WAVES.md` + issues promoted to "Needs Spec"
+**Output:** `.vbw-planning/PHASES.md` + issues promoted to "Needs Spec"
 
-A wave is a batch of issues selected for the current execution cycle. This skill selects which issues to work on next, validates dependencies, and promotes them so the spec pipeline can begin.
+A phase is a batch of issues selected for the current execution cycle. This skill selects which issues to work on next, validates dependencies, and promotes them so the spec pipeline can begin.
 
-**Wave composition guidelines:**
+**Phase composition guidelines:**
 
 | Guideline | Target |
 |-----------|--------|
-| Wave size | 3-8 issues |
+| Phase size | 3-8 issues |
 | Complexity mix | At least 1 Low for quick wins, no more than 2 High |
-| Dependencies | No issue blocked by something outside the wave (unless it's Done) |
+| Dependencies | No issue blocked by something outside the phase (unless it's Done) |
 | Milestone coverage | Prefer completing milestones over splitting them |
 
-**What happens when you approve a wave:**
+**What happens when you approve a phase:**
 
 1. Selected issues move from "On Deck" → "Needs Spec"
-2. If On Deck is now empty, issues from "Future Waves" get promoted to On Deck
-3. A Linear comment is posted on each issue noting its wave assignment
-4. `.vbw-planning/WAVES.md` is created/updated with the wave registry
+2. If On Deck is now empty, issues from "Future Phases" get promoted to On Deck
+3. A Linear comment is posted on each issue noting its phase assignment
+4. `.vbw-planning/PHASES.md` is created/updated with the phase registry
 
-**WAVES.md tracks wave history:**
+**PHASES.md tracks phase history:**
 ```markdown
-## Current Wave: Wave 1
+## Current Phase: Phase 1
 - Started: 2026-04-08
 - Theme: Foundation
 - Milestone(s): WP-1 Data Foundation, WP-2 Search
@@ -375,7 +375,7 @@ A wave is a batch of issues selected for the current execution cycle. This skill
   - RSV-2 — Basic search [Needs Spec]
   - RSV-3 — User authentication [Needs Spec]
 
-## Completed Waves
+## Completed Phases
 - (none yet)
 ```
 
@@ -397,15 +397,15 @@ Before the spec pipeline begins, `/roadmap-review` validates that Stage 0 is com
 | VBW scaffold | `.vbw-planning/` | Run `/vbw:init` |
 | Roadmap | `.vbw-planning/ROADMAP.md` | Run `/roadmap-create` |
 | Linear board | Issues exist for requirements | Run `/roadmap-create` |
-| Wave defined | `.vbw-planning/WAVES.md` | Run `/wave-plan` |
+| Phase defined | `.vbw-planning/PHASES.md` | Run `/phase-plan` |
 
-**Ongoing health checks** (run every wave):
+**Ongoing health checks** (run every phase):
 
 - **Completeness** — every roadmap requirement has a Linear issue
 - **Assignment** — issues are in the correct stage/project/milestone
 - **Dependencies** — `blocked_by` relations match the roadmap
 - **Ordering** — workflow states are consistent with dependency order
-- **Spec coverage** — how many issues in the current wave have specs
+- **Spec coverage** — how many issues in the current phase have specs
 - **Doc freshness** — strategy docs flagged if features shipped without a sync
 
 If any check fails, the report tells you exactly which skill to run to fix it.
@@ -631,27 +631,27 @@ Strategy Docs (vision) → Specs → Plans → Code → Strategy Docs (reality)
 **Critical rule: Code is truth.** If the implementation differs from the spec, the Strategy doc matches the code — not the spec. Specs describe intent; code describes reality.
 
 **When to run:**
-- After UAT passes for a wave
+- After UAT passes for a phase
 - Before stakeholder presentations
 - Before onboarding new team members
 - When `/roadmap-review` flags doc staleness
 
 ---
 
-## Between Waves
+## Between Phases
 
-When a wave's issues are all Done (or a wave is otherwise complete):
+When a phase's issues are all Done (or a phase is otherwise complete):
 
-1. **`/wave-plan --next`** — archives the completed wave and proposes the next one
-   - Shows a brief retrospective: how long the wave took, complexity accuracy
+1. **`/phase-plan --next`** — archives the completed phase and proposes the next one
+   - Shows a brief retrospective: how long the phase took, complexity accuracy
    - Identifies newly unblocked issues (their blockers just completed)
-   - Proposes the next wave composition
+   - Proposes the next phase composition
 2. **`/roadmap-review`** — validates the roadmap is still healthy before speccing
-3. **`/light-spec`** — begin speccing the next wave's issues
+3. **`/light-spec`** — begin speccing the next phase's issues
 
-**`/wave-plan --status`** is available anytime for a progress dashboard:
+**`/phase-plan --status`** is available anytime for a progress dashboard:
 ```
-Wave 2 Status — 2026-04-15
+Phase 2 Status — 2026-04-15
 
 | Issue | Title | Status | Days |
 |-------|-------|--------|------|
@@ -664,40 +664,40 @@ Progress: 1/4 Done (25%)
 Alert: RSV-7 in "Needs Spec" for 4 days — run /light-spec RSV-7
 ```
 
-**`/wave-plan --rebalance`** adjusts the current wave if priorities shift — add, remove, or swap issues.
+**`/phase-plan --rebalance`** adjusts the current phase if priorities shift — add, remove, or swap issues.
 
 ---
 
-## The Wave Model
+## The Phase Model
 
-Waves, milestones, and cycles serve different purposes. Understanding their relationship is important for wave planning.
+Phases, milestones, and cycles serve different purposes. Understanding their relationship is important for phase planning.
 
 ### The Three Concepts
 
 | Concept | What It Is | Linear Construct | Lifespan |
 |---------|-----------|-----------------|----------|
 | **Milestone (Work Package)** | A feature cluster — groups related issues for gating | Linear Milestone | Permanent within a stage |
-| **Wave** | An execution batch — what we're building right now | `.vbw-planning/WAVES.md` | Temporary (one cycle) |
+| **Phase** | An execution batch — what we're building right now | `.vbw-planning/PHASES.md` | Temporary (one cycle) |
 | **Cycle** (optional) | A time-boxed sprint — capacity planning | Linear Cycle | Configurable duration |
 
 ### How They Relate
 
-**Milestones group by feature. Waves group by execution order.**
+**Milestones group by feature. Phases group by execution order.**
 
-A wave may pull from multiple milestones:
+A phase may pull from multiple milestones:
 ```
-Wave 1:
+Phase 1:
   - RSV-1 from WP-1 (Foundation)
   - RSV-2 from WP-1 (Foundation)
   - RSV-3 from WP-2 (Search)
 ```
 
-A large milestone may span multiple waves:
+A large milestone may span multiple phases:
 ```
 WP-2 (Search) — 8 issues:
-  - Wave 1: RSV-3, RSV-4 (core search)
-  - Wave 2: RSV-7, RSV-8 (advanced search, export)
-  - Wave 3: RSV-11, RSV-12, RSV-13, RSV-14 (filters, saved searches)
+  - Phase 1: RSV-3, RSV-4 (core search)
+  - Phase 2: RSV-7, RSV-8 (advanced search, export)
+  - Phase 3: RSV-11, RSV-12, RSV-13, RSV-14 (filters, saved searches)
 ```
 
 ### Milestone Gating
@@ -706,14 +706,14 @@ WP-2 (Search) — 8 issues:
 
 ### Linear Cycles (Optional)
 
-If you want time-boxed sprints with capacity tracking, map waves to Linear Cycles. This is optional — the method works without cycles. Cycles add:
+If you want time-boxed sprints with capacity tracking, map phases to Linear Cycles. This is optional — the method works without cycles. Cycles add:
 - Start/end dates
 - Team capacity tracking
 - Velocity measurement
 
-### Wave State Tracking
+### Phase State Tracking
 
-Waves are tracked in `.vbw-planning/WAVES.md`, not in Linear. Linear tracks individual issue status (Needs Spec, Building, UAT, Done). WAVES.md tracks which issues belong to which wave and the wave's overall progress.
+Phases are tracked in `.vbw-planning/PHASES.md`, not in Linear. Linear tracks individual issue status (Needs Spec, Building, UAT, Done). PHASES.md tracks which issues belong to which phase and the phase's overall progress.
 
 ---
 
@@ -776,7 +776,7 @@ Initiative = Stage              "What stage does this ship in?"
 
 ```
 Planned path:
-  Triage → Ideas → Future Waves → On Deck → Needs Spec → Specced → Approved → Building → UAT → Done
+  Triage → Ideas → Future Phases → On Deck → Needs Spec → Specced → Approved → Building → UAT → Done
 
 Ad-hoc path:
   Triage → In Progress → UAT → Done
@@ -786,20 +786,20 @@ Terminal:
 ```
 
 **Key distinction:**
-- **Building** = VBW owns it. Wave-batched, planned work.
-- **In Progress** = You're doing it manually. Ad-hoc, outside the wave.
+- **Building** = VBW owns it. Phase-batched, planned work.
+- **In Progress** = You're doing it manually. Ad-hoc, outside the phase.
 
-### Wave Management via Status
+### Phase Management via Status
 
-| Status Group | Wave Role |
+| Status Group | Phase Role |
 |-------------|-----------|
 | Ideas | Someday — evaluated but not scheduled |
-| Future Waves | Known future stage — not current or next |
-| On Deck | Next wave — staging area |
-| Needs Spec → UAT | Current wave — active pipeline |
+| Future Phases | Known future stage — not current or next |
+| On Deck | Next phase — staging area |
+| Needs Spec → UAT | Current phase — active pipeline |
 | Done | Shipped |
 
-`/wave-plan` manages the On Deck → Needs Spec promotion. Refilling On Deck from Future Waves happens when the current wave starts.
+`/phase-plan` manages the On Deck → Needs Spec promotion. Refilling On Deck from Future Phases happens when the current phase starts.
 
 ### Labels
 
@@ -819,7 +819,7 @@ Terminal:
 | Task decomposition | `.vbw-planning/` PLAN files | Linear |
 | Execution status | Both (synced via `/sync-linear`) | — |
 | Code | Git | Linear or VBW |
-| Wave composition | `.vbw-planning/WAVES.md` | Linear |
+| Phase composition | `.vbw-planning/PHASES.md` | Linear |
 
 **Never create Linear issues for VBW tasks.** Features are the bridge between Linear and VBW.
 
@@ -1015,10 +1015,10 @@ Add to `.git/hooks/post-commit` or your project's hook system:
 | Startup | `/startup` | Full orchestrator (chains everything) |
 | Roadmap Create | `/roadmap-create` | Strategy → ROADMAP.md + Linear |
 | Roadmap Verify | `/roadmap-create --verify` | Check Linear matches roadmap |
-| Wave Plan | `/wave-plan` | Select first/next wave |
-| Wave Status | `/wave-plan --status` | Current wave progress |
-| Wave Next | `/wave-plan --next` | Archive + plan next wave |
-| Wave Rebalance | `/wave-plan --rebalance` | Adjust current wave |
+| Phase Plan | `/phase-plan` | Select first/next phase |
+| Phase Status | `/phase-plan --status` | Current phase progress |
+| Phase Next | `/phase-plan --next` | Archive + plan next phase |
+| Phase Rebalance | `/phase-plan --rebalance` | Adjust current phase |
 
 ### Development Pipeline
 
@@ -1064,7 +1064,7 @@ Key skills include a `## Red Flags` section — self-sabotage thoughts that Clau
 | "This doesn't need a Linear issue" | Every idea gets an issue. Issues without tracking get forgotten. |
 | "I'll keep it in Ideas for now" | "Keep" without a trigger condition is how issues die |
 
-Skills with Red Flags: `/concept`, `/define`, `/strategy-create`, `/roadmap-create`, `/wave-plan`, `/launch`, `/light-spec`, `/brainstorm`.
+Skills with Red Flags: `/concept`, `/define`, `/strategy-create`, `/roadmap-create`, `/phase-plan`, `/launch`, `/light-spec`, `/brainstorm`.
 
 ---
 
@@ -1115,13 +1115,13 @@ Immediately after creating the issue, force one of three decisions:
 
 | Decision | What Happens |
 |----------|-------------|
-| **Now** | Route to pipeline — assign to a wave/stage, move to Needs Spec |
-| **Later** | Park with explicit trigger condition + target wave. Tagged `Parked` in Linear. |
+| **Now** | Route to pipeline — assign to a phase/stage, move to Needs Spec |
+| **Later** | Park with explicit trigger condition + target phase. Tagged `Parked` in Linear. |
 | **Kill** | Archive with rationale. Move to Canceled. |
 
 **Parking rules for "Later" items:**
 - Must have a trigger condition (e.g., "revisit when RSV-56 ships")
-- Must have a target wave/stage (e.g., "Wave 4+")
+- Must have a target phase/stage (e.g., "Phase 4+")
 - Surfaced by `/roadmap-review` when trigger conditions are met
 
 ### REDUCE (for "Now" items)
@@ -1142,7 +1142,7 @@ If the brainstorm is broad, cut to v1 scope before entering the spec pipeline:
 | `/brainstorm` | EXPAND + immediate HOLD + optional REDUCE |
 | `/brainstorm-review` | Batch HOLD for untriaged backlog |
 | `/roadmap-review` | Surfaces parked items whose triggers have fired |
-| `/wave-plan --rebalance` | Adds "Now" dispositions to current wave |
+| `/phase-plan --rebalance` | Adds "Now" dispositions to current phase |
 
 ---
 
@@ -1170,7 +1170,7 @@ Brevity, `[TBD]`, limited context are fine. Hidden assumptions and implicit beha
 AI proposes, reviews, and executes. Humans decide. AI never locks in a product decision — it presents analysis and waits for the call.
 
 ### Code Is Truth
-When code and documentation disagree, trust the code. Strategy docs track reality, not aspirations. `/strategy-sync` enforces this after every wave.
+When code and documentation disagree, trust the code. Strategy docs track reality, not aspirations. `/strategy-sync` enforces this after every phase.
 
 ### Every Step Forward Is a PR
 No direct merges between long-lived branches. Each promotion (dev → beta → main) is a PR with CI gates. Hotfixes cherry-pick back immediately.

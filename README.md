@@ -10,14 +10,14 @@ A structured AI-assisted software delivery system. Provides a deterministic pipe
 
 ```
 Stage 0: Foundation (once per project)
-  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /wave-plan
+  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /phase-plan
 
-Stages 1-5: Development (repeats per wave)
+Stages 1-5: Development (repeats per phase)
   [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
   VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
 ```
 
-Stage 0 takes a project from raw idea to first wave ready for speccing. Stages 1-5 repeat for each wave of features.
+Stage 0 takes a project from raw idea to first phase ready for speccing. Stages 1-5 repeat for each phase of features.
 
 ## What's Included
 
@@ -55,7 +55,7 @@ piper-dev-method/
     define/                        #   Stage 0: distill concept into definition
     strategy-create/               #   Stage 0: bootstrap strategy docs
     roadmap-create/                #   Stage 0: create roadmap + populate Linear
-    wave-plan/                     #   Stage 0: select execution waves
+    phase-plan/                    #   Stage 0: select execution phases
     startup/                       #   Stage 0: full bootstrap orchestrator
     update-method/                 #   Sync method into consuming projects
     00-roadmap-review/             #   Stage 0 gate + health check
@@ -91,7 +91,7 @@ piper-dev-method/
 
 # It chains everything:
 #   /concept → /define → tech stack → infra setup → /strategy-create →
-#   method sync → /vbw:init → /roadmap-create → skills → CLAUDE.md → /wave-plan →
+#   method sync → /vbw:init → /roadmap-create → skills → CLAUDE.md → /phase-plan →
 #   /roadmap-review (validation)
 ```
 
@@ -133,7 +133,7 @@ cp method.config.template.md method.config.md
 - `method/decisions/` — project-specific ADRs
 - `.claude/rules/` — project coding conventions
 - `.claude/skills/{project-specific}/` — skills tied to your stack
-- `.vbw-planning/` — all project state (ROADMAP, WAVES, phases, plans)
+- `.vbw-planning/` — all project state (ROADMAP, PHASES, phases, plans)
 
 ## Documentation
 

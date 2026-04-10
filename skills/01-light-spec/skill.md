@@ -163,7 +163,7 @@ Same as `/brainstorm`, but with planning implications:
 
 - **Low (~2-4h):** Can skip full VBW planning — spec is sufficient for `/linear-todo-runner` to pick up directly if AC section is complete.
 - **Medium (~6-10h):** Benefits from a single VBW plan (1 PLAN.md). The light spec provides enough for the lead agent to generate tasks.
-- **High (~12-20h+):** Likely needs multiple VBW plans across a wave. The light spec seeds the architect agent's phase decomposition.
+- **High (~12-20h+):** Likely needs multiple VBW plans across a phase. The light spec seeds the architect agent's phase decomposition.
 
 ## Red Flags
 

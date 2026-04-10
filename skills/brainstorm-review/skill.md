@@ -62,11 +62,11 @@ Brainstormed: 3 days ago
 Complexity: Medium (~6-10h)
 Dependencies: RSV-3 (Basic search) — currently in Building
 
-Assessment: Aligns with Stage 1. Dependency will be met this wave.
-Recommendation: Now — queue for next wave after RSV-3 ships.
+Assessment: Aligns with Stage 1. Dependency will be met this phase.
+Recommendation: Now — queue for next phase after RSV-3 ships.
 
 Disposition:
-  1. Now → route to pipeline (assign wave, move to Needs Spec)
+  1. Now → route to pipeline (assign phase, move to Needs Spec)
   2. Later → park with trigger condition
   3. Kill → archive with rationale
   4. Merge → combine with existing issue
@@ -76,19 +76,19 @@ Disposition:
 ### Phase 4 — Execute Disposition
 
 **Now:**
-1. Ask which wave/stage
+1. Ask which phase/stage
 2. If the brainstorm is broad, run REDUCE: _"What's the smallest useful version? What can wait?"_
 3. Update description with `## v1 Scope` if reduced
-4. Move to "On Deck" or "Needs Spec" based on wave timing
+4. Move to "On Deck" or "Needs Spec" based on phase timing
 5. Set priority (ask user)
 6. Assign to correct project/initiative
 
 **Later:**
 1. Ask for trigger condition (e.g., "revisit when RSV-3 ships")
-2. Ask for target wave/stage
-3. Move to "Ideas" or "Future Waves"
+2. Ask for target phase/stage
+3. Move to "Ideas" or "Future Phases"
 4. Add `Parked` label
-5. Post Linear comment: `"Parked: Revisit when {trigger}. Target: {wave/stage}."`
+5. Post Linear comment: `"Parked: Revisit when {trigger}. Target: {phase/stage}."`
 
 **Kill:**
 1. Ask for rationale
@@ -109,8 +109,8 @@ Disposition:
 Reviewed: {N} issues
 
   Now: {N} (moved to On Deck / Needs Spec)
-    - RSV-12 — Advanced search filters → Wave 2
-    - RSV-15 — Export to PDF → Wave 3
+    - RSV-12 — Advanced search filters → Phase 2
+    - RSV-15 — Export to PDF → Phase 3
 
   Later: {N} (parked with triggers)
     - RSV-18 — AI matching → revisit after Stage 1 UAT
@@ -124,7 +124,7 @@ Reviewed: {N} issues
   Skipped: {N}
 
 Next steps:
-  - /wave-plan --rebalance if "Now" items should enter the current wave
+  - /phase-plan --rebalance if "Now" items should enter the current phase
   - /light-spec {issue} for any "Now" items in Needs Spec
   - /roadmap-review to validate the updated board
 ```
@@ -135,7 +135,7 @@ Next steps:
 |-------|----------------|
 | `/brainstorm` | Creates the issues this skill triages. `/brainstorm` now includes immediate disposition (Phase 2), but older issues or batch-created issues still need `/brainstorm-review`. |
 | `/roadmap-review` | Surfaces "Later" items whose trigger conditions have fired. When a parked issue's trigger is met, `/roadmap-review` flags it for re-disposition. |
-| `/wave-plan` | "Now" dispositions feed into wave composition. Run `/wave-plan --rebalance` after a review session that adds issues to the current stage. |
+| `/phase-plan` | "Now" dispositions feed into phase composition. Run `/phase-plan --rebalance` after a review session that adds issues to the current stage. |
 | `/light-spec` | The next step for "Now" items that move to Needs Spec. |
 
 ## Red Flags
@@ -144,11 +144,11 @@ If you catch yourself thinking any of these, follow the process more strictly:
 
 - **"I'll keep it in Ideas for now"** → "Keep" without a trigger condition is how issues get forgotten. Force a Later (with trigger) or Kill decision.
 - **"This might be useful someday"** → "Someday" is not a trigger condition. Either define when to revisit or kill it.
-- **"Let me just prioritize it and move on"** → Setting priority without a wave/stage assignment is a half-disposition. Where does it ship?
+- **"Let me just prioritize it and move on"** → Setting priority without a phase/stage assignment is a half-disposition. Where does it ship?
 
 ## Related
 
 - `/brainstorm` — creates issues with immediate disposition
 - `/concept` — project-level ideation (different from feature brainstorming)
-- `/wave-plan` — manages wave composition after disposition
+- `/phase-plan` — manages phase composition after disposition
 - `/roadmap-review` — surfaces parked items whose triggers have fired

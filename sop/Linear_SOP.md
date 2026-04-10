@@ -43,7 +43,7 @@ Labels = Cross-cutting metadata        <- Filterable on everything
 | Phase | Initiative | 1:1 match |
 | Feature cluster | Project | Grouped by product area |
 | Work Package | Milestone | Execution batches within projects |
-| Plan (wave) | -- | VBW internal only. `.vbw-planning/` |
+| Plan (phase) | -- | VBW internal only. `.vbw-planning/` |
 | Task | -- | VBW internal only. `.vbw-planning/` |
 | Issue (ISSUES.md) | Issue | Issue IDs shared across both systems |
 
@@ -67,7 +67,7 @@ Labels = Cross-cutting metadata        <- Filterable on everything
 ### Pipeline
 
 ```
-Planned:   Triage -> Ideas -> Future Waves -> On Deck -> Needs Spec -> Specced -> Approved -> Building -> UAT -> Done
+Planned:   Triage -> Ideas -> Future Phases -> On Deck -> Needs Spec -> Specced -> Approved -> Building -> UAT -> Done
 Ad-hoc:    Triage -> In Progress -> UAT -> Done                                                              -> Canceled
                                                                                                              -> Duplicate
 ```
@@ -84,13 +84,13 @@ Every status maps to a pipeline position. An issue's status tells you whose turn
 |---|---|---|---|---|
 | **Triage** | triage | You | Pre-pipeline | External input: bug reports, client requests, `/brainstorm` output. Sort into the right place. |
 | **Ideas** | backlog | -- | Pre-pipeline | Triaged items to act on at some point, but not now. Parking lot for evaluated ideas. |
-| **Future Waves** | backlog | -- | Pre-pipeline | Belongs to a known future stage. Not in scope for current or next wave. |
-| **On Deck** | backlog | Scanning | Pre-pipeline | Next wave's batch. Start getting eyes on these, light-spec proactively if you get ahead. |
-| **Needs Spec** | backlog | You + Claude | Step 1 ready | Current wave. Needs `/light-spec` applied. |
+| **Future Phases** | backlog | -- | Pre-pipeline | Belongs to a known future stage. Not in scope for current or next phase. |
+| **On Deck** | backlog | Scanning | Pre-pipeline | Next phase's batch. Start getting eyes on these, light-spec proactively if you get ahead. |
+| **Needs Spec** | backlog | You + Claude | Step 1 ready | Current phase. Needs `/light-spec` applied. |
 | **Specced** | unstarted | You | Steps 2-3 | Light spec applied, agent reviewed. Awaiting your sign-off. |
-| **Approved** | unstarted | VBW (queued) | Post Step 3 | Human approved. Ready for VBW when a wave batch is complete. |
-| **In Progress** | started | You | Ad-hoc | Manual work outside the wave: hotfixes, quick bug fixes, chores. Not VBW-managed. |
-| **Building** | started | VBW | Steps 4-7 | VBW planning + execution + QA. Current-wave execution queue only. |
+| **Approved** | unstarted | VBW (queued) | Post Step 3 | Human approved. Ready for VBW when a phase batch is complete. |
+| **In Progress** | started | You | Ad-hoc | Manual work outside the phase: hotfixes, quick bug fixes, chores. Not VBW-managed. |
+| **Building** | started | VBW | Steps 4-7 | VBW planning + execution + QA. Current-phase execution queue only. |
 | **UAT** | started | You | Step 8 | Code complete, QA passed. Your turn to accept or reject. |
 | **Done** | completed | -- | Step 9 | Shipped and verified. |
 | **Canceled** | canceled | -- | -- | Won't do. |
@@ -101,13 +101,13 @@ Every status maps to a pipeline position. An issue's status tells you whose turn
 | From | To | Trigger | Who |
 |---|---|---|---|
 | Triage | Ideas / Needs Spec / In Progress | You triage it | You |
-| Ideas | Future Waves / On Deck | Stage/wave assignment | You |
-| Future Waves | On Deck | Promoted for next wave | You |
-| On Deck | Needs Spec | Current wave begins | You |
+| Ideas | Future Phases / On Deck | Stage/phase assignment | You |
+| Future Phases | On Deck | Promoted for next phase | You |
+| On Deck | Needs Spec | Current phase begins | You |
 | Needs Spec | Specced | `/light-spec` applied + agent reviewed | Claude + You |
 | Specced | Needs Spec | Agent or human sends back for revision | You |
 | Specced | Approved | You approve scope, decisions, priority | You |
-| Approved | Building | Wave batch is ready for execution | You (or VBW pickup) |
+| Approved | Building | Phase batch is ready for execution | You (or VBW pickup) |
 | Building | UAT | VBW QA passes | VBW QA agent |
 | UAT | Done | You accept + ship | You + promotion skill |
 | UAT | Building | You reject — needs rework | You |
@@ -119,28 +119,28 @@ Every status maps to a pipeline position. An issue's status tells you whose turn
 
 | Lane | Path | Managed By |
 |---|---|---|
-| **Planned (features)** | Ideas → Future Waves → On Deck → Needs Spec → Specced → Approved → Building → UAT → Done | VBW |
-| **Bug fix (into wave)** | Triage → Needs Spec → Specced → Approved → Building → UAT → Done | VBW (enters the wave) |
+| **Planned (features)** | Ideas → Future Phases → On Deck → Needs Spec → Specced → Approved → Building → UAT → Done | VBW |
+| **Bug fix (into phase)** | Triage → Needs Spec → Specced → Approved → Building → UAT → Done | VBW (enters the phase) |
 | **Hotfix** | Triage → In Progress → UAT → Done | You (manual fix) |
 | **Quick fix** | Triage → In Progress → Done | You (no UAT needed) |
 
-**Building** = VBW owns it. Wave-batched, trigger rules apply. Never put ad-hoc work here.
-**In Progress** = You're doing it by hand, outside the wave. VBW ignores these.
+**Building** = VBW owns it. Phase-batched, trigger rules apply. Never put ad-hoc work here.
+**In Progress** = You're doing it by hand, outside the phase. VBW ignores these.
 
-### Wave Management
+### Phase Management
 
-The backlog is ordered by **wave proximity** (furthest out → closest to execution):
+The backlog is ordered by **phase proximity** (furthest out → closest to execution):
 
 ```
-Ideas → Future Waves → On Deck → Needs Spec
+Ideas → Future Phases → On Deck → Needs Spec
 ```
 
-- **Current wave** = issues in Needs Spec + Specced + Approved + Building + UAT
-- **Next wave** = issues in On Deck
-- **Future** = issues in Future Waves
+- **Current phase** = issues in Needs Spec + Specced + Approved + Building + UAT
+- **Next phase** = issues in On Deck
+- **Future** = issues in Future Phases
 - **Someday** = issues in Ideas
 
-When the current wave ships, promote On Deck → Needs Spec and refill On Deck from Future Waves.
+When the current phase ships, promote On Deck → Needs Spec and refill On Deck from Future Phases.
 
 ---
 

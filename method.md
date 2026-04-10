@@ -26,14 +26,14 @@ When ambiguity is detected, the pipeline sends work backward — not forward. A 
 
 ```
 Stage 0: Foundation (runs once per project)
-  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /wave-plan
+  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /phase-plan
 
-Stages 1-5: Development Pipeline (repeats per wave/feature)
+Stages 1-5: Development Pipeline (repeats per phase/feature)
   [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
   VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
 ```
 
-**Stage 0** takes a project from idea to first wave ready for speccing. **Stages 1-5** repeat for each wave of features.
+**Stage 0** takes a project from idea to first phase ready for speccing. **Stages 1-5** repeat for each phase of features.
 
 **Bookends:** `/roadmap-review` validates Stage 0 outputs and plan health before entering the pipeline. `/strategy-sync` updates Strategy docs after features ship — closing the documentation loop.
 
@@ -49,7 +49,7 @@ Stages 1-5: Development Pipeline (repeats per wave/feature)
 | 0.4 | **Infra Setup** | `/startup` (Steps 3-6) | Tech stack decisions | Working repo, DB, deploy, MCP | Pre-deploy gate passes |
 | 0.5 | **VBW Init** | `/vbw:init` | — | `.vbw-planning/` scaffold | Directory exists |
 | 0.6 | **Roadmap** | `/roadmap-create` | Strategy docs + definition | `ROADMAP.md` + populated Linear | Every requirement has an issue |
-| 0.7 | **Wave Plan** | `/wave-plan` | Populated Linear board | First wave in "Needs Spec" | Dependencies clear, wave sized |
+| 0.7 | **Phase Plan** | `/phase-plan` | Populated Linear board | First phase in "Needs Spec" | Dependencies clear, phase sized |
 
 Stage 0 runs once per project. `/startup` orchestrates the full flow.
 
@@ -57,7 +57,7 @@ Stage 0 runs once per project. `/startup` orchestrates the full flow.
 
 | # | Step | Tool | Input | Output | Gate |
 |---|------|------|-------|--------|------|
-| 0 | **Roadmap Review** | `/roadmap-review` | ROADMAP, Linear state, WAVES.md | Health report: Stage 0 check, gaps, ordering, spec coverage, doc freshness | Stage 0 complete, plan coherent |
+| 0 | **Roadmap Review** | `/roadmap-review` | ROADMAP, Linear state, PHASES.md | Health report: Stage 0 check, gaps, ordering, spec coverage, doc freshness | Stage 0 complete, plan coherent |
 | 1 | **Light Spec** | `/light-spec` + Linear | Feature idea or issue | Structured spec exploring codebase and Strategy docs | — |
 | 2 | **Agent Review** | Linear Spec Review Agent | Light spec | Pass/Revise verdict with readiness score | Spec must be unambiguous and decomposable without guessing |
 | 3 | **Human Review** | You in Linear | Agent-reviewed spec | Approved spec with product decisions locked | Human signs off on scope, decisions, and priority |
@@ -72,7 +72,7 @@ Stage 0 runs once per project. `/startup` orchestrates the full flow.
 
 **Feedback loops:** Steps 2, 6, 8, and 9 can send work backward. Agent review returns specs for revision. Plan review returns plans for rework. QA returns tasks to dev. UAT returns features to execution. The pipeline is linear by default, corrective when needed.
 
-**Between waves:** `/wave-plan --next` selects the next batch of issues and promotes them to "Needs Spec." `/roadmap-review` validates before speccing begins.
+**Between phases:** `/phase-plan --next` selects the next batch of issues and promotes them to "Needs Spec." `/roadmap-review` validates before speccing begins.
 
 > **Optional pre-step:** `/brainstorm` — for exploring feature-level ideas within an existing project. For project-level ideation, use `/concept`.
 
@@ -80,11 +80,11 @@ Stage 0 runs once per project. `/startup` orchestrates the full flow.
 
 ## Stage 0: Foundation
 
-**Steps:** 0.1–0.7 (Concept → Define → Strategy → Setup → VBW Init → Roadmap → Wave Plan)
+**Steps:** 0.1–0.7 (Concept → Define → Strategy → Setup → VBW Init → Roadmap → Phase Plan)
 
-**Tools:** `/concept`, `/define`, `/strategy-create`, `/startup`, `/vbw:init`, `/roadmap-create`, `/wave-plan`
+**Tools:** `/concept`, `/define`, `/strategy-create`, `/startup`, `/vbw:init`, `/roadmap-create`, `/phase-plan`
 
-Runs once per project. Takes a raw idea through structured definition, strategy documentation, infrastructure setup, and roadmap creation to produce a populated Linear board with the first wave ready for speccing.
+Runs once per project. Takes a raw idea through structured definition, strategy documentation, infrastructure setup, and roadmap creation to produce a populated Linear board with the first phase ready for speccing.
 
 - `/concept` captures the idea and assesses viability — supports ingesting existing documents (proposals, research, notes)
 - `/define` distills the concept into stages, roles, workflows, and success criteria
@@ -92,9 +92,9 @@ Runs once per project. Takes a raw idea through structured definition, strategy 
 - `/startup` orchestrates the full flow and handles infrastructure (repo, DB, deploy, MCP, Linear)
 - `/vbw:init` scaffolds `.vbw-planning/` for the planning engine
 - `/roadmap-create` extracts requirements from strategy docs and populates both ROADMAP.md and Linear
-- `/wave-plan` selects 3-8 issues for the first execution wave
+- `/phase-plan` selects 3-8 issues for the first execution phase
 
-**Output:** `concept-brief.md`, `project-definition.md`, `Strategy/` docs, working infrastructure, `.vbw-planning/ROADMAP.md`, populated Linear board, `.vbw-planning/WAVES.md` with first wave defined.
+**Output:** `concept-brief.md`, `project-definition.md`, `Strategy/` docs, working infrastructure, `.vbw-planning/ROADMAP.md`, populated Linear board, `.vbw-planning/PHASES.md` with first phase defined.
 
 **Gate:** `/roadmap-review` validates all Stage 0 outputs before the spec pipeline begins.
 
@@ -106,7 +106,7 @@ Runs once per project. Takes a raw idea through structured definition, strategy 
 
 **Tools:** `/roadmap-review`
 
-Run before entering the spec pipeline to validate that Stage 0 is complete and the roadmap is coherent: concept and definition exist, strategy docs match config, all requirements have Linear issues, dependencies are set, workflow states are consistent, current wave is defined, and spec coverage is adequate. Also flags Strategy doc staleness (recommends `/strategy-sync` if needed).
+Run before entering the spec pipeline to validate that Stage 0 is complete and the roadmap is coherent: concept and definition exist, strategy docs match config, all requirements have Linear issues, dependencies are set, workflow states are consistent, current phase is defined, and spec coverage is adequate. Also flags Strategy doc staleness (recommends `/strategy-sync` if needed).
 
 **Output:** Health report with action items. Resolve blockers before speccing.
 
@@ -198,7 +198,7 @@ Strategy Docs (vision) → Light Specs → Plans → Code → Strategy Docs (rea
 
 **Output:** Updated Strategy docs with version bump. All changes presented as diffs for human approval before applying.
 
-**Cadence:** After UAT passes for a wave/phase, before stakeholder presentations, before onboarding new team members.
+**Cadence:** After UAT passes for a phase, before stakeholder presentations, before onboarding new team members.
 
 ---
 
@@ -249,7 +249,7 @@ Skills are convenience wrappers. They automate the same conventions documented i
 | `/strategy-create` | Bootstrap strategy docs from project definition |
 | `/startup` | Full project bootstrap orchestrator (chains all Stage 0 + setup skills) |
 | `/roadmap-create` | Create ROADMAP.md and populate Linear with issues |
-| `/wave-plan` | Select execution waves, track progress, manage wave transitions |
+| `/phase-plan` | Select execution phases, track progress, manage phase transitions |
 
 **Development Pipeline**
 

@@ -105,7 +105,7 @@ Analyzes project completion status and recommends moving the next batch of issue
 #### Workflow Status Ladder
 
 ```
-Future Waves → On Deck → Needs Spec → Specced → Approved → In Progress → Building → UAT → Done
+Future Phases → On Deck → Needs Spec → Specced → Approved → In Progress → Building → UAT → Done
 ```
 
 State IDs are stored in `linear-map.json` under `states.*`. Always read from there — never hardcode.
@@ -118,15 +118,15 @@ State IDs are stored in `linear-map.json` under `states.*`. Always read from the
    - Classify by status bucket:
      - **Done bucket:** Done, Canceled, Duplicate
      - **Active bucket:** In Progress, Building, UAT, Approved, Specced, Needs Spec
-     - **Waiting bucket:** On Deck, Future Waves, Triage, Ideas
+     - **Waiting bucket:** On Deck, Future Phases, Triage, Ideas
    - Determine project completion: all non-canceled issues in Done bucket
 3. **Find the promotion boundary:**
    - Walk projects in order. The **leading project** is the highest-numbered project where ALL issues are Done.
    - The **active project** is the next project (being specced/built).
    - The **on-deck project** is the one after that.
-   - The **next-up project** is the one after on-deck (candidates for Future Waves → On Deck).
+   - The **next-up project** is the one after on-deck (candidates for Future Phases → On Deck).
 4. **Recommend promotions** for the next-up project's issues:
-   - Issues in `Future Waves` → recommend `On Deck`
+   - Issues in `Future Phases` → recommend `On Deck`
    - Issues in `Triage` or `Ideas` → recommend `On Deck` (they're in a project, so they're real)
 5. **Present the recommendation** as a table showing issue ID, title, current status, and proposed status
 6. **Ask for confirmation** before executing. On approval, batch-update all issues via `mcp__linear-server__save_issue`
@@ -165,7 +165,7 @@ The promote logic treats each track independently. A project on the parallel tra
 ### Recommended Promotions
 | Issue | Title | Current | Proposed |
 |-------|-------|---------|----------|
-| WIT-XXX | ... | Future Waves | On Deck |
+| WIT-XXX | ... | Future Phases | On Deck |
 
 Approve? (y/n)
 ```

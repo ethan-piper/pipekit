@@ -32,7 +32,7 @@ These skills work across any project that follows the method. They read `method.
 | `/define` | Distill concept into full project definition | Stage 0: Foundation |
 | `/strategy-create` | Bootstrap strategy docs from project definition | Stage 0: Foundation |
 | `/roadmap-create` | Create ROADMAP.md and populate Linear | Stage 0: Foundation |
-| `/wave-plan` | Select and manage execution waves | Stage 0: Foundation / Ongoing |
+| `/phase-plan` | Select and manage execution phases | Stage 0: Foundation / Ongoing |
 | `/roadmap-review` | Pre-pipeline health check (Stage 0 gate) | Stage 0 → Stage 1 gate |
 | `/brainstorm` | Feature-level feasibility exploration | Stage 1: Definition |
 | `/brainstorm-review` | Triage untriaged Linear issues | Stage 1: Definition |

@@ -49,7 +49,7 @@ If a Changelog doc exists in the manifest, it is excluded from sync content — 
 
 1. Read `method.config.md` to get the strategy doc manifest
 2. Read the first strategy doc's version header to get the last update date
-3. Read `.vbw-planning/STATE.md` for recently completed phases/waves
+3. Read `.vbw-planning/STATE.md` for recently completed phases
 4. Query Linear for issues in Done state since the last Strategy doc update date:
    - Use `mcp__linear-server__list_issues` filtered by state = Done
    - Filter to issues completed after the last doc update
@@ -164,13 +164,13 @@ After updating primary docs, check consistency across all docs in the manifest:
 
 ### Doc Freshness
 Strategy docs now reflect all shipped features through YYYY-MM-DD.
-Next sync recommended after: [next wave ships]
+Next sync recommended after: [next phase ships]
 ```
 
 ## Cadence
 
 Run at these moments:
-- **After UAT passes** for a wave or stage — the primary trigger
+- **After UAT passes** for a phase or stage — the primary trigger
 - **Before stakeholder presentations** — ensure docs are current
 - **Before onboarding a new team member** — they'll read these docs first
 - **When `/roadmap-review` flags doc staleness**
