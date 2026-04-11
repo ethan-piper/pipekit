@@ -1,0 +1,57 @@
+# VBW Commands Reference
+
+Output of `/vbw:help` (VBW v1.34.1) — included here for context on how Pipekit wraps VBW.
+
+---
+
+## Lifecycle — The Main Loop
+
+| Command | Description |
+|:--------|-------------|
+| `/vbw:discuss [N] [--assumptions]` | Start or continue phase discussion to build context before planning. |
+| `/vbw:init` | Set up environment, scaffold `.vbw-planning`, detect project context, and bootstrap project-defining files. |
+| `/vbw:vibe [intent or flags]` | The one command. Detects state, parses intent, routes to any lifecycle mode — bootstrap, scope, plan, execute, verify, discuss, archive, and more. |
+
+**`/vbw:vibe` flags:** `--plan`, `--execute`, `--verify`, `--discuss`, `--assumptions`, `--scope`, `--add`, `--insert`, `--remove`, `--archive`, `--yolo`, `--effort=level`, `--skip-qa`, `--skip-audit`, `--plan=NN`, `[N]`
+
+## Monitoring — Trust But Verify
+
+| Command | Description |
+|---------|-------------|
+| `/vbw:qa [phase-number] [--tier=quick\|standard\|deep] [--effort=...]` | Run deep verification on completed phase work using the QA agent. |
+| `/vbw:status [--verbose] [--metrics]` | Display project progress dashboard with phase status, velocity metrics, and next action. |
+| `/vbw:verify [phase-number] [--resume]` | Run human acceptance testing on completed phase work. Presents CHECKPOINT prompts one at a time. |
+
+## Supporting — The Safety Net
+
+| Command | Description |
+|---------|-------------|
+| `/vbw:config [setting value]` | View and modify VBW configuration including effort profile, verification tier, and skill-hook wiring. |
+| `/vbw:debug <bug description>` | Investigate a bug using the Debugger agent's scientific method protocol. |
+| `/vbw:doctor` | Run health checks on VBW installation and project setup. |
+| `/vbw:fix <description>` | Apply a quick fix or small change with commit discipline. Turbo mode — no planning ceremony. |
+| `/vbw:help [command-name]` | Display all available VBW commands with descriptions and usage examples. |
+| `/vbw:list-todos [priority filter]` | List pending todos from STATE.md and select one to act on. |
+| `/vbw:pause [notes]` | Save session notes for next time (state auto-persists). |
+| `/vbw:profile [profile-name \| save \| delete]` | Switch between work profiles or create custom ones. Profiles change effort, autonomy, and verification in one go. |
+| `/vbw:report [problem description] [--file-issue]` | Collect diagnostic context for bug reporting and optionally file a GitHub issue. |
+| `/vbw:resume` | Restore project context from `.vbw-planning/` state. |
+| `/vbw:skills [--search \| --list \| --refresh]` | Browse and install community skills from skills.sh based on your project's tech stack. |
+| `/vbw:teach ["convention" \| remove \| refresh]` | View, add, or manage project conventions. Shows what VBW already knows and warns about conflicts. |
+| `/vbw:todo <description> [--priority=...]` | Add an item to the persistent backlog in STATE.md. |
+
+## Advanced — For When You're Feeling Ambitious
+
+| Command | Description |
+|---------|-------------|
+| `/vbw:map [--incremental] [--package=name] [--tier=...]` | Analyze existing codebase with adaptive Scout teammates to produce structured mapping documents. |
+| `/vbw:research <topic> [--parallel]` | Run standalone research by spawning Scout agent(s) for web searches and documentation lookups. |
+| `/vbw:uninstall` | Cleanly remove all VBW traces from the system before plugin uninstall. |
+| `/vbw:update [--check]` | Update VBW to the latest version with automatic cache refresh. |
+| `/vbw:whats-new [version]` | View changelog and recent updates since your installed version. |
+
+## Quick Start
+
+```
+/vbw:init → /vbw:vibe → /vbw:vibe --archive
+```

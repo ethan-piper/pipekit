@@ -45,7 +45,7 @@ Stages 1-5: Development Pipeline (repeats per phase/feature)
 |---|------|------|-------|--------|------|
 | 0.1 | **Concept** | `/concept` | Raw idea + existing docs | `concept-brief.md` | Idea is specific enough to define |
 | 0.2 | **Define** | `/define` | Concept brief | `project-definition.md` | Definition supports tech stack + strategy decisions |
-| 0.3 | **Strategy Create** | `/strategy-create` | Project definition | `Strategy/` docs | Docs describe a coherent product |
+| 0.3 | **Strategy Create** | `/strategy-create` | Project definition | `Strategy/` docs (incl. Design Direction) | Docs describe a coherent product |
 | 0.4 | **Infra Setup** | `/startup` (Steps 3-6) | Tech stack decisions | Working repo, DB, deploy, MCP | Pre-deploy gate passes |
 | 0.5 | **VBW Init** | `/vbw:init` | — | `.vbw-planning/` scaffold | Directory exists |
 | 0.6 | **Roadmap** | `/roadmap-create` | Strategy docs + definition | `ROADMAP.md` + populated Linear | Every requirement has an issue |

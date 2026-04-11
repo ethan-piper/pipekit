@@ -122,7 +122,7 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
      
      {full issue description}
      
-     Read CLAUDE.md for project conventions. Place the plan in .vbw-planning/phases/{phase-slug}/
+     Read CLAUDE.md for project conventions. If the spec involves UI work, read Strategy/DesignDirection.md for visual design guidance. Place the plan in .vbw-planning/phases/{phase-slug}/
      The spec has been human-approved — do not change scope or decisions.
      Decompose into atomic tasks with verify/done criteria derived from the AC."
    )

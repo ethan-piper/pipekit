@@ -257,7 +257,7 @@ You are implementing a Linear issue. Read CLAUDE.md and method.config.md for pro
 
 ## Instructions
 
-1. Read CLAUDE.md in the repo root for all project conventions. CLAUDE.md is the authoritative source for coding standards, naming patterns, and architectural decisions.
+1. Read CLAUDE.md in the repo root for all project conventions. CLAUDE.md is the authoritative source for coding standards, naming patterns, and architectural decisions. If the issue has UI work, also read `Strategy/DesignDirection.md` for visual design guidance.
 2. Implement the changes described in the issue.
 3. Include `PROJ-{XXX}` in all commit messages.
    Format: `{type}({scope}): {description} (PROJ-{XXX})`

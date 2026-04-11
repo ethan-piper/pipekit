@@ -88,6 +88,29 @@ Walk through setup checklist from `STARTUP.md` Step 3, in order. Skip steps alre
 
 **Output:** `Strategy/` directory with docs, `method.config.md` updated with doc manifest
 
+### Step 5.5 — Design Direction
+
+**Check:** Does `Strategy/DesignDirection.md` exist?
+- If yes: _"Design direction exists. Skip or review?"_
+- If no and project has a UI: walk through design preferences interactively
+
+If the project has a user interface (web, mobile, desktop), capture design intent now — before any features are built. This ensures consistent aesthetics from the first UI work.
+
+Walk through the template at `templates/strategy/design-direction.md`:
+
+1. **Aesthetic direction** — ask: _"What feeling should this product convey? (e.g., clean and professional, playful and bold, minimal and refined)"_
+2. **Inspiration** — ask: _"Any sites, apps, or screenshots that capture the look you want? Even rough direction helps."_
+3. **Typography** — ask: _"Any font preferences? Or adjectives — geometric, rounded, editorial?"_
+4. **Color & theme** — ask: _"Any colors in mind? Light or dark theme? Both?"_
+5. **Motion** — ask: _"How much animation? Subtle transitions, or more expressive?"_
+6. **Anti-patterns** — ask: _"Anything you specifically don't want? Generic dashboards, specific styles to avoid?"_
+
+Write `Strategy/DesignDirection.md` with their answers. This doc is read by development agents and the `/frontend-design` skill during execution.
+
+**If the project has no UI** (CLI tool, API-only, library): skip this step.
+
+**Output:** `Strategy/DesignDirection.md` — design intent captured for build agents
+
 ### Step 6 — Method Sync
 
 **Check:** Does `method/` directory exist? Are skills in `.claude/skills/`?

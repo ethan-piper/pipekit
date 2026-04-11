@@ -43,6 +43,7 @@ These docs are living documents: `/strategy-create` generates v0.1.0, `/strategy
 **Create if applicable:**
 | Doc | Template | Trigger |
 |-----|----------|---------|
+| Design Direction | `templates/strategy/design-direction.md` | Project has a UI (web, mobile, desktop) |
 | Permissions | `templates/strategy/permissions.md` | Project has user roles with different access levels |
 | Data Model | `templates/strategy/data-model.md` | Project has complex data relationships or calculations |
 | Workflow Examples | `templates/strategy/workflow-examples.md` | Project has multi-step user journeys |
@@ -87,6 +88,7 @@ For each approved doc, in order:
 **Audience discipline:**
 - Conceptual Overview: Simple language. A stakeholder with no technical background should understand it completely. No code, no jargon.
 - Technical Architecture: Developer-level. Schema detail, API patterns, code conventions.
+- Design Direction: Practical. Developers and AI agents need clear aesthetic guidance. Ask for inspiration links, color preferences, typography direction, and anti-patterns. This doc is read by `/frontend-design` during execution.
 - Permissions: Technical but clear. Admins need to understand the access model.
 - Data Model: Developer-level. Entity relationships, constraints, calculations.
 - Workflow Examples: Step-by-step, concrete. All audiences.
@@ -99,6 +101,7 @@ For each approved doc, in order:
 3. Use consistent filenames matching the method config format:
    - `Strategy/ConceptualOverview.md`
    - `Strategy/TechnicalArchitecture.md`
+   - `Strategy/DesignDirection.md`
    - `Strategy/Permissions.md`
    - `Strategy/DataModel.md`
    - `Strategy/WorkflowExamples.md`
