@@ -50,70 +50,95 @@ VBW doesn't need the full project plan — it's designed for bounded scope. Pipe
 | 10 | Ship | Promote to production |
 | 11 | Strategy Sync | Update docs to match what was built |
 
-## Prerequisites
+## What You Need First
 
-- [Claude Code](https://claude.ai/code) (CLI)
-- [VBW plugin](https://github.com/dnakov/claude-code-vbw) installed
-- [Linear](https://linear.app/) workspace (for issue tracking)
-- Linear MCP server configured
+1. **[Claude Code](https://claude.ai/code)** — Anthropic's CLI tool. This is what runs the skills.
+2. **[VBW plugin](https://github.com/dnakov/claude-code-vbw)** — The planning/execution engine. Pipekit wraps this.
+3. **[Linear](https://linear.app/)** — Free issue tracker. Pipekit uses it for visibility.
+4. **Linear MCP server** — Connects Claude Code to your Linear workspace. Set up in `.mcp.json`.
 
-## Quick Start
+## Getting Started
 
-### New project
+### Step 1: Clone Pipekit
+
+Open your terminal and run:
 
 ```bash
-# 1. Clone Pipekit
-git clone git@github.com:ethan-piper/pipekit.git ~/Projects/pipekit
+git clone https://github.com/ethan-piper/pipekit.git ~/Projects/pipekit
+```
 
-# 2. In your project directory, copy and run the sync script
+This downloads Pipekit to your computer. You only do this once — all your projects share this one copy.
+
+### Step 2: Set up your project
+
+**Starting a brand new project:**
+
+```bash
+# Create your project folder
+mkdir ~/Projects/my-project
+cd ~/Projects/my-project
+git init
+
+# Copy the sync script from Pipekit
 mkdir -p scripts
 cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
-./scripts/sync-method.sh
 
-# 3. Open Claude Code and run the startup orchestrator
+# Run it — this pulls all the skills, templates, and SOPs into your project
+./scripts/sync-method.sh
+```
+
+**Already have a project folder:**
+
+```bash
+cd ~/Projects/my-project
+
+# Copy the sync script from Pipekit
+mkdir -p scripts
+cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
+
+# Run it
+./scripts/sync-method.sh
+```
+
+The sync script creates a `method.config.md` file in your project — this is where your project-specific settings go (Linear workspace IDs, environments, etc.). You'll fill this in during setup.
+
+### Step 3: Run the startup orchestrator
+
+Open Claude Code in your project directory and type:
+
+```
 /startup
-
-# It chains everything:
-#   /concept → /define → /strategy-create → tech stack → infra setup →
-#   method sync → /vbw:init → /roadmap-create → /phase-plan → /roadmap-review
 ```
 
-### Existing project (adopt the method)
+This walks you through everything interactively:
+- Captures your project idea (`/concept`)
+- Distills it into a structured definition (`/define`)
+- Generates strategy docs (`/strategy-create`)
+- Helps you choose a tech stack and set up infrastructure
+- Initializes VBW (`/vbw:init`)
+- Creates a roadmap and populates Linear (`/roadmap-create`)
+- Selects your first batch of work (`/phase-plan`)
 
-```bash
-# 1. Clone Pipekit
-git clone git@github.com:ethan-piper/pipekit.git ~/Projects/pipekit
+Each step checks if it's already done, so you can stop and resume anytime.
 
-# 2. Copy the sync script into your project
-cp ~/Projects/pipekit/scripts/sync-method.sh your-project/scripts/
+**If you already have docs** (proposals, research, notes), point the concept step at them:
 
-# 3. Run it
-cd your-project
-./scripts/sync-method.sh
-
-# 4. The sync creates method.config.md — fill in your project values
-
-# 5. Run /startup to scaffold, or /roadmap-review to see what's missing
 ```
-
-### Existing project with docs
-
-If you already have concept docs, proposals, or research:
-
-```bash
-# After syncing, run concept with your existing docs:
 /concept --docs docs/ proposal/
-
-# It ingests everything and asks only about gaps
 ```
 
-### Update to latest method
+It reads everything and only asks about gaps — you don't have to re-explain what's already written.
+
+### Updating Pipekit
+
+When Pipekit gets updates, re-run the sync script in your project:
 
 ```bash
-./scripts/sync-method.sh          # From main
-./scripts/sync-method.sh v1.0     # Pin to a version
-./scripts/sync-method.sh --dry-run  # Preview changes
+cd ~/Projects/my-project
+./scripts/sync-method.sh
 ```
+
+This updates skills, SOPs, and templates. It never touches your project-specific files (strategy docs, config, plans, etc.).
 
 ## What's Included
 
