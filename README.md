@@ -1,6 +1,20 @@
 # Pipekit
 
-A structured AI-assisted software delivery system. Provides a deterministic pipeline from idea to production with quality gates at every stage.
+A structured AI-assisted software delivery system. Wraps [VBW](https://github.com/dnakov/claude-code-vbw) in a visibility and project management layer — from idea to production with quality gates at every stage.
+
+## What This Is (and Isn't)
+
+Pipekit **does not replace VBW**. VBW handles planning, execution, and QA. Pipekit adds structure around it:
+
+| Layer | What Pipekit does | What VBW does |
+|-------|-------------------|---------------|
+| **Before** (steps 1-4) | Spec creation, agent review, human sign-off, gate checks | — |
+| **During** (steps 5-8) | — | **Plan, execute, QA — all VBW** |
+| **After** (steps 9-11) | UAT tracking, shipping, doc sync | — |
+| **Around** | Linear integration for cross-issue visibility | Tracks one phase at a time |
+| **Stage 0** | Project bootstrap (idea → roadmap) | Starts at "I have a task" |
+
+VBW doesn't need the full project plan — it's designed for bounded scope. Pipekit makes sure the input going into VBW is clean and unambiguous, and tracks what comes out.
 
 ## Core Principle
 
@@ -8,26 +22,108 @@ A structured AI-assisted software delivery system. Provides a deterministic pipe
 
 ## The Pipeline
 
-```
-Stage 0: Foundation (once per project)
-  /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /phase-plan
+**Stage 0: Foundation** (runs once per project)
 
-Stages 1-5: Development (repeats per phase)
-  [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
-  VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
+| Step | Skill | Output |
+|------|-------|--------|
+| Concept | `/concept` | `concept-brief.md` |
+| Define | `/define` | `project-definition.md` |
+| Strategy | `/strategy-create` | `Strategy/` docs (incl. Design Direction) |
+| Setup | `/startup` | Repo, DB, deploy, Linear board |
+| VBW Init | `/vbw:init` | `.vbw-planning/` scaffold |
+| Roadmap | `/roadmap-create` | `ROADMAP.md` + Linear issues |
+| Phase Plan | `/phase-plan` | First phase in "Needs Spec" |
+
+**Development Pipeline** (repeats per feature)
+
+| # | Step | What happens |
+|---|------|-------------|
+| 1 | Light Spec | Spec the feature (codebase-aware, AI→AI contract) |
+| 2 | Agent Review | Linear's agent reviews the spec |
+| 3 | Human Review | You sign off in Linear |
+| 4 | Launch | Gates checked, complexity routed |
+| 5 | **VBW Plan** | **VBW Lead generates PLAN.md from the spec** |
+| 6 | **Plan Review** | **Plan validated for executability** |
+| 7 | **VBW Execution** | **VBW Dev agents build it** |
+| 8 | **VBW QA** | **VBW QA verifies against spec** |
+| 9 | UAT | You test the built feature |
+| 10 | Ship | Promote to production |
+| 11 | Strategy Sync | Update docs to match what was built |
+
+## Prerequisites
+
+- [Claude Code](https://claude.ai/code) (CLI)
+- [VBW plugin](https://github.com/dnakov/claude-code-vbw) installed
+- [Linear](https://linear.app/) workspace (for issue tracking)
+- Linear MCP server configured
+
+## Quick Start
+
+### New project
+
+```bash
+# 1. Clone Pipekit
+git clone git@github.com:ethan-piper/pipekit.git ~/Projects/pipekit
+
+# 2. In your project directory, copy and run the sync script
+mkdir -p scripts
+cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
+./scripts/sync-method.sh
+
+# 3. Open Claude Code and run the startup orchestrator
+/startup
+
+# It chains everything:
+#   /concept → /define → /strategy-create → tech stack → infra setup →
+#   method sync → /vbw:init → /roadmap-create → /phase-plan → /roadmap-review
 ```
 
-Stage 0 takes a project from raw idea to first phase ready for speccing. Stages 1-5 repeat for each phase of features.
+### Existing project (adopt the method)
+
+```bash
+# 1. Clone Pipekit
+git clone git@github.com:ethan-piper/pipekit.git ~/Projects/pipekit
+
+# 2. Copy the sync script into your project
+cp ~/Projects/pipekit/scripts/sync-method.sh your-project/scripts/
+
+# 3. Run it
+cd your-project
+./scripts/sync-method.sh
+
+# 4. The sync creates method.config.md — fill in your project values
+
+# 5. Run /startup to scaffold, or /roadmap-review to see what's missing
+```
+
+### Existing project with docs
+
+If you already have concept docs, proposals, or research:
+
+```bash
+# After syncing, run concept with your existing docs:
+/concept --docs docs/ proposal/
+
+# It ingests everything and asks only about gaps
+```
+
+### Update to latest method
+
+```bash
+./scripts/sync-method.sh          # From main
+./scripts/sync-method.sh v1.0     # Pin to a version
+./scripts/sync-method.sh --dry-run  # Preview changes
+```
 
 ## What's Included
 
 ```
 pipekit/
-  GUIDE.md                         # Complete instruction manual
+  GUIDE.md                         # Complete instruction manual (start here)
   method.md                        # The methodology — pipeline, principles, tooling
-  method.config.template.md        # Project config template (copy per project)
+  method.config.template.md        # Project config template (copied per project)
   STARTUP.md                       # Reference guide for project bootstrap
-  METHOD_IMPROVEMENTS.md           # Planned improvements
+  VBW_COMMANDS.md                  # VBW command reference
   sop/                             # Standard operating procedures
     Code_Quality.md                #   Quality standards and pre-deploy gates
     Git_and_Deployment.md          #   Branch strategy, release flow, worktrees
@@ -43,7 +139,7 @@ pipekit/
     strategy/                      #   Strategy doc templates
       conceptual-overview.md
       technical-architecture.md
-      design-direction.md         #     Visual style + inspiration for build agents
+      design-direction.md          #     Visual style + inspiration for build agents
       permissions.md
       data-model.md
       workflow-examples.md
@@ -51,96 +147,33 @@ pipekit/
     rules/                         #   Portable rule templates for .claude/rules/
       verify-library-api.md        #     Check installed versions before using APIs
       ad-hoc-plan-gate.md          #     Lightweight plan gate for interactive sessions
-  skills/                          # Portable Claude Code skills
-    concept/                       #   Stage 0: project-level ideation
-    define/                        #   Stage 0: distill concept into definition
-    strategy-create/               #   Stage 0: bootstrap strategy docs
-    roadmap-create/                #   Stage 0: create roadmap + populate Linear
-    phase-plan/                    #   Stage 0: select execution phases
-    startup/                       #   Stage 0: full bootstrap orchestrator
-    update-method/                 #   Sync method into consuming projects
-    00-roadmap-review/             #   Stage 0 gate + health check
-    01-light-spec/                 #   Stage 1: structured spec generation
-    brainstorm/                    #   Feature-level ideation
-    brainstorm-review/             #   Triage untriaged issues
-    launch/                        #   Stage 2: validate gates, route, execute
-    06-linear-todo-runner/         #   Stage 3: batch execution
-    task-processor/                #   Process Linear tasks
-    linear/                        #   Linear issue workflow
-    linear-status/                 #   Quick board triage view
-    sync-linear/                   #   Bidirectional VBW ↔ Linear sync
-    branch/                        #   Create worktree + branch + Linear link
-    start-session/                 #   Session start: review progress
-    end-session/                   #   Session end: changelog, updates
-    10-strategy-sync/              #   Stage 5: update docs post-ship
-    pr-fix/                        #   PR review + fix workflow
-    security-review/               #   Security review
-    spec-validator/                #   Validate spec completeness
-    skill-index/                   #   Sync skill index
+  skills/                          # Portable Claude Code skills (25 total)
   scripts/
     sync-method.sh                 # Pull method into a consuming project
     drift-check.sh                 # Detect stale references in documentation
 ```
 
-## Quick Start
+## What Gets Synced vs. What Stays
 
-### New project (from scratch)
+**Synced from Pipekit** (updated when you re-run `sync-method.sh`):
+- `.claude/skills/` — portable skills
+- `method/` — SOPs, templates, methodology docs
 
-```bash
-# 1. In your new project directory, run the startup orchestrator:
-/startup
-
-# It chains everything:
-#   /concept → /define → tech stack → infra setup → /strategy-create →
-#   method sync → /vbw:init → /roadmap-create → skills → CLAUDE.md → /phase-plan →
-#   /roadmap-review (validation)
-```
-
-### Existing project (adopt the method)
-
-```bash
-# 1. Clone the method repo
-git clone git@github.com:YOUR_ORG/pipekit.git ~/Projects/pipekit
-
-# 2. Copy the sync script into your project
-cp ~/Projects/pipekit/scripts/sync-method.sh your-project/scripts/
-
-# 3. Run it
-cd your-project
-./scripts/sync-method.sh
-
-# 4. Configure
-cp method.config.template.md method.config.md
-# Fill in your project-specific values (Linear IDs, environments, etc.)
-
-# 5. If starting fresh, run /startup to scaffold everything
-# If mid-project, run /roadmap-review to see what's missing
-```
-
-### Update to latest method
-
-```bash
-./scripts/sync-method.sh          # From main
-./scripts/sync-method.sh v1.0     # Pin to a version
-./scripts/sync-method.sh --dry-run  # Preview changes
-```
-
-## What Stays in Your Project
-
+**Stays in your project** (never overwritten):
 - `concept-brief.md` — project concept
 - `project-definition.md` — project definition
-- `Strategy/` — project strategy docs
-- `method.config.md` — project configuration
-- `method/decisions/` — project-specific ADRs
+- `Strategy/` — project strategy docs (incl. Design Direction)
+- `method.config.md` — project configuration (Linear IDs, environments, etc.)
 - `.claude/rules/` — project coding conventions
 - `.claude/skills/{project-specific}/` — skills tied to your stack
-- `.vbw-planning/` — all project state (ROADMAP, PHASES, phases, plans)
+- `.vbw-planning/` — all project state (ROADMAP, PHASES, plans)
 
 ## Documentation
 
 - **[GUIDE.md](GUIDE.md)** — Complete instruction manual (start here)
 - **[method.md](method.md)** — The methodology: pipeline, principles, tooling
 - **[STARTUP.md](STARTUP.md)** — Reference guide for project bootstrap
+- **[VBW_COMMANDS.md](VBW_COMMANDS.md)** — VBW command reference
 - **[sop/](sop/)** — Standard operating procedures
 
 ## Versioning
