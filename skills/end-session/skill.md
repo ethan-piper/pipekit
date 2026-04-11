@@ -161,11 +161,11 @@ Check for uncommitted changes and confirm with the user before committing.
 
 ### Step 9 — Post to Slack
 
-Post a brief summary to `#task-chat` (channel ID: C0ACD76K8KW):
+Post a brief summary to the project's Slack channel (configure channel ID in `method.config.md`):
 
 ```
 mcp__slack__conversations_add_message(
-  channel_id: "C0ACD76K8KW",
+  channel_id: "{slack_channel_id from method.config.md}",
   content_type: "text/markdown",
   payload: "
 **Session Ended** — [duration]
