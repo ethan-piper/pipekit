@@ -52,10 +52,39 @@ VBW doesn't need the full project plan — it's designed for bounded scope. Pipe
 
 ## What You Need First
 
-1. **[Claude Code](https://claude.ai/code)** — Anthropic's CLI tool. This is what runs the skills.
-2. **[VBW plugin](https://github.com/dnakov/claude-code-vbw)** — The planning/execution engine. Pipekit wraps this.
-3. **[Linear](https://linear.app/)** — Free issue tracker. Pipekit uses it for visibility.
-4. **Linear MCP server** — Connects Claude Code to your Linear workspace. Set up in `.mcp.json`.
+### 1. Claude Code
+
+Anthropic's CLI tool — this is what runs the skills. Install it from [claude.ai/code](https://claude.ai/code).
+
+### 2. VBW plugin
+
+The planning/execution engine that Pipekit wraps. Install it from inside Claude Code:
+
+```
+/install-plugin https://github.com/dnakov/claude-code-vbw
+```
+
+Or manually: see the [VBW repo](https://github.com/dnakov/claude-code-vbw) for details.
+
+### 3. Linear + MCP server
+
+[Linear](https://linear.app/) is a free issue tracker. Pipekit uses it for visibility across your project.
+
+1. Create a free workspace at [linear.app](https://linear.app/)
+2. Connect Claude Code to Linear by adding this to your project's `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "linear-server": {
+      "type": "http",
+      "url": "https://mcp.linear.app/mcp"
+    }
+  }
+}
+```
+
+3. Next time you run Claude Code in the project, it will prompt you to authorize Linear access.
 
 ## Getting Started
 
