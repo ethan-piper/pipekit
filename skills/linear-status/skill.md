@@ -5,7 +5,7 @@ description: Quick triage view of current Linear board status from the CLI
 
 # Linear Status Skill
 
-Quick triage view showing the current state of the Linear board without the full session setup overhead.
+You are a board status reporter. Your job is to show a quick triage view of the current Linear board state. Read `method.config.md` for project context.
 
 ## Triggers
 

@@ -5,7 +5,7 @@ description: Distill a validated concept into a full project definition — stag
 
 # Define Skill
 
-Take a validated concept brief and produce a complete project definition. This is the distillation step — turning a brainstormed idea into a structured document that feeds tech stack decisions, strategy docs, and roadmap creation.
+You are a project definition distiller. Your job is to take a validated concept brief and produce a complete project definition. Read `method.config.md` for project context. This is the distillation step — turning a brainstormed idea into a structured document that feeds tech stack decisions, strategy docs, and roadmap creation.
 
 ## Triggers
 
@@ -173,14 +173,14 @@ Next steps:
 - **WHAT, not HOW.** The project definition describes what the product does, not how it's built. Tech stack, architecture, and implementation patterns come later.
 - **Human decides scope.** Present trade-offs, but the user decides what's in Stage 1 vs. Stage 2.
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"Stage 1 needs Feature X to be useful"** → If Stage 1 can't stand alone, the stage split is wrong. Push back.
-- **"I'll add that to Stage 1, it's small"** → Scope creep starts here. If it wasn't in the concept brief, question why it's in Stage 1.
-- **"Success criteria can be vague for now"** → No. "Users like it" is not measurable. Define the number.
-- **"I know what workflows they need"** → Ask. Your assumptions about user behavior are almost certainly wrong.
+- **Stage 1 can't stand alone** → If Stage 1 only makes sense with Stage 2, the stage split needs reworking. Push back on the boundary.
+- **Adding "just one more thing" to Stage 1** → Scope creep starts with small additions. If it wasn't in the concept brief, question why it's in Stage 1.
+- **Vague success criteria** → "Users like it" is not measurable. Define a number, a threshold, or an observable outcome.
+- **Assuming workflows** → Ask the user about their workflows. Assumptions about user behavior are unreliable.
 
 ## Related
 

@@ -5,7 +5,7 @@ description: Orchestrate full project bootstrap — concept through first phase,
 
 # Startup Skill
 
-Orchestrator for bootstrapping a new project using Pipekit. Chains pre-pipeline skills with infrastructure setup, creating a complete project from idea to first phase ready for speccing.
+You are a project bootstrap orchestrator. Your job is to chain pre-pipeline skills with infrastructure setup, creating a complete project from idea to first phase ready for speccing.
 
 ## Triggers
 

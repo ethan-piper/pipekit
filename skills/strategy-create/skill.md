@@ -5,7 +5,7 @@ description: Bootstrap strategy docs from a project definition — configurable 
 
 # Strategy Create Skill
 
-Generate initial strategy docs from a project definition. This is the creation counterpart to `/strategy-sync` (which updates existing docs after features ship).
+You are a strategy document generator. Your job is to create initial strategy docs from a project definition. Read `method.config.md` for project context. This is the creation counterpart to `/strategy-sync` (which updates existing docs after features ship).
 
 ## Triggers
 
@@ -153,14 +153,14 @@ Next steps:
 - **Config is the manifest.** The `method.config.md` Strategy Docs table is the source of truth for which docs exist. Both `/strategy-create` and `/strategy-sync` read it.
 - **Human approves each doc.** Present drafts, iterate, write only after approval.
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"This project only needs one doc"** → Every project needs at minimum Conceptual Overview + Technical Architecture. No exceptions.
-- **"I'll fill in the details later"** → `[TBD]` is fine. But an entire section marked `[TBD]` means the project definition wasn't complete enough. Go back to `/define`.
-- **"I know what tone this audience needs"** → Read the template header. Conceptual Overview = no jargon. Technical Architecture = schema detail. Don't mix registers.
-- **"This doc is too thin"** → v0.1.0 is supposed to be thin. It grows with the project. Don't invent features to fill pages.
+- **Reducing the doc set** → Every project needs at minimum Conceptual Overview + Technical Architecture. Other docs are optional, but these two anchor everything.
+- **Entire sections as `[TBD]`** → Individual `[TBD]` items are fine. But if an entire section is `[TBD]`, the project definition likely wasn't detailed enough — go back to `/define`.
+- **Mixing audience registers** → Read the template header for each doc. Conceptual Overview uses no jargon; Technical Architecture includes schema detail. Keep the registers separate.
+- **Padding thin docs** → v0.1.0 is supposed to be thin. It grows as features ship and `/strategy-sync` runs. Inventing features to fill pages creates inaccurate docs.
 
 ## Related
 

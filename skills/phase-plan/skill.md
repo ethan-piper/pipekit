@@ -5,7 +5,7 @@ description: Select issues for the next execution phase, track phase state, and 
 
 # Phase Plan Skill
 
-Define, track, and manage execution phases. A phase is a batch of issues selected for the current execution cycle — pulled from the roadmap, validated for dependencies, and promoted to "Needs Spec" so the spec pipeline can begin.
+You are a phase composition planner. Your job is to define, track, and manage execution phases. Read `method.config.md` for project context. A phase is a batch of issues selected for the current execution cycle — pulled from the roadmap, validated for dependencies, and promoted to "Needs Spec" so the spec pipeline can begin.
 
 ## Triggers
 
@@ -228,21 +228,21 @@ Complexity accuracy:
 
 ## Rules
 
-- **3-8 issues per phase.** Fewer is fine for a first phase or complex work. More creates coordination overhead.
-- **Dependencies within the phase must be satisfiable.** If PROJ-3 depends on PROJ-2, both must be in the phase (or PROJ-2 must already be Done).
-- **Don't split milestones unless necessary.** Prefer completing a WP in one phase. Split only when the WP is too large (>8 issues) or has mixed priorities.
+- **Target 3-8 issues per phase.** Fewer is fine for a first phase or complex work. More than 8 creates coordination overhead.
+- **Dependencies within the phase should be satisfiable.** If PROJ-3 depends on PROJ-2, both should be in the phase (or PROJ-2 should already be Done).
+- **Prefer completing milestones over splitting them.** Split only when the WP is too large (>8 issues) or has mixed priorities.
 - **On Deck is the staging area.** Issues move: Future Phases → On Deck → Needs Spec. `/phase-plan` manages the On Deck → Needs Spec promotion. Refilling On Deck from Future Phases happens automatically.
 - **PHASES.md is the phase registry.** Linear tracks individual issue status. PHASES.md tracks phase composition and history.
 - **Human decides phase composition.** Present a recommendation with rationale, but the user approves.
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"Let's just put everything in one phase"** → 3-8 issues. More than 8 creates coordination overhead and hides priorities.
-- **"This blocked issue will probably be unblocked soon"** → Don't plan on hope. If the blocker isn't Done, the issue isn't ready.
-- **"We can split this milestone across 4 phases"** → Prefer completing milestones. If you're splitting that many ways, the milestone is too big — break it up in Linear.
-- **"The phase is fine, no need to rebalance"** → If an issue has been in "Needs Spec" for >3 days, something is wrong. Either spec it or swap it out.
+- **Overloading a phase** → Keep to 3-8 issues. Larger phases create coordination overhead and hide priorities.
+- **Including blocked issues optimistically** → Only include issues whose blockers are Done. Planning on hope leads to stalled phases.
+- **Splitting a milestone across many phases** → If you're splitting across 4+ phases, the milestone itself may be too big — consider breaking it up in Linear.
+- **Stale issues in "Needs Spec"** → If an issue has been in "Needs Spec" for >3 days, investigate. Either spec it or swap it out for something ready.
 
 ## Related
 

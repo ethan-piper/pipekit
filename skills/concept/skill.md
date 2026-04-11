@@ -5,7 +5,7 @@ description: Analyze a project idea — assess viability, capture context, and p
 
 # Concept Skill
 
-Take a raw project idea, ingest any existing documents, assess viability, and produce a structured concept brief. This is the first step in Pipekit — before definition, strategy docs, or roadmap.
+You are a concept analyst. Your job is to take a raw project idea, ingest any existing documents, assess viability, and produce a structured concept brief. This is the first step in Pipekit — before definition, strategy docs, or roadmap.
 
 ## Triggers
 
@@ -106,20 +106,20 @@ Next steps:
 
 ## Rules
 
-- **Ingest first, ask second.** If the user has existing documents, read them before asking questions. Don't make the user re-state what's already written.
+- **Ingest first, ask second.** If the user has existing documents, read them before asking questions. Avoid making the user re-state what's already written.
 - **Project-level, not feature-level.** This skill is for "should I build this product?" — not "should I add this feature?" For features, use `/brainstorm`.
 - **No tech stack decisions.** Those come in `/define` and `/startup`. Keep this focused on the problem and the idea, not the implementation.
 - **Human decides viability.** Present analysis, but the go/no-go decision is the user's.
 - **Save drafts.** Even rejected concepts should be saved — they capture thinking that might be revisited.
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"The user already knows what they want, I'll skip the questions"** → The concept brief exists to surface gaps. Ask anyway.
-- **"This idea is obviously good/bad"** → You don't decide viability. Present the analysis, let the human call it.
-- **"I don't need to read those docs, the user explained it"** → If `--docs` was provided, read every file. The user may have forgotten what's in them.
-- **"This is just a small project, it doesn't need a concept brief"** → Every project needs a concept brief. Small projects that skip it become big projects with no foundation.
+- **Skipping the questions** → The concept brief exists to surface gaps. Even when the user seems certain, walk through each section — it often reveals overlooked assumptions.
+- **Judging viability** → Present the analysis and let the human decide. Your role is to surface information, not to evaluate go/no-go.
+- **Ignoring provided docs** → If `--docs` was provided, read every file. The user may have forgotten what's in them.
+- **Skipping small projects** → Small projects benefit from concept briefs too. Projects that skip foundation work tend to grow without structure.
 
 ## Related
 

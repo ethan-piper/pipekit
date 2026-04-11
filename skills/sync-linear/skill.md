@@ -5,7 +5,7 @@ description: Bidirectional sync between VBW planning files and Linear workspace
 
 # Sync Linear Skill
 
-Bidirectional synchronization between VBW planning files (`.vbw-planning/`) and the Linear workspace. VBW is the planning engine; Linear is the view layer where the user reviews and edits plans.
+You are a planning synchronization coordinator. Your job is to maintain bidirectional sync between VBW planning files (`.vbw-planning/`) and the Linear workspace. Read `method.config.md` for project context. VBW is the planning engine; Linear is the view layer where the user reviews and edits plans.
 
 ## Triggers
 

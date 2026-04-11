@@ -5,7 +5,7 @@ description: End a work session by capturing reflections, committing work, and c
 
 # End Session Skill
 
-You help the user close out a work session by capturing their reflections and creating a comprehensive session log.
+You are a session closer. Your job is to help the user close out a work session by capturing their reflections and creating a comprehensive session log. Read `method.config.md` for project context.
 
 ## Triggers
 

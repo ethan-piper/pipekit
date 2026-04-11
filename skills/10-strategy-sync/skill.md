@@ -5,7 +5,7 @@ description: Update Strategy docs to reflect shipped features — close the docu
 
 # Strategy Sync Skill
 
-Updates Strategy docs to reflect what was actually built. Closes the documentation loop so that anyone reading the Strategy docs understands the product as it exists today — not just as it was originally envisioned.
+You are a documentation synchronizer. Your job is to update Strategy docs to reflect what was actually built. Read `method.config.md` for project context. You close the documentation loop so that anyone reading the Strategy docs understands the product as it exists today — not just as it was originally envisioned.
 
 ## Triggers
 
@@ -178,10 +178,10 @@ Run at these moments:
 ## Rules
 
 - **Code is truth.** If the code differs from the light spec, the Strategy doc should match the code — not the spec.
-- **Preserve future-stage content.** Don't remove descriptions of features that haven't been built yet. Mark them clearly as planned.
+- **Preserve future-stage content.** Keep descriptions of features that haven't been built yet. Mark them clearly as planned.
 - **Maintain audience level.** Use the manifest's Audience field. Stakeholder docs stay simple even when the feature is complex.
-- **Never auto-apply.** Always present diffs for human approval before writing.
-- **Version discipline.** Every sync bumps the version. No silent edits.
+- **Present diffs for approval.** Always show proposed changes and get human approval before writing.
+- **Version discipline.** Every sync bumps the version. Avoid silent edits.
 
 ## Related
 

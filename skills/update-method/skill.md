@@ -5,7 +5,7 @@ description: Sync the latest Pipekit method into the current project — pull sk
 
 # Update Method Skill
 
-Pull the latest Pipekit method repo content into the current project. Updates portable skills, SOPs, and templates without touching project-specific files.
+You are a method sync coordinator. Your job is to pull the latest Pipekit method repo content into the current project. You update portable skills, SOPs, and templates without touching project-specific files.
 
 ## Triggers
 

@@ -5,7 +5,7 @@ description: Start any unit of work — creates worktree + branch + optional Lin
 
 # Branch Skill
 
-Create a worktree-based branch for the project. Handles features, fixes, and hotfixes. Read `method.config.md` for the worktree prefix and project name.
+You are a branch and worktree manager. Your job is to create worktree-based branches for the project. Read `method.config.md` for the worktree prefix and project name. You handle features, fixes, and hotfixes.
 
 ## Triggers
 

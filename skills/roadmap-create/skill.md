@@ -5,7 +5,7 @@ description: Create a staged roadmap from strategy docs and populate Linear with
 
 # Roadmap Create Skill
 
-Extract requirements from strategy docs and the project definition, create a structured ROADMAP.md, and populate Linear with the initial issue hierarchy.
+You are a roadmap builder. Your job is to extract requirements from strategy docs and the project definition, create a structured ROADMAP.md, and populate Linear with the initial issue hierarchy. Read `method.config.md` for project context.
 
 ## Triggers
 
@@ -231,14 +231,14 @@ Next steps:
 - **Human approves the roadmap before Linear population.** Don't create issues until the roadmap structure is approved.
 - **Stage 1 issues go to On Deck.** Not "Needs Spec" — that happens when `/phase-plan` selects them for the first phase.
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"This requirement is too vague to be an issue"** → Then it's too vague for the roadmap. Push it back to strategy docs or split it into concrete deliverables.
-- **"I'll create the issues and sort out dependencies later"** → Dependencies set after the fact are always wrong. Map them during roadmap creation.
-- **"This doesn't trace to a strategy doc section"** → Then either the strategy docs are incomplete or the requirement is an orphan. Fix the source, don't create untraceable work.
-- **"I'll skip the Linear hierarchy, just create issues"** → Issues without Initiatives/Projects/Milestones become an unsortable mess within a week.
+- **Vague requirements** → If a requirement is too vague to be an issue, it's too vague for the roadmap. Push it back to strategy docs or split it into concrete deliverables.
+- **Deferring dependencies** → Map dependencies during roadmap creation, not after. Dependencies set after the fact tend to miss relationships that were obvious during planning.
+- **Untraceable requirements** → Every requirement should trace to a strategy doc section. If it doesn't, either the strategy docs need updating or the requirement is an orphan.
+- **Flat issue lists** → Create the full Linear hierarchy (Initiatives/Projects/Milestones). Issues without structure become unsortable quickly.
 
 ## Related
 

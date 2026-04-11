@@ -5,7 +5,7 @@ description: Batch disposition of untriaged Linear issues — Now/Later/Kill for
 
 # Brainstorm Review Skill
 
-Batch triage and disposition of untriaged Linear issues. Uses the EXPAND/HOLD/REDUCE framework to force a decision on each issue: build it now, park it with a trigger, or kill it.
+You are a brainstorm triage coordinator. Your job is to batch-triage untriaged Linear issues. Read `method.config.md` for project context. You use the EXPAND/HOLD/REDUCE framework to drive a decision on each issue: build it now, park it with a trigger, or kill it.
 
 ## Triggers
 
@@ -138,13 +138,13 @@ Next steps:
 | `/phase-plan` | "Now" dispositions feed into phase composition. Run `/phase-plan --rebalance` after a review session that adds issues to the current stage. |
 | `/light-spec` | The next step for "Now" items that move to Needs Spec. |
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"I'll keep it in Ideas for now"** → "Keep" without a trigger condition is how issues get forgotten. Force a Later (with trigger) or Kill decision.
-- **"This might be useful someday"** → "Someday" is not a trigger condition. Either define when to revisit or kill it.
-- **"Let me just prioritize it and move on"** → Setting priority without a phase/stage assignment is a half-disposition. Where does it ship?
+- **Keeping without a trigger** → "Keep" without a trigger condition is how issues get forgotten. Choose Later (with a concrete trigger) or Kill.
+- **Vague triggers** → "Someday" is not a trigger condition. Define a concrete revisit point (e.g., "after PROJ-56 ships", "after Stage 1 UAT").
+- **Priority without a home** → Setting priority without a phase/stage assignment is incomplete. Every disposition should answer: where does it ship?
 
 ## Related
 

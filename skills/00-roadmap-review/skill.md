@@ -5,7 +5,7 @@ description: Validate roadmap health — issue completeness, dependency ordering
 
 # Roadmap Review Skill
 
-Comprehensive health check of the overall plan. Run before speccing a new phase to ensure the roadmap is coherent and complete.
+You are a roadmap health auditor. Your job is to run a comprehensive health check of the overall plan. Read `method.config.md` for project context. Run this before speccing a new phase to ensure the roadmap is coherent and complete.
 
 ## Triggers
 
@@ -46,13 +46,13 @@ Validate that pre-pipeline outputs exist. If any are missing, report which skill
 If any Stage 0 check fails, report it prominently at the top of the health report:
 
 ```
-## Stage 0: Foundation — INCOMPLETE
+## Stage 0: Foundation — Incomplete
 
 Missing:
   - concept-brief.md → run /concept
   - .vbw-planning/PHASES.md → run /phase-plan
 
-Stage 0 must be complete before entering the spec pipeline.
+Complete Stage 0 before entering the spec pipeline.
 ```
 
 If all Stage 0 checks pass, continue to the next check.

@@ -57,9 +57,9 @@ Explore the codebase to understand what exists and what's needed:
 
 Write the spec using the **Light Spec Template** below. Fill in every section.
 
-**Decision discipline:** All behavior-affecting decisions MUST be either defined or marked `[TBD]`. A decision left implicit (not mentioned at all) makes the spec invalid — the planner will guess, and guesses compound. `[TBD]` is only valid if it does **not** block task decomposition. If a `[TBD]` would force the planner to guess at task boundaries, the decision must be resolved before the spec is ready.
+**Decision discipline:** All behavior-affecting decisions should be either defined or marked `[TBD]`. A decision left implicit (not mentioned at all) means the planner will guess, and guesses compound. `[TBD]` is only valid if it does **not** block task decomposition. If a `[TBD]` would force the planner to guess at task boundaries, resolve the decision before the spec is ready.
 
-**Scope discipline:** Specs define WHAT, not HOW. Apply this litmus test: if a statement can be rewritten as "change X line" or "use Y syntax," it is implementation detail and must be removed. Do not include file paths to create, function signatures, or implementation patterns — VBW planning agents own the HOW.
+**Scope discipline:** Specs define WHAT, not HOW. Litmus test: if a statement can be rewritten as "change X line" or "use Y syntax," it is implementation detail — remove it. If a statement can be rewritten as "the system should [observable behavior]," it belongs in the spec. Do not include file paths to create, function signatures, or implementation patterns — VBW planning agents own the HOW.
 
 ### Phase 3.5 — Planning Readiness Check
 
@@ -165,15 +165,15 @@ Same as `/brainstorm`, but with planning implications:
 - **Medium (~6-10h):** Benefits from a single VBW plan (1 PLAN.md). The light spec provides enough for the lead agent to generate tasks.
 - **High (~12-20h+):** Likely needs multiple VBW plans across a phase. The light spec seeds the architect agent's phase decomposition.
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"This feature is simple, I don't need to explore the codebase"** → Run the Explore agent. Your assumptions about what exists are wrong more often than they're right.
-- **"The authority is obvious"** → Define it explicitly anyway. Ambiguous authority is the #1 cause of spec revision.
-- **"These acceptance criteria are fine as-is"** → Apply the litmus test: can the planner verify each one without guessing? "Works correctly" always fails.
-- **"I'll leave this decision implicit, it's clear from context"** → If it's not in the Decisions section (defined or `[TBD]`), the spec is invalid. Context is not a contract.
-- **"I know this API"** → Check the installed version. Your training data is stale.
+- **Skipping codebase exploration** → When uncertain whether exploration is needed, explore. Assumptions about what exists are wrong more often than right.
+- **Leaving authority implicit** → Define it explicitly. Ambiguous authority is the #1 cause of spec revision.
+- **Vague acceptance criteria** → Apply the litmus test: can the planner verify each criterion without guessing what "works correctly" or "handles properly" means? Every criterion needs a concrete, observable outcome.
+- **Implicit decisions** → Put it in the Decisions section (defined or `[TBD]`). Context is not a contract — downstream agents can't read your mind.
+- **Assuming API behavior** → Check the installed version. Training data may not reflect the project's actual dependencies.
 
 ## Related Skills
 

@@ -5,7 +5,7 @@ description: Precision PR review across 4 dimensions with confidence-gated findi
 
 # PR Fix
 
-Diff-based review across 4 dimensions with conditional routing, confidence scoring, deduplication, and an interactive fix workflow. Finds real issues with zero noise, then fixes them with user approval.
+You are a precision PR reviewer. Your job is to perform diff-based review across 4 dimensions with conditional routing, confidence scoring, deduplication, and an interactive fix workflow. You find real issues with zero noise, then fix them with user approval.
 
 ## Triggers
 

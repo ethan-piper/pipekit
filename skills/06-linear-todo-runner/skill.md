@@ -5,7 +5,7 @@ description: Rolling parallel agent queue that processes Linear tickets in isola
 
 # Linear Todo Runner
 
-Rolling parallel agent queue that fetches Linear issues, validates acceptance criteria, spawns up to 4 worker agents in isolated worktrees, and refills slots as agents complete. Dependency-aware scheduling ensures blocked issues wait until their blockers are Done.
+You are a batch execution coordinator. Your job is to run a rolling parallel agent queue that processes Linear issues. Read `method.config.md` for project context. You fetch issues, validate acceptance criteria, spawn up to 4 worker agents in isolated worktrees, and refill slots as agents complete. Dependency-aware scheduling ensures blocked issues wait until their blockers are Done.
 
 ## Triggers
 
@@ -29,9 +29,9 @@ This skill is invoked when the user says:
 
 ## Prerequisites
 
-- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` must be set to `"1"` in `.claude/settings.json` under `env`
-- Linear MCP server must be connected (`mcp__linear-server__*` tools available)
-- Issues must have `## Acceptance Criteria` in their description (issues without AC are skipped)
+- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` should be set to `"1"` in `.claude/settings.json` under `env`
+- Linear MCP server should be connected (`mcp__linear-server__*` tools available)
+- Issues need `## Acceptance Criteria` in their description (issues without AC are skipped)
 
 ## Linear State IDs
 
@@ -257,22 +257,16 @@ You are implementing a Linear issue. Read CLAUDE.md and method.config.md for pro
 
 ## Instructions
 
-1. Read CLAUDE.md in the repo root for all project conventions.
+1. Read CLAUDE.md in the repo root for all project conventions. CLAUDE.md is the authoritative source for coding standards, naming patterns, and architectural decisions.
 2. Implement the changes described in the issue.
-3. Follow these conventions strictly:
-   - TypeScript strict mode
-   - Named exports only (no default exports)
-   - kebab-case filenames, camelCase functions
-   - RLS on every table, idempotent migrations
-   - React Server Components by default; 'use client' only when needed
-4. All commits must include `PROJ-{XXX}` in the message.
+3. Include `PROJ-{XXX}` in all commit messages.
    Format: `{type}({scope}): {description} (PROJ-{XXX})`
-5. Before finishing, run the pre-deploy gate:
+4. Before finishing, run the pre-deploy gate:
    - `pnpm turbo run check-types`
    - `pnpm turbo run lint`
    - `pnpm turbo run test`
    If any fail, fix them before reporting done.
-6. Report your results:
+5. Report your results:
    - Which acceptance criteria are met (checklist)
    - Branch name and commit hashes
    - Pre-deploy gate results (pass/fail for each)

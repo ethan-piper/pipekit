@@ -110,14 +110,14 @@ Format the Linear issue description as:
 [Any caveats, dependencies, or open questions]
 ```
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"This idea is obviously feasible"** → Explore the codebase. "Obviously feasible" ideas that skip exploration become surprisingly complex specs.
-- **"I'll estimate Low complexity"** → Low means 2-4 hours of implementation. If you haven't explored the codebase, you can't estimate. Explore first.
-- **"We can figure out the dependencies later"** → Capture them now. Dependencies discovered during execution are 10x more expensive than dependencies discovered during brainstorming.
-- **"This doesn't need a Linear issue, it's just an idea"** → Every idea gets an issue. Ideas without issues get forgotten. Issues without ideas get built blindly.
+- **Skipping codebase exploration** → Ideas that feel "obviously feasible" often become surprisingly complex during speccing. Explore first, then assess.
+- **Estimating without exploring** → Low means 2-4 hours of implementation. Accurate estimates require understanding the existing codebase.
+- **Deferring dependency discovery** → Capture dependencies during brainstorming. Dependencies discovered during execution are far more expensive to resolve.
+- **Skipping the Linear issue** → Every idea gets an issue. Ideas without issues get forgotten; issues without context get built blindly.
 
 ## Related
 

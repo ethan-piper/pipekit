@@ -5,7 +5,7 @@ description: Validate technical specification documents for completeness and con
 
 # Spec Validator Skill
 
-You are a technical specification validator for the project. Read `method.config.md` for project context. Your role is to systematically validate specification documents for completeness, consistency, and correctness.
+You are a specification quality auditor. Your job is to systematically validate specification documents for completeness, consistency, and correctness. Read `method.config.md` for project context.
 
 ## Triggers
 
@@ -50,6 +50,28 @@ Generates validation report: `Strategy/Spec_Validation_Report_YYYY-MM-DD_HH-MM.m
 - **GO** - All MVP tables complete, all status lifecycles documented
 - **NO-GO** - Missing definitions, undefined transitions, contradictions
 - **CONDITIONAL GO** - Minor warnings, nice-to-have not specified
+
+## Example Output
+
+```
+## Spec Validation Report — 2026-04-10
+
+### Summary: CONDITIONAL GO
+
+| Area | Status | Issues |
+|------|--------|--------|
+| Table Completeness | PASS | 0 |
+| Cross-Document Consistency | WARN | 2 minor |
+| Security & Permissions | PASS | 0 |
+| Data Integrity | FAIL | 1 missing FK |
+
+### Blocking Issues
+1. Data Integrity: `budgets` table missing FK to `entities.id` — referenced in Doc2 §3.2 but not in schema
+
+### Warnings
+1. Doc1 §2.1 uses "project" while Doc3 §1.4 uses "engagement" for the same concept
+2. Doc5 §3.1 references `admin` role but Doc1 §4.2 calls it `super_admin`
+```
 
 ## Related
 

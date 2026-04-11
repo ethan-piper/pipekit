@@ -5,7 +5,7 @@ description: Formalized trigger to plan and execute a specced Linear issue throu
 
 # Launch Skill
 
-Transitions a human-approved Linear issue from spec to execution. Validates readiness gates, routes by complexity, manages Linear status transitions, and produces a shippable feature or queues it for batch processing.
+You are a launch gate controller. Your job is to transition a human-approved Linear issue from spec to execution. Read `method.config.md` for project context. You validate readiness gates, route by complexity, manage Linear status transitions, and produce a shippable feature or queue it for batch processing.
 
 ## Triggers
 
@@ -41,14 +41,14 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
 2. Validate the issue has:
    - A `## Light Spec` or `## Acceptance Criteria` section in the description
    - Status is **Approved** ({Approved state ID from method.config.md}) or **Specced** with human approval noted
-3. If no spec/AC found: **STOP** with `"PROJ-XXX has no spec or AC. Run /light-spec PROJ-XXX first."`
-4. If status is before Approved: **STOP** with `"PROJ-XXX is in {status}. Move to Approved in Linear before launching."`
+3. If no spec/AC found: stop and report `"PROJ-XXX has no spec or AC. Run /light-spec PROJ-XXX first."`
+4. If status is before Approved: stop and report `"PROJ-XXX is in {status}. Move to Approved in Linear before launching."`
 
 ### Step 2 — Check Dependencies
 
 1. Read `blocked_by` relations from the issue
 2. For each blocker, check its status via `mcp__linear-server__get_issue`
-3. If any blocker is NOT in **Done** ({Done state ID from method.config.md}): **STOP** with `"PROJ-XXX is blocked by PROJ-YYY ({status}). Resolve blockers first."`
+3. If any blocker is NOT in **Done** ({Done state ID from method.config.md}): stop and report `"PROJ-XXX is blocked by PROJ-YYY ({status}). Resolve blockers first."`
 
 ### Step 3 — Milestone Readiness Gate
 
@@ -56,7 +56,7 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
 2. If the issue belongs to a milestone:
    - Fetch all sibling issues in that milestone via `mcp__linear-server__list_issues` filtered by milestone
    - Check that ALL sibling issues are at least in **Specced** ({Specced state ID from method.config.md}) or later state
-   - If any sibling is in Needs Spec, On Deck, or earlier: **STOP** with:
+   - If any sibling is in Needs Spec, On Deck, or earlier: stop and report:
      ```
      Milestone gate failed: {milestone name}
      
@@ -255,15 +255,15 @@ Downstream transitions (not owned by `/launch`):
 
 ---
 
-## Red Flags
+## Common Drifts to Avoid
 
-If you catch yourself thinking any of these, follow the process more strictly:
+When you encounter these situations, take the safer path:
 
-- **"The spec is close enough, I'll just launch it"** → If the spec doesn't pass the gate, it doesn't launch. Run `/light-spec` first.
-- **"I'll skip the milestone gate, it's just one issue"** → The milestone gate exists because later specs change assumptions. Use `--force` only if the user explicitly says so.
-- **"This is Low complexity, it doesn't need AC"** → The batch runner requires AC. No AC = no execution. Every issue needs verifiable criteria.
-- **"I'll fix the dependency issue after launching"** → Dependencies exist for a reason. If a blocker isn't Done, the issue isn't ready. Period.
-- **"I know the complexity without reading the spec"** → Read the spec. Every time. Your estimate from the title is wrong.
+- **Launching without a passing gate** → Specs that don't pass the gate go back to `/light-spec`, not forward to execution.
+- **Skipping the milestone gate** → The gate exists because later specs can change assumptions that affect earlier work. Only bypass with `--force` when the user explicitly requests it.
+- **Low complexity without AC** → The batch runner needs acceptance criteria to execute. Every issue needs verifiable criteria regardless of complexity.
+- **Launching despite unresolved blockers** → Blockers should be Done before launching. If a blocker looks ready but isn't marked Done, flag it for the user rather than proceeding.
+- **Estimating complexity from the title** → Read the spec to determine complexity. Title-based estimates are unreliable.
 
 ---
 
