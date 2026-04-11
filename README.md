@@ -43,6 +43,7 @@ pipekit/
     strategy/                      #   Strategy doc templates
       conceptual-overview.md
       technical-architecture.md
+      design-direction.md         #     Visual style + inspiration for build agents
       permissions.md
       data-model.md
       workflow-examples.md

@@ -234,12 +234,13 @@ The skill analyzes the project definition and recommends which docs are needed:
 |-----|----------|-------------|
 | Conceptual Overview | `templates/strategy/conceptual-overview.md` | Always — every project needs a plain-language description |
 | Technical Architecture | `templates/strategy/technical-architecture.md` | Always — developers need to understand the system design |
+| Design Direction | `templates/strategy/design-direction.md` | Project has a UI — captures visual style, inspiration, and anti-patterns for build agents |
 | Permissions | `templates/strategy/permissions.md` | Project has user roles with different access levels |
 | Data Model | `templates/strategy/data-model.md` | Complex data relationships or calculations |
 | Workflow Examples | `templates/strategy/workflow-examples.md` | Multi-step user journeys defined |
 | UX Reference | `templates/strategy/ux-reference.md` | Complex UI interactions (often added later, not at creation) |
 
-**Audience discipline:** Each doc type has a target audience. Conceptual Overview is stakeholder-friendly (no jargon). Technical Architecture is developer-level (schema detail). The skill matches the tone to the audience.
+**Audience discipline:** Each doc type has a target audience. Conceptual Overview is stakeholder-friendly (no jargon). Technical Architecture is developer-level (schema detail). Design Direction is practical and read by both developers and AI agents (including `/frontend-design`) during execution. The skill matches the tone to the audience.
 
 **What gets configured:** The doc set is recorded in `method.config.md` under `## Strategy Docs`. Both `/strategy-create` and `/strategy-sync` read this table to know which docs exist and how to update them.
 
@@ -727,6 +728,7 @@ Strategy docs are configurable per project. Each project defines which docs it m
 |----------|----------|----------|---------------|
 | Conceptual Overview | `templates/strategy/conceptual-overview.md` | Stakeholders | Always — every project |
 | Technical Architecture | `templates/strategy/technical-architecture.md` | Developers | Always — every project |
+| Design Direction | `templates/strategy/design-direction.md` | Developers, AI Agents | If project has a UI |
 | Permissions | `templates/strategy/permissions.md` | Developers, Admins | If auth/roles exist |
 | Data Model | `templates/strategy/data-model.md` | Developers | If complex data |
 | Workflow Examples | `templates/strategy/workflow-examples.md` | All | If multi-step user flows |

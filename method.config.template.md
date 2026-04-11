@@ -105,6 +105,7 @@ Add rows as needed. Common additions:
 
 | Doc | File | Purpose | Audience |
 |-----|------|---------|----------|
+| Design Direction | `Strategy/DesignDirection.md` | Visual style, inspiration, anti-patterns for build agents | Developers, AI Agents |
 | Permissions | `Strategy/Permissions.md` | Auth, roles, RLS, access control | Developers, Admins |
 | UX Reference | `Strategy/UXReference.md` | UI patterns, shortcuts, onboarding | Developers, Support |
 | Workflow Examples | `Strategy/WorkflowExamples.md` | Step-by-step user scenarios | All |

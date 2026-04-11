@@ -34,6 +34,7 @@ Break the build into stages. Each stage should be independently deployable and t
 
 **Output:** A `Strategy/` directory with at minimum:
 - `ConceptualOverview.md` — what the product does in plain language
+- `DesignDirection.md` — visual style, inspiration, and anti-patterns (if project has a UI)
 - Stage breakdown with scope boundaries
 
 ### 1.3 Linear Setup Decisions
