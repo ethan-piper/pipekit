@@ -54,6 +54,8 @@ Choose a branching model during `/startup`. This decision determines your enviro
 
 **Model:** `two-tier` | `three-tier`
 
+> **Note:** `/startup` will fill in your chosen model below and remove the other option. Both are shown here as a template reference.
+
 ### Two-Tier (dev → main)
 
 Best for: solo dev, small teams, projects where preview URLs replace a staging environment.

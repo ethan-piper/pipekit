@@ -494,4 +494,9 @@ Next steps:
 - **Decisions are the user's.** Present analysis, make recommendations, but never lock in a choice without explicit approval.
 - **Skip what's done.** If a step's output already exists, acknowledge and offer to skip. Mark it `⏭️ Skipped` in the tracker.
 - **Save as you go.** Update CLAUDE.md, method.config.md, Strategy docs, AND the tracker as decisions are made — don't batch to the end.
+- **Clean up after decisions.** When the user chooses between alternatives (two-tier vs. three-tier, framework A vs. B, etc.), **remove or collapse the unchosen option** from the document. The chosen path should be clean and unambiguous. Specifically:
+  1. Keep the chosen option's full detail in place.
+  2. Remove the unchosen option's configuration blocks (environment tables, promotion skills, workflow details, etc.) so they don't look active.
+  3. If the unchosen option has reference value, move it to a collapsed section at the bottom: `<!-- Not chosen: three-tier --> ... <!-- /Not chosen -->` — but only if it adds value. When in doubt, remove it entirely.
+  This applies to `method.config.md`, `CLAUDE.md`, strategy docs, and any file where alternatives were presented. A document should never look like two conflicting decisions are both active.
 - **Resumable.** The tracker + artifact checks make `/startup` fully resumable across sessions. A new session reads the tracker and picks up exactly where the last one stopped.
