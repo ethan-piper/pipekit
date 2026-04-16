@@ -82,8 +82,15 @@ For each approved doc, in order:
    - Match the audience level specified in the template header
    - Mark sections as `[TBD]` where the definition doesn't provide enough detail
    - Set version to `v0.1.0` and date to today
-4. Present the draft to the user: _"Here's the draft {doc name}. Review and edit?"_
-5. Iterate until approved
+4. **Write the file to `Strategy/` immediately** — don't dump the full document in the terminal
+5. Tell the user where to find it and give a brief summary:
+
+_"Written to `Strategy/{DocName}.md`. Here's what it covers:"_
+- {3-5 bullet summary of the document's key content}
+
+_"Open it in your editor, review it, and let me know what to change — or say 'approved' to move to the next doc."_
+
+6. Wait for feedback. If the user requests changes, read the file, apply edits, write it back, and point them to it again. Iterate until approved.
 
 **Audience discipline:**
 - Conceptual Overview: Simple language. A stakeholder with no technical background should understand it completely. No code, no jargon.
@@ -154,7 +161,7 @@ Next steps:
 - **Don't invent features.** Strategy docs describe what's in the project definition, not new ideas. If a doc feels thin, that's OK — it'll grow.
 - **Match audience.** Conceptual Overview reads like a product pitch. Technical Architecture reads like system design docs. Don't mix the registers.
 - **Config is the manifest.** The `method.config.md` Strategy Docs table is the source of truth for which docs exist. Both `/strategy-create` and `/strategy-sync` read it.
-- **Human approves each doc.** Present drafts, iterate, write only after approval.
+- **Write first, review in editor.** Write each doc to disk immediately, point the user to the file, and give a brief terminal summary. Don't dump full documents in the terminal — the user reviews in their editor.
 
 ## Common Drifts to Avoid
 

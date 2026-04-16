@@ -138,15 +138,21 @@ Only capture what's relevant — skip categories that don't apply.
 
 1. Compile everything into `project-definition.md` using the template from `templates/project-definition.md`
 2. Fill in the `## Source Documents` table
-3. Present the complete definition to the user
+3. **Write `project-definition.md` to disk immediately** — don't dump the full document in the terminal
+4. Tell the user where to find it and give a brief summary:
 
-Ask: _"Is this definition complete enough to choose a tech stack and write strategy docs?"_
+_"Written to `project-definition.md`. Here's what it covers:"_
+- {Bullet summary: stages defined, roles identified, key workflows, NFRs}
 
-If no: identify which sections need more detail and iterate.
+_"Open it in your editor, review it, and let me know what to change — or say 'approved' to move on."_
+
+5. Wait for feedback. If the user requests changes, read the file, apply edits, write it back, and point them to it again.
+
+Ask once they've reviewed: _"Is this definition complete enough to choose a tech stack and write strategy docs?"_
 
 ### Phase 10 — Save
 
-1. Write `project-definition.md` to the project root
+1. Update `project-definition.md` (already written in Phase 9) with final status
 2. Set Status to `Approved` if the user confirms completeness
 3. Report next steps:
 

@@ -67,11 +67,15 @@ For each section:
 
 1. Draft the complete concept brief using the template from `templates/concept-brief.md`
 2. Fill in the `## Source Documents` table with all ingested document paths
-3. Present the draft to the user
+3. **Write `concept-brief.md` to disk immediately** — don't dump the full document in the terminal
+4. Tell the user where to find it and give a brief summary:
 
-Ask: _"Does this capture the concept accurately? Want to refine anything?"_
+_"Written to `concept-brief.md`. Here's what it covers:"_
+- {3-5 bullet summary of key points — problem, solution, target users, scale, main risks}
 
-Iterate until the user approves.
+_"Open it in your editor, review it, and let me know what to change — or say 'approved' to move on."_
+
+5. Wait for feedback. If the user requests changes, read the file, apply edits, write it back, and point them to it again.
 
 ### Phase 4 — Gate Decision
 
@@ -85,7 +89,7 @@ Present the gate question:
 
 ### Phase 5 — Save
 
-1. Write `concept-brief.md` to the project root
+1. Update `concept-brief.md` (already written in Phase 3) with the final gate decision
 2. Set the Status field based on the gate decision:
    - Yes → `Validated`
    - No → `Draft`

@@ -466,6 +466,13 @@ Next steps:
 ## Rules
 
 - **Tracker first.** Create or read `{folder-name}-startup.md` before doing anything else. Update it after every step. This file IS the state of the startup process.
+- **Documents, not terminal walls.** When a step produces a document (concept brief, project definition, strategy docs, etc.):
+  1. **Write the file to disk first.** Don't dump the full content in the terminal.
+  2. **Tell the user where it is:** _"Written to `concept-brief.md` — open it in your editor and review. Let me know what to change, or say 'approved' to continue."_
+  3. **Give a brief summary** in the terminal (3-5 bullet points of what the document covers — enough to orient, not enough to substitute for reading it).
+  4. **Wait for feedback.** The user may edit the file directly, give verbal instructions, or approve as-is.
+  5. **If the user requests changes:** read the file, apply the edits, write it back, and point them to it again.
+  This applies to every document-producing step. The terminal is for conversation and status updates. Documents live in files.
 - **One step at a time.** Don't rush ahead. Confirm the user is ready before moving to the next step.
 - **Show progress.** At each step transition, show what's been completed and what's next.
 - **Decisions are the user's.** Present analysis, make recommendations, but never lock in a choice without explicit approval.
