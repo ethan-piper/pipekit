@@ -82,7 +82,7 @@ Every status maps to a pipeline position. An issue's status tells you whose turn
 
 | Status | Type | Whose Turn | Pipeline Step | Purpose |
 |---|---|---|---|---|
-| **Triage** | triage | You | Pre-pipeline | External input: bug reports, client requests, `/brainstorm` output. Sort into the right place. |
+| **Triage** | triage (setting) | You | Pre-pipeline | External input: bug reports, client requests, `/brainstorm` output. Sort into the right place. Enable via Settings → Team → General, not created as a workflow state. |
 | **Ideas** | backlog | -- | Pre-pipeline | Triaged items to act on at some point, but not now. Parking lot for evaluated ideas. |
 | **Future Phases** | backlog | -- | Pre-pipeline | Belongs to a known future stage. Not in scope for current or next phase. |
 | **On Deck** | backlog | Scanning | Pre-pipeline | Next phase's batch. Start getting eyes on these, light-spec proactively if you get ahead. |

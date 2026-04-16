@@ -249,15 +249,19 @@ Fetch team details and populate `method.config.md`:
 
 **4c. Workflow States**
 
-Pipekit requires 13 specific workflow states. Linear workspaces start with defaults (Backlog, Todo, In Progress, Done, Canceled) that need to be replaced.
+Pipekit requires 12 workflow states plus Triage enabled. Linear workspaces start with defaults (Backlog, Todo, In Progress, Done, Canceled) that need to be replaced.
 
-Present the target state configuration:
+**Important:** Triage is NOT a workflow state — it's a setting. It must be enabled separately in Linear's team settings. The 12 workflow states below are what you create/configure in the Workflow section.
+
+Colors are yours to choose. Pipekit defines the required state names and types — pick whatever colors work for your team.
+
+Present the target configuration:
 
 ```
-Pipekit requires these 13 workflow states in this order:
+Pipekit requires Triage enabled + these 12 workflow states:
 
-  Triage states:
-    • Triage                    (type: triage)
+  ENABLE TRIAGE (Settings → Team → General):
+    • Turn on "Triage" — this adds a Triage inbox, not a workflow state
 
   Backlog states:
     • Ideas                     (type: backlog)
@@ -287,17 +291,20 @@ Pipekit requires these 13 workflow states in this order:
 _"Linear's workflow states need to be configured in the UI. Here's exactly what to do:"_
 
 ```
-1. Open Linear → Settings → Team Settings → {Team} → Workflow
+1. Enable Triage:
+   Open Linear → Settings → Team Settings → {Team} → General
+   Turn on "Triage" (this adds a Triage inbox for incoming issues)
 
-2. Remove default states that Pipekit doesn't use:
+2. Configure Workflow States:
+   Open Linear → Settings → Team Settings → {Team} → Workflow
+
+3. Remove default states that Pipekit doesn't use:
    - Remove "Backlog" (Pipekit uses Ideas/Future Phases/On Deck/Needs Spec instead)
    - Remove "Todo" (Pipekit uses Specced/Approved instead)
    - You can't delete states with issues — move any existing issues first
 
-3. Create these states (in order, with these types):
-
-   TRIAGE section:
-     ✓ Triage (usually exists by default)
+4. Create these states (in order, with these types):
+   Choose whatever colors you like for each.
 
    BACKLOG section:
      + Ideas
@@ -321,7 +328,7 @@ _"Linear's workflow states need to be configured in the UI. Here's exactly what 
      ✓ Canceled (usually exists by default)
      + Duplicate
 
-4. Drag to reorder so they appear in the order listed above.
+5. Drag to reorder so they appear in the order listed above.
 ```
 
 Ask the user to confirm when done: _"Let me know when the workflow states are configured and I'll fetch the IDs."_
