@@ -125,6 +125,18 @@ Each step checks if its output already exists and offers to skip — making `/st
 - If yes: _"Project definition exists. Review it, skip, or redo?"_
 - If no: Run `/define`
 
+**After this step, populate the Project section of `method.config.md`:**
+
+```
+| **Project name** | `{folder-name}` |
+| **Project display name** | `{from project definition}` |
+| **Worktree prefix** | `~/Projects/{folder-name}-` |
+| **Session logs path** | `Logs/Sessions/` |
+| **Strategy docs path** | `Strategy/` |
+```
+
+These values are now known from the concept brief and project definition. Write them immediately.
+
 **Output:** `project-definition.md` — phases, roles, workflows, success criteria
 
 ### Step 3 — Tech Stack
@@ -146,12 +158,16 @@ Walk through tech stack decisions from `STARTUP.md` Step 2:
 | **Two-tier** (`dev` → `main`) | Solo dev, small teams, preview URLs suffice for UAT |
 | **Three-tier** (`dev` → `beta` → `main`) | Teams with QA, need stable UAT environment, regulated industries |
 
-Record the choice in `method.config.md` under `## Git Architecture`. This decision determines:
+**Update `method.config.md` immediately:**
+- Set `## Git Architecture` → **Model** to `two-tier` or `three-tier`
+- Fill in the Environments table with the branches (URLs come in Step 4)
+
+This decision determines:
 - Which environments to configure in Step 4
 - Which promotion skills to create in Step 9 (no `/g-promote-beta` needed for two-tier)
 - How Linear status transitions work on merge (see `sop/Git_and_Deployment.md`)
 
-**Output:** Tech stack + git architecture decisions recorded
+**Output:** Tech stack + git architecture decisions recorded in `method.config.md`
 
 ### Step 4 — Infrastructure Setup
 
@@ -160,8 +176,8 @@ Walk through setup checklist from `STARTUP.md` Step 3, in order. Skip steps alre
 1. **Repository** — create GitHub repo, initialize framework, TypeScript strict, .gitignore, .env.example
 2. **Monorepo** (if applicable) — Turborepo, workspaces, shared config
 3. **Database** — create project(s), initial schema, auth setup
-4. **Deployment** — link to Vercel/equivalent, env vars, custom domains, preview deploys
-5. **Tooling** — ESLint, Vitest, Playwright, pre-deploy gate
+4. **Deployment** — link to Vercel/equivalent, env vars, custom domains, preview deploys. Update the Environments table in `method.config.md` with URLs once deployed.
+5. **Tooling** — ESLint, Vitest, Playwright, pre-deploy gate. Update the `## Pre-Deploy Gate` section of `method.config.md` with the actual commands for this project's stack.
 6. **MCP Servers** — configure `.mcp.json` (Linear, GitHub, DB, browser, etc.)
 
 **Linear workspace setup:**
