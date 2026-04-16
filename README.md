@@ -58,13 +58,17 @@ Anthropic's CLI tool — this is what runs the skills. Install it from [claude.a
 
 ### 2. VBW plugin
 
-The planning/execution engine that Pipekit wraps. Install it from inside Claude Code:
+The planning/execution engine that Pipekit wraps. Install it from inside Claude Code (two separate commands — don't paste them together):
 
 ```
-/install-plugin https://github.com/dnakov/claude-code-vbw
+/plugin marketplace add yidakee/vibe-better-with-claude-code-vbw
 ```
 
-Or manually: see the [VBW repo](https://github.com/dnakov/claude-code-vbw) for details.
+```
+/plugin install vbw@vbw-marketplace
+```
+
+To update later: `/vbw:update`. See the [VBW repo](https://github.com/yidakee/vibe-better-with-claude-code-vbw) for details.
 
 ### 3. Linear + MCP server
 
