@@ -52,7 +52,7 @@ These skills work across any project that follows the method. They read `method.
 | `/skill-index` | Sync skill index after changes | Anytime |
 | `/task-processor` | Process Linear tasks systematically | Stage 3: Execution |
 | `/startup` | Full project bootstrap orchestrator | Stage 0 (all steps) |
-| `/update-method` | Sync method repo into project | Anytime |
+| `/pipekit-update` | Pull latest Pipekit from GitHub into project | Anytime |
 
 ### Project-Specific Skills (stay in each project)
 

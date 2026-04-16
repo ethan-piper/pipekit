@@ -74,6 +74,6 @@ VBW agents don't call skills — they read the consuming project's CLAUDE.md dir
 | `/launch` | Validates gates, routes by complexity, triggers execution |
 | `/light-spec` | Generates structured specs as AI-to-AI contracts |
 | `/strategy-sync` | Updates Strategy docs post-ship to match what was actually built |
-| `/update-method` | Sync latest method into a consuming project (supports `--push`) |
+| `/pipekit-update` | Pull latest Pipekit from GitHub into project (supports `--push`) |
 
 Full skill list in `sop/Skills_SOP.md`.

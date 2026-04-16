@@ -178,7 +178,10 @@ Configure in `.mcp.json` with `${VAR}` interpolation for secrets.
 ### 3.7 Sync the Method
 
 ```
-[ ] Copy sync script: cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
+[ ] Fetch sync script:
+    mkdir -p scripts
+    curl -fsSL https://raw.githubusercontent.com/ethan-piper/pipekit/main/scripts/sync-method.sh -o scripts/sync-method.sh
+    chmod +x scripts/sync-method.sh
 [ ] Run: ./scripts/sync-method.sh
 [ ] Fill in method.config.md with project-specific values
 [ ] Commit synced method files

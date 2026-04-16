@@ -368,7 +368,12 @@ Write `Strategy/DesignDirection.md` with their answers. This doc is read by deve
 - If no: Copy and run sync script
 
 ```bash
-cp ~/Projects/pipekit/scripts/sync-method.sh scripts/sync-method.sh
+# Fetch sync script if it doesn't exist
+if [ ! -f scripts/sync-method.sh ]; then
+  mkdir -p scripts
+  curl -fsSL https://raw.githubusercontent.com/ethan-piper/pipekit/main/scripts/sync-method.sh -o scripts/sync-method.sh
+  chmod +x scripts/sync-method.sh
+fi
 ./scripts/sync-method.sh
 ```
 

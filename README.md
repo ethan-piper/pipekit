@@ -63,7 +63,6 @@ Anthropic's CLI tool — this is what runs everything. Install it from [claude.a
 **Starting a brand new project:**
 
 ```bash
-# Create your project folder
 mkdir ~/Projects/my-project
 cd ~/Projects/my-project
 git init
@@ -75,19 +74,19 @@ git init
 cd ~/Projects/my-project
 ```
 
-### Step 3: Clone Pipekit and sync
+### Step 3: Pull Pipekit into your project
 
 ```bash
-# Clone Pipekit (one-time — all projects share this copy)
-git clone https://github.com/ethan-piper/pipekit.git ~/Projects/pipekit
-
-# Copy the sync script into your project
+# Fetch the sync script from GitHub
 mkdir -p scripts
-cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
+curl -fsSL https://raw.githubusercontent.com/ethan-piper/pipekit/main/scripts/sync-method.sh -o scripts/sync-method.sh
+chmod +x scripts/sync-method.sh
 
 # Run it — pulls skills, templates, and SOPs into your project
 ./scripts/sync-method.sh
 ```
+
+No local clone of Pipekit needed — the sync script pulls directly from GitHub.
 
 The sync script creates a `method.config.md` file in your project — this is where your project-specific settings go (Linear workspace IDs, environments, etc.). You'll fill this in during setup.
 
@@ -147,14 +146,20 @@ It reads everything and only asks about gaps — you don't have to re-explain wh
 
 ### Updating Pipekit
 
-When Pipekit gets updates, re-run the sync script in your project:
+From inside Claude Code, run:
+
+```
+/pipekit-update
+```
+
+Or from your terminal:
 
 ```bash
 cd ~/Projects/my-project
 ./scripts/sync-method.sh
 ```
 
-This updates skills, SOPs, and templates. It never touches your project-specific files (strategy docs, config, plans, etc.). Restart Claude Code after syncing to pick up the updated skills.
+Either way, this pulls the latest skills, SOPs, and templates from GitHub. It never touches your project-specific files (strategy docs, config, plans, etc.). Restart Claude Code after updating to load the new skills.
 
 ## What's Included
 

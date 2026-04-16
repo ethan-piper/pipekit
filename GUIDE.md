@@ -937,12 +937,17 @@ The method repo is the source of truth. Projects pull from it using `scripts/syn
 ### Commands
 
 ```bash
-# First time
-cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
+# First time — fetch sync script from GitHub
+mkdir -p scripts
+curl -fsSL https://raw.githubusercontent.com/ethan-piper/pipekit/main/scripts/sync-method.sh -o scripts/sync-method.sh
+chmod +x scripts/sync-method.sh
 ./scripts/sync-method.sh
 
-# Update to latest
+# Update to latest (from terminal)
 ./scripts/sync-method.sh
+
+# Or update from inside Claude Code
+/pipekit-update
 
 # Pin to a version
 ./scripts/sync-method.sh v1.0
@@ -951,7 +956,7 @@ cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
 ./scripts/sync-method.sh --dry-run
 
 # Push improvements back to method repo
-/update-method --push
+/pipekit-update --push
 ```
 
 ---
@@ -1045,8 +1050,8 @@ Add to `.git/hooks/post-commit` or your project's hook system:
 | Start Session | `/start-session` | Review progress, capture intentions |
 | End Session | `/end-session` | Changelog, Linear updates |
 | Strategy Sync | `/strategy-sync` | Update docs to match shipped code |
-| Update Method | `/update-method` | Pull latest method into project |
-| Update + Push | `/update-method --push` | Push improvements back to method repo |
+| Pipekit Update | `/pipekit-update` | Pull latest Pipekit from GitHub into project |
+| Update + Push | `/pipekit-update --push` | Push improvements back to method repo |
 
 ---
 
