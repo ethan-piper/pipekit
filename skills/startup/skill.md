@@ -180,6 +180,43 @@ Walk through setup checklist from `STARTUP.md` Step 3, in order. Skip steps alre
 5. **Tooling** — ESLint, Vitest, Playwright, pre-deploy gate. Update the `## Pre-Deploy Gate` section of `method.config.md` with the actual commands for this project's stack.
 6. **MCP Servers** — configure `.mcp.json` (Linear, GitHub, DB, browser, etc.)
 
+**Tool and integration wiring:**
+
+For **every service chosen in the tech stack** (database, deployment, auth, etc.), don't just set up the service — wire up the full development toolchain around it. For each service:
+
+1. **Look up current setup instructions.** Use Context7 (`/mcp__Context7__resolve-library-id` → `/mcp__Context7__get-library-docs`) to check for the service's CLI, SDK, and MCP server documentation. If Context7 doesn't have it, check the service's official documentation via web search/fetch.
+
+2. **Install the CLI** if one exists. Examples:
+   - Supabase → `npx supabase init`, `supabase login`, `supabase link`
+   - Vercel → `npx vercel link`
+   - Stripe → `stripe login`
+   - Prisma → `npx prisma init`
+
+3. **Connect an MCP server** if one exists. Check:
+   - The official MCP registry (`mcp__mcp-registry__search_mcp_registry` if available)
+   - The service's own docs (many now ship MCP servers — Supabase, GitHub, Stripe, etc.)
+   - For each MCP server found, install it:
+     ```
+     claude mcp add --transport {type} --scope {user|project} {server-name} {url-or-command}
+     ```
+   - Use `--scope user` for services shared across projects (GitHub, Supabase account-level)
+   - Use `--scope project` for project-specific connections (project-specific DB, etc.)
+   - Verify the connection works by calling a basic tool from the server
+
+4. **Install SDK packages** the project will need:
+   - Database client libraries (`@supabase/supabase-js`, `@prisma/client`, etc.)
+   - Auth libraries (`@supabase/auth-helpers-nextjs`, `next-auth`, etc.)
+   - Deployment SDKs if needed
+
+5. **Configure environment variables:**
+   - Add required env vars to `.env` (with actual values)
+   - Add placeholder versions to `.env.example` (no secrets)
+   - Document them in CLAUDE.md
+
+6. **Verify the connection works** — run a basic test (fetch a table list, ping the API, etc.)
+
+Record everything in the startup tracker under Step Notes — which CLIs were installed, which MCP servers were connected, which packages were added. This is the context a future session needs to understand the tooling landscape.
+
 **Linear workspace setup:**
 
 This is the most important infrastructure step — every downstream skill depends on Linear being correctly configured. Walk through it carefully.
