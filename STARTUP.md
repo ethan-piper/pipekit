@@ -283,6 +283,7 @@ Your `CLAUDE.md` is the single document VBW agents and Claude Code sessions read
 - Deployment: ...
 
 ## Structure
+App code lives in `src/`. Project root is for Pipekit files, config, and scripts.
 {Directory layout}
 
 ## Common Commands

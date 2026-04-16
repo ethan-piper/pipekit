@@ -173,7 +173,7 @@ This decision determines:
 
 Walk through setup checklist from `STARTUP.md` Step 3, in order. Skip steps already done.
 
-1. **Repository** — create GitHub repo, initialize framework, TypeScript strict, .gitignore, .env.example
+1. **Repository** — create GitHub repo, initialize framework in `src/`, TypeScript strict, .gitignore, .env.example
 2. **Monorepo** (if applicable) — Turborepo, workspaces, shared config
 3. **Database** — create project(s), initial schema, auth setup
 4. **Deployment** — link to Vercel/equivalent, env vars, custom domains, preview deploys. Update the Environments table in `method.config.md` with URLs once deployed.
@@ -499,4 +499,5 @@ Next steps:
   2. Remove the unchosen option's configuration blocks (environment tables, promotion skills, workflow details, etc.) so they don't look active.
   3. If the unchosen option has reference value, move it to a collapsed section at the bottom: `<!-- Not chosen: three-tier --> ... <!-- /Not chosen -->` — but only if it adds value. When in doubt, remove it entirely.
   This applies to `method.config.md`, `CLAUDE.md`, strategy docs, and any file where alternatives were presented. A document should never look like two conflicting decisions are both active.
+- **App code lives in `src/`.** All application code (framework, components, API routes, etc.) goes in a `src/` subdirectory. The project root is reserved for Pipekit files (`method.config.md`, `concept-brief.md`, `project-definition.md`, `Strategy/`, `.vbw-planning/`, `method/`, `.claude/`), config files (`.gitignore`, `.env`, `package.json`, `tsconfig.json`), and scripts. This keeps Pipekit's methodology layer cleanly separated from the application. When initializing a framework (Next.js, Remix, etc.), configure it to use `src/` as the source directory.
 - **Resumable.** The tracker + artifact checks make `/startup` fully resumable across sessions. A new session reads the tracker and picks up exactly where the last one stopped.
