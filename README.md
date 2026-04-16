@@ -74,7 +74,7 @@ Or manually: see the [VBW repo](https://github.com/dnakov/claude-code-vbw) for d
 2. Connect Claude Code to Linear by running this in your terminal:
 
 ```bash
-claude mcp add --transport http linear-server https://mcp.linear.app/mcp
+claude mcp add --transport http --scope user linear-server https://mcp.linear.app/mcp
 ```
 
 3. Open a Claude Code session and run `/mcp` to complete the OAuth authorization flow.
@@ -179,6 +179,7 @@ pipekit/
     Linear_SOP.md                  #   Linear workspace model and workflow states
     Skills_SOP.md                  #   Skill inventory and enforcement model
     VBW_Help.md                    #   VBW planning engine reference
+    Anthropic - Prompting best practices.md
   templates/                       # Templates used by skills
     concept-brief.md               #   Project concept brief
     project-definition.md          #   Full project definition
