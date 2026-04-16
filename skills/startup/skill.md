@@ -13,9 +13,103 @@ You are a project bootstrap orchestrator. Your job is to chain pre-pipeline skil
 - "start the project setup"
 - "bootstrap this project"
 
+## Startup Tracker
+
+The first thing `/startup` does is create (or read) a **`{folder-name}-startup.md`** file in the project root. This file persists across sessions — it's how `/startup` knows where you left off, what decisions were made, and what's still open.
+
+**On first run:** Create the file using the template below. Derive `{folder-name}` from the project directory name (e.g., `~/Projects/the-vault/` → `the-vault-startup.md`).
+
+**On subsequent runs:** Read the file first. Use it to restore context — current step, decisions made, blockers, project summary. Skip re-asking questions that are already answered in the tracker.
+
+**After every step:** Update the tracker immediately — mark the step complete, record any decisions or notes, update the "Current step" field. Do not batch updates.
+
+### Tracker Template
+
+```markdown
+# {Project Name} — Startup Tracker
+
+**Started:** {date}
+**Last updated:** {date}
+**Current step:** {step number — name}
+
+## Progress
+
+| # | Step | Status | Completed |
+|---|------|--------|-----------|
+| 1 | Concept | ⬜ Not started | — |
+| 2 | Define | ⬜ Not started | — |
+| 3 | Tech Stack | ⬜ Not started | — |
+| 4 | Infrastructure | ⬜ Not started | — |
+| 5 | Strategy Docs | ⬜ Not started | — |
+| 5.5 | Design Direction | ⬜ Not started | — |
+| 6 | Method Sync | ⬜ Not started | — |
+| 7 | VBW Init | ⬜ Not started | — |
+| 8 | Roadmap | ⬜ Not started | — |
+| 9 | Project Skills | ⬜ Not started | — |
+| 10 | CLAUDE.md & Rules | ⬜ Not started | — |
+| 11 | Phase Plan | ⬜ Not started | — |
+| 12 | Validate | ⬜ Not started | — |
+
+## Project Summary
+
+{Filled in after Step 1 — brief description of the project}
+
+## Decisions
+
+### Tech Stack (Step 3)
+| Decision | Choice |
+|----------|--------|
+| Framework | |
+| Language | |
+| Database | |
+| Auth | |
+| Deployment | |
+| CSS/UI | |
+| Testing | |
+| Git model | |
+
+### Linear (Step 4)
+| Key | Value |
+|-----|-------|
+| Workspace | |
+| Team | |
+| States configured | No |
+| State IDs populated | No |
+
+### Infrastructure (Step 4)
+| Key | Value |
+|-----|-------|
+| Repo | |
+| Database | |
+| Deployment | |
+
+## Step Notes
+
+{After each step, record what happened — context, decisions, anything
+the next session needs to know. This is the "memory" that makes
+/startup resumable across sessions.}
+
+## Blockers & Open Questions
+
+{Anything unresolved that needs attention before proceeding.}
+```
+
+### Status Values
+
+Use these in the Progress table:
+- `⬜ Not started` — hasn't begun
+- `🔄 In progress` — started but not complete (session ended mid-step)
+- `⏭️ Skipped` — output already existed, user chose to skip
+- `✅ Done` — complete, with date
+
+---
+
 ## Execution
 
 Each step checks if its output already exists and offers to skip — making `/startup` resumable. If you stop after Step 4, re-running picks up at Step 5.
+
+**Before any step:** Read `{folder-name}-startup.md` to restore context.
+**After every step:** Update `{folder-name}-startup.md` with status, decisions, and notes.
 
 ### Step 1 — Concept
 
@@ -366,9 +460,10 @@ Next steps:
 
 ## Rules
 
+- **Tracker first.** Create or read `{folder-name}-startup.md` before doing anything else. Update it after every step. This file IS the state of the startup process.
 - **One step at a time.** Don't rush ahead. Confirm the user is ready before moving to the next step.
 - **Show progress.** At each step transition, show what's been completed and what's next.
 - **Decisions are the user's.** Present analysis, make recommendations, but never lock in a choice without explicit approval.
-- **Skip what's done.** If a step's output already exists, acknowledge and offer to skip.
-- **Save as you go.** Update CLAUDE.md, method.config.md, and Strategy docs as decisions are made — don't batch to the end.
-- **Resumable.** Each step checks for existing output. Re-running `/startup` picks up where you left off.
+- **Skip what's done.** If a step's output already exists, acknowledge and offer to skip. Mark it `⏭️ Skipped` in the tracker.
+- **Save as you go.** Update CLAUDE.md, method.config.md, Strategy docs, AND the tracker as decisions are made — don't batch to the end.
+- **Resumable.** The tracker + artifact checks make `/startup` fully resumable across sessions. A new session reads the tracker and picks up exactly where the last one stopped.
