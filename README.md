@@ -50,15 +50,52 @@ VBW doesn't need the full project plan — it's designed for bounded scope. Pipe
 | 10 | Ship | Promote to production |
 | 11 | Strategy Sync | Update docs to match what was built |
 
-## What You Need First
+## Getting Started
 
-### 1. Claude Code
+> **Use a terminal.** Pipekit involves running shell commands alongside Claude Code. Use a terminal or terminal emulator — iTerm, VS Code's integrated terminal, Cursor, tmux, etc. The Claude desktop app isn't designed for shell workflows.
 
-Anthropic's CLI tool — this is what runs the skills. Install it from [claude.ai/code](https://claude.ai/code).
+### Step 1: Install Claude Code
 
-### 2. VBW plugin
+Anthropic's CLI tool — this is what runs everything. Install it from [claude.ai/code](https://claude.ai/code).
 
-The planning/execution engine that Pipekit wraps. Install it from inside Claude Code (two separate commands — don't paste them together):
+### Step 2: Set up your project
+
+**Starting a brand new project:**
+
+```bash
+# Create your project folder
+mkdir ~/Projects/my-project
+cd ~/Projects/my-project
+git init
+```
+
+**Already have a project folder:**
+
+```bash
+cd ~/Projects/my-project
+```
+
+### Step 3: Clone Pipekit and sync
+
+```bash
+# Clone Pipekit (one-time — all projects share this copy)
+git clone https://github.com/ethan-piper/pipekit.git ~/Projects/pipekit
+
+# Copy the sync script into your project
+mkdir -p scripts
+cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
+
+# Run it — pulls skills, templates, and SOPs into your project
+./scripts/sync-method.sh
+```
+
+The sync script creates a `method.config.md` file in your project — this is where your project-specific settings go (Linear workspace IDs, environments, etc.). You'll fill this in during setup.
+
+### Step 4: Install VBW and connect Linear
+
+Open Claude Code **in your project directory** and install the dependencies:
+
+**VBW** — the planning/execution engine that Pipekit wraps. Run these as two separate commands (don't paste them together):
 
 ```
 /plugin marketplace add yidakee/vibe-better-with-claude-code-vbw
@@ -70,73 +107,19 @@ The planning/execution engine that Pipekit wraps. Install it from inside Claude 
 
 To update later: `/vbw:update`. See the [VBW repo](https://github.com/yidakee/vibe-better-with-claude-code-vbw) for details.
 
-### 3. Linear + MCP server
-
-[Linear](https://linear.app/) is a free issue tracker. Pipekit uses it for visibility across your project.
-
-1. Create a free workspace at [linear.app](https://linear.app/)
-2. Connect Claude Code to Linear by running this in your terminal:
+**Linear** — the issue tracker Pipekit uses for visibility. Close Claude Code, then run in your terminal:
 
 ```bash
 claude mcp add --transport http --scope user linear-server https://mcp.linear.app/mcp
 ```
 
-3. Open a Claude Code session and run `/mcp` to complete the OAuth authorization flow.
+Reopen Claude Code and run `/mcp` to complete the OAuth authorization flow. If you don't have a Linear workspace yet, create a free one at [linear.app](https://linear.app/) first.
 
 Linear's MCP server is remotely hosted — no API keys or local servers needed. OAuth handles auth automatically.
 
-## Getting Started
+### Step 5: Run the startup orchestrator
 
-> **Use a terminal.** Pipekit involves running shell commands alongside Claude Code. Use a terminal or terminal emulator — iTerm, VS Code's integrated terminal, Cursor, tmux, etc. The Claude desktop app isn't designed for shell workflows.
-
-### Step 1: Clone Pipekit
-
-Open your terminal and run:
-
-```bash
-git clone https://github.com/ethan-piper/pipekit.git ~/Projects/pipekit
-```
-
-This downloads Pipekit to your computer. You only do this once — all your projects share this one copy.
-
-### Step 2: Set up your project
-
-**Starting a brand new project:**
-
-```bash
-# Create your project folder
-mkdir ~/Projects/my-project
-cd ~/Projects/my-project
-git init
-
-# Copy the sync script from Pipekit
-mkdir -p scripts
-cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
-
-# Run it — this pulls all the skills, templates, and SOPs into your project
-./scripts/sync-method.sh
-```
-
-**Already have a project folder:**
-
-```bash
-cd ~/Projects/my-project
-
-# Copy the sync script from Pipekit
-mkdir -p scripts
-cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
-
-# Run it
-./scripts/sync-method.sh
-```
-
-The sync script creates a `method.config.md` file in your project — this is where your project-specific settings go (Linear workspace IDs, environments, etc.). You'll fill this in during setup.
-
-**Important:** If you already have a Claude Code session open in this project, close it and start a new one. Claude Code loads skills on startup — it won't see the newly synced skills until you restart.
-
-### Step 3: Run the startup orchestrator
-
-Open Claude Code in your project directory and type:
+In Claude Code, type:
 
 ```
 /startup
