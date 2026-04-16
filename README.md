@@ -87,6 +87,8 @@ Linear's MCP server is remotely hosted — no API keys or local servers needed. 
 
 ## Getting Started
 
+> **Use a terminal.** Pipekit involves running shell commands alongside Claude Code. Use a terminal or terminal emulator — iTerm, VS Code's integrated terminal, Cursor, tmux, etc. The Claude desktop app isn't designed for shell workflows.
+
 ### Step 1: Clone Pipekit
 
 Open your terminal and run:
@@ -130,6 +132,8 @@ cp ~/Projects/pipekit/scripts/sync-method.sh scripts/
 
 The sync script creates a `method.config.md` file in your project — this is where your project-specific settings go (Linear workspace IDs, environments, etc.). You'll fill this in during setup.
 
+**Important:** If you already have a Claude Code session open in this project, close it and start a new one. Claude Code loads skills on startup — it won't see the newly synced skills until you restart.
+
 ### Step 3: Run the startup orchestrator
 
 Open Claude Code in your project directory and type:
@@ -167,7 +171,7 @@ cd ~/Projects/my-project
 ./scripts/sync-method.sh
 ```
 
-This updates skills, SOPs, and templates. It never touches your project-specific files (strategy docs, config, plans, etc.).
+This updates skills, SOPs, and templates. It never touches your project-specific files (strategy docs, config, plans, etc.). Restart Claude Code after syncing to pick up the updated skills.
 
 ## What's Included
 
