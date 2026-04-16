@@ -71,20 +71,15 @@ Or manually: see the [VBW repo](https://github.com/dnakov/claude-code-vbw) for d
 [Linear](https://linear.app/) is a free issue tracker. Pipekit uses it for visibility across your project.
 
 1. Create a free workspace at [linear.app](https://linear.app/)
-2. Connect Claude Code to Linear by adding this to your project's `.mcp.json`:
+2. Connect Claude Code to Linear by running this in your terminal:
 
-```json
-{
-  "mcpServers": {
-    "linear-server": {
-      "type": "http",
-      "url": "https://mcp.linear.app/mcp"
-    }
-  }
-}
+```bash
+claude mcp add --transport http linear-server https://mcp.linear.app/mcp
 ```
 
-3. Next time you run Claude Code in the project, it will prompt you to authorize Linear access.
+3. Open a Claude Code session and run `/mcp` to complete the OAuth authorization flow.
+
+Linear's MCP server is remotely hosted — no API keys or local servers needed. OAuth handles auth automatically.
 
 ## Getting Started
 
