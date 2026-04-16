@@ -70,15 +70,171 @@ Walk through setup checklist from `STARTUP.md` Step 3, in order. Skip steps alre
 5. **Tooling** — ESLint, Vitest, Playwright, pre-deploy gate
 6. **MCP Servers** — configure `.mcp.json` (Linear, GitHub, DB, browser, etc.)
 
-**Linear setup:**
-- Automate via MCP/CLI what's possible:
-  - Create issues, set relations, apply labels
-- Give explicit manual instructions for what requires the UI:
-  - Workflow state configuration (13 standard states from `sop/Linear_SOP.md`)
-  - Initiative and project creation
-- After manual setup: fetch state IDs and populate `method.config.md`
+**Linear workspace setup:**
 
-**Output:** Working infrastructure — repo builds, deploys, pre-deploy gate passes
+This is the most important infrastructure step — every downstream skill depends on Linear being correctly configured. Walk through it carefully.
+
+**4a. Verify MCP connection**
+
+Test that the Linear MCP server is connected by calling `mcp__linear-server__list_issues` (or any list tool). If it fails:
+- _"Linear MCP isn't connected. Run this in your terminal and restart Claude Code:"_
+  ```
+  claude mcp add --transport http --scope user linear-server https://mcp.linear.app/mcp
+  ```
+- Then run `/mcp` in Claude Code to complete OAuth authorization.
+
+**4b. Workspace and Team**
+
+Ask: _"Do you already have a Linear workspace, or should we start fresh?"_
+
+- **Existing workspace:** Ask for the workspace slug and team name. Verify by fetching issues.
+- **New workspace:** Direct the user to [linear.app](https://linear.app/) to create one (free tier is fine). Then:
+  - Ask them to create a team (e.g., the project name). Linear creates one by default during onboarding.
+  - Record the workspace slug, team name, and team ID.
+
+Fetch team details and populate `method.config.md`:
+```
+| **Workspace slug** | `{slug}` |
+| **Team name** | `{team}` |
+| **Team ID** | `{uuid}` |
+| **Issue prefix** | `{PREFIX}` |
+```
+
+**4c. Workflow States**
+
+Pipekit requires 13 specific workflow states. Linear workspaces start with defaults (Backlog, Todo, In Progress, Done, Canceled) that need to be replaced.
+
+Present the target state configuration:
+
+```
+Pipekit requires these 13 workflow states in this order:
+
+  Triage states:
+    • Triage                    (type: triage)
+
+  Backlog states:
+    • Ideas                     (type: backlog)
+    • Future Phases             (type: backlog)
+    • On Deck                   (type: backlog)
+    • Needs Spec                (type: backlog)
+
+  Unstarted states:
+    • Specced                   (type: unstarted)
+    • Approved                  (type: unstarted)
+
+  Started states:
+    • In Progress               (type: started)
+    • Building                  (type: started)
+    • UAT                       (type: started)
+
+  Completed states:
+    • Done                      (type: completed)
+
+  Canceled states:
+    • Canceled                  (type: canceled)
+    • Duplicate                 (type: canceled)
+```
+
+**Attempt to configure via MCP first.** Try creating workflow states programmatically. If the MCP tools support state creation/management, automate the full setup. If not, give the user step-by-step manual instructions:
+
+_"Linear's workflow states need to be configured in the UI. Here's exactly what to do:"_
+
+```
+1. Open Linear → Settings → Team Settings → {Team} → Workflow
+
+2. Remove default states that Pipekit doesn't use:
+   - Remove "Backlog" (Pipekit uses Ideas/Future Phases/On Deck/Needs Spec instead)
+   - Remove "Todo" (Pipekit uses Specced/Approved instead)
+   - You can't delete states with issues — move any existing issues first
+
+3. Create these states (in order, with these types):
+
+   TRIAGE section:
+     ✓ Triage (usually exists by default)
+
+   BACKLOG section:
+     + Ideas
+     + Future Phases
+     + On Deck
+     + Needs Spec
+
+   UNSTARTED section:
+     + Specced
+     + Approved
+
+   STARTED section:
+     + In Progress (usually exists by default)
+     + Building
+     + UAT
+
+   COMPLETED section:
+     ✓ Done (usually exists by default)
+
+   CANCELED section:
+     ✓ Canceled (usually exists by default)
+     + Duplicate
+
+4. Drag to reorder so they appear in the order listed above.
+```
+
+Ask the user to confirm when done: _"Let me know when the workflow states are configured and I'll fetch the IDs."_
+
+**4d. Fetch State IDs**
+
+After states are configured, fetch all workflow state IDs. Use the Linear MCP tools to list workflow states for the team, or guide the user to get them from Settings → Workflow (each state has a UUID visible in the URL when clicked).
+
+Populate the Workflow State IDs table in `method.config.md`:
+
+```
+| State | ID |
+|-------|-----|
+| Triage | `{uuid}` |
+| Ideas | `{uuid}` |
+| Future Phases | `{uuid}` |
+| On Deck | `{uuid}` |
+| Needs Spec | `{uuid}` |
+| Specced | `{uuid}` |
+| Approved | `{uuid}` |
+| Building | `{uuid}` |
+| In Progress | `{uuid}` |
+| UAT | `{uuid}` |
+| Done | `{uuid}` |
+| Canceled | `{uuid}` |
+| Duplicate | `{uuid}` |
+```
+
+**Do not proceed past this step with empty state IDs.** Every downstream skill depends on these values.
+
+**4e. Standard Labels**
+
+Create the standard label taxonomy via `mcp__linear-server__save_issue` or equivalent label tools. If MCP doesn't support label creation, instruct manually:
+
+```
+Create these labels in Linear (Settings → Labels):
+
+Type labels:
+  Feature, Improvement, Bug, Research, Tech Debt, Chore
+
+Flag labels:
+  Quick Win, Blocked, Hotfix, Breaking Change
+
+Audience labels:
+  Client Request
+```
+
+Domain and Tier labels are project-specific — these get created during `/roadmap-create` based on the project's feature clusters and stages.
+
+**4f. Verify Linear Setup**
+
+Run a quick verification:
+1. Fetch issues for the team — confirms MCP connection and team ID
+2. Count workflow states — should be exactly 13
+3. List labels — should include all Type and Flag labels
+4. Confirm `method.config.md` has no empty state IDs
+
+If anything is missing, loop back to the relevant sub-step.
+
+**Output:** Working infrastructure — repo builds, deploys, pre-deploy gate passes, Linear workspace fully configured
 
 ### Step 5 — Strategy Docs
 
