@@ -29,7 +29,7 @@ VBW doesn't need the full project plan — it's designed for bounded scope. Pipe
 | Concept | `/concept` | `concept-brief.md` |
 | Define | `/define` | `project-definition.md` |
 | Strategy | `/strategy-create` | `Strategy/` docs (incl. Design Direction) |
-| Setup | `/startup` | Repo, DB, deploy, Linear board |
+| Setup | `/startup` | Repo, DB, deploy, Linear workspace |
 | VBW Init | `/vbw:init` | `.vbw-planning/` scaffold |
 | Roadmap | `/roadmap-create` | `ROADMAP.md` + Linear issues |
 | Phase Plan | `/phase-plan` | First phase in "Needs Spec" |
@@ -139,6 +139,7 @@ This walks you through everything interactively:
 - Distills it into a structured definition (`/define`)
 - Generates strategy docs (`/strategy-create`)
 - Helps you choose a tech stack and set up infrastructure
+- Configures your Linear workspace (team, workflow states, labels, state IDs)
 - Initializes VBW (`/vbw:init`)
 - Creates a roadmap and populates Linear (`/roadmap-create`)
 - Selects your first batch of work (`/phase-plan`)
@@ -179,7 +180,7 @@ pipekit/
     Linear_SOP.md                  #   Linear workspace model and workflow states
     Skills_SOP.md                  #   Skill inventory and enforcement model
     VBW_Help.md                    #   VBW planning engine reference
-    Anthropic - Prompting best practices.md
+    Anthropic - Prompting best practices.md  #   Prompt engineering reference
   templates/                       # Templates used by skills
     concept-brief.md               #   Project concept brief
     project-definition.md          #   Full project definition
