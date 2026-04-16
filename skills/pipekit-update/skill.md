@@ -59,32 +59,120 @@ Show what changed:
 
 If `method.config.md` doesn't exist, warn: _"No method.config.md found. Run `/startup` to configure."_
 
-### Phase 3 — Verify
+### Phase 3 — Changelog
 
-1. Check that all portable skills are present in `.claude/skills/`
-2. Check that `method.config.md` exists and has Linear state IDs filled in
-3. Report any skills that reference `method.config.md` values that are still TBD
-4. Show summary:
+Before reconciling, understand what actually changed. This is how the user (and you) know what to act on.
+
+1. **Diff the synced files** against what was there before. The sync script output shows what was updated — capture that. For more detail, use `git diff` on the synced paths:
+   - `.claude/skills/` — new, renamed, or updated skills
+   - `method/sop/` — SOP changes
+   - `method/templates/` — template changes
+   - `method/method.md`, `method/GUIDE.md`, `method/STARTUP.md`
+
+2. **Categorize the changes:**
+
+   | Category | Example | Action needed? |
+   |----------|---------|----------------|
+   | **New skill added** | A skill directory that didn't exist before | Tell user what it does, when to use it |
+   | **Skill renamed** | Old directory gone, new one appeared | Tell user the new trigger command |
+   | **Skill behavior changed** | `skill.md` content differs | Summarize what changed in the workflow |
+   | **New config fields** | `method.config.template.md` has fields not in `method.config.md` | Need to fill them in |
+   | **SOP updated** | New workflow states, conventions, or processes | May affect how the user works |
+   | **Template changed** | Spec template, strategy template updated | Future docs will use the new format |
+
+3. **Present a human-readable changelog:**
 
 ```
-## Pipekit Update Complete
+## What Changed
 
-Updated from: pipekit @ {ref}
+### Skills
+- 🆕 `/new-skill` — {description, when to use it}
+- 🔄 `/updated-skill` — {what changed in behavior}
+- ➡️ `/old-name` renamed to `/new-name`
+- 🗑️ `/removed-skill` — deprecated, use {alternative} instead
 
-Skills: {N} synced, {M} unchanged
-SOPs: {N} synced
-Templates: {N} synced
+### SOPs
+- {SOP name}: {summary of what changed}
 
-Warnings:
-  - method.config.md: Linear state IDs not yet configured
-  - Skill X references {value} which is TBD
+### Templates
+- {template name}: {summary of what changed}
+
+### Config
+- New field: `{field name}` in method.config.md — needs a value
+```
+
+### Phase 4 — Reconcile
+
+This is the critical phase — bring the project into alignment with what was updated. Walk through each change that requires action.
+
+**4a. Config alignment**
+
+Compare `method.config.template.md` (just synced) against the project's `method.config.md`:
+
+1. Check for **new fields** in the template that don't exist in the project config
+2. Check for **removed fields** that are no longer in the template
+3. Check for **structural changes** (renamed sections, moved fields)
+
+For each new field:
+- Explain what it's for
+- Ask the user for the value (or derive it from existing project context)
+- Write it to `method.config.md` immediately
+
+For removed/renamed fields:
+- Migrate the value to the new location
+- Remove the old field
+
+_"Your `method.config.md` is missing these fields that were added in this update: {list}. Let's fill them in."_
+
+**4b. Skill onboarding**
+
+For each **new skill**:
+1. Read the skill's `skill.md` to understand its purpose and triggers
+2. Explain to the user in 2-3 sentences: what it does, when to use it, and how it fits into the pipeline
+3. If the skill requires any setup (config values, MCP tools, etc.), walk through it now
+
+For each **renamed skill**:
+- Tell the user the new command
+- Check if any project-specific files reference the old name (CLAUDE.md, rules, scripts) and offer to update them
+
+For each **skill with changed behavior**:
+- Summarize what's different
+- If the change affects existing project artifacts (e.g., a template format changed), ask if the user wants to update existing docs to match
+
+**4c. SOP alignment**
+
+For each updated SOP, check if the project is already following the new conventions:
+
+- **Linear SOP changed?** → Check if the project's Linear workspace matches (states, labels, conventions)
+- **Git SOP changed?** → Check if the project's branching model aligns
+- **Code Quality SOP changed?** → Check if the pre-deploy gate in `method.config.md` matches
+
+Flag any misalignment: _"The Code Quality SOP now recommends X, but your pre-deploy gate doesn't include it. Want to update?"_
+
+**4d. Startup tracker alignment**
+
+If a `{folder-name}-startup.md` exists:
+1. Check if any completed steps have new requirements in the updated skills
+2. Flag steps that may need re-running: _"Step 4 (Infrastructure) has new Linear setup instructions. Your Linear config looks complete, so no action needed."_
+3. Or: _"Step 3 (Tech Stack) now records git architecture in method.config.md, but yours is empty. Want to fill it in now?"_
+
+**4e. Summary and next steps**
+
+```
+## Reconciliation Complete
+
+Config fields added: {N}
+New skills onboarded: {N}
+SOPs aligned: {N} checked, {M} actions taken
+Startup tracker: {aligned | N items flagged}
+
+Action items remaining:
+  - {any deferred items the user said "later" to}
 
 Restart Claude Code to load updated skills.
 ```
 
-**Important:** Remind the user to restart Claude Code after syncing so updated skills are loaded.
-
-### Phase 4 — Push Improvements Back (--push only)
+### Phase 5 — Push Improvements Back (--push only)
 
 When invoked with `--push`, this mode captures improvements made to portable skills *in the current project* and pushes them back to the method repo.
 
