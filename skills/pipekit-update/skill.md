@@ -61,26 +61,20 @@ If `method.config.md` doesn't exist, warn: _"No method.config.md found. Run `/st
 
 ### Phase 3 — Changelog
 
-Before reconciling, understand what actually changed. This is how the user (and you) know what to act on.
+The sync script writes a changelog to `method/.sync-changelog.md` that captures what changed. **Read this file first** — it's the source of truth for what needs reconciliation.
 
-1. **Diff the synced files** against what was there before. The sync script output shows what was updated — capture that. For more detail, use `git diff` on the synced paths:
-   - `.claude/skills/` — new, renamed, or updated skills
-   - `method/sop/` — SOP changes
-   - `method/templates/` — template changes
-   - `method/method.md`, `method/GUIDE.md`, `method/STARTUP.md`
+1. **Read `method/.sync-changelog.md`** — it contains:
+   - New skills added (with descriptions from their `skill.md`)
+   - Updated skills (content changed)
+   - Possibly removed/renamed skills
+   - Updated method docs
+   - New config fields in the template that aren't in the project's `method.config.md`
 
-2. **Categorize the changes:**
+2. **For updated skills, read the actual diffs** to understand *what* changed in behavior. For each updated skill:
+   - Read the new `skill.md`
+   - Summarize the behavioral changes (not just "file changed" — what's *different* for the user)
 
-   | Category | Example | Action needed? |
-   |----------|---------|----------------|
-   | **New skill added** | A skill directory that didn't exist before | Tell user what it does, when to use it |
-   | **Skill renamed** | Old directory gone, new one appeared | Tell user the new trigger command |
-   | **Skill behavior changed** | `skill.md` content differs | Summarize what changed in the workflow |
-   | **New config fields** | `method.config.template.md` has fields not in `method.config.md` | Need to fill them in |
-   | **SOP updated** | New workflow states, conventions, or processes | May affect how the user works |
-   | **Template changed** | Spec template, strategy template updated | Future docs will use the new format |
-
-3. **Present a human-readable changelog:**
+3. **Present a human-readable changelog to the user:**
 
 ```
 ## What Changed
@@ -89,17 +83,15 @@ Before reconciling, understand what actually changed. This is how the user (and 
 - 🆕 `/new-skill` — {description, when to use it}
 - 🔄 `/updated-skill` — {what changed in behavior}
 - ➡️ `/old-name` renamed to `/new-name`
-- 🗑️ `/removed-skill` — deprecated, use {alternative} instead
 
-### SOPs
-- {SOP name}: {summary of what changed}
-
-### Templates
-- {template name}: {summary of what changed}
+### Method Docs
+- {doc name}: {summary of what changed}
 
 ### Config
 - New field: `{field name}` in method.config.md — needs a value
 ```
+
+If `method/.sync-changelog.md` doesn't exist (e.g., older sync script), fall back to `git diff` on the synced paths.
 
 ### Phase 4 — Reconcile
 

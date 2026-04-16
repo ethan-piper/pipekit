@@ -26,6 +26,7 @@ METHOD_REPO="${METHOD_REPO:-https://github.com/ethan-piper/pipekit.git}"
 REF="${1:-main}"
 DRY_RUN=false
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CHANGELOG="$PROJECT_ROOT/method/.sync-changelog.md"
 
 # Parse flags
 for arg in "$@"; do
@@ -50,8 +51,30 @@ git clone --depth 1 --branch "$REF" "$METHOD_REPO" "$TEMP" 2>/dev/null || {
   exit 1
 }
 
+# --- Pre-sync: snapshot current state for changelog ---
+SNAP=$(mktemp -d)
+snapshot_dir() {
+  local dir="$1"
+  local label="$2"
+  if [ -d "$dir" ]; then
+    find "$dir" -type f -exec md5sum {} \; 2>/dev/null | sort > "$SNAP/$label.md5"
+  else
+    touch "$SNAP/$label.md5"
+  fi
+}
+
+snapshot_dir "$PROJECT_ROOT/.claude/skills" "skills"
+snapshot_dir "$PROJECT_ROOT/method" "method"
+
 # Track changes
 CHANGES=0
+
+# Changelog arrays
+NEW_SKILLS=""
+UPDATED_SKILLS=""
+REMOVED_SKILLS=""
+UPDATED_FILES=""
+NEW_FILES=""
 
 sync_dir() {
   local src="$1"
@@ -131,11 +154,17 @@ for skill in $PORTABLE_SKILLS; do
     continue
   fi
 
+  # Track new vs updated
+  if [ ! -d "$dst" ]; then
+    NEW_SKILLS="$NEW_SKILLS $skill"
+  elif ! diff -rq "$src" "$dst" >/dev/null 2>&1; then
+    UPDATED_SKILLS="$UPDATED_SKILLS $skill"
+  fi
+
   mkdir -p "$dst"
 
   if $DRY_RUN; then
     if [ -d "$dst" ]; then
-      local diff_count
       diff_count=$(diff -rq "$src" "$dst" 2>/dev/null | wc -l | tr -d ' ')
       if [ "$diff_count" -gt 0 ]; then
         echo "  WOULD UPDATE skill: $skill"
@@ -154,14 +183,36 @@ for skill in $PORTABLE_SKILLS; do
   fi
 done
 
+# Check for skills that exist locally but not in the method repo (removed/renamed)
+if [ -d "$PROJECT_ROOT/.claude/skills" ]; then
+  for existing_skill_dir in "$PROJECT_ROOT/.claude/skills"/*/; do
+    existing_skill=$(basename "$existing_skill_dir")
+    if [ ! -d "$TEMP/skills/$existing_skill" ]; then
+      # Could be project-specific or a removed portable skill
+      # Only flag it if it has no project-specific marker
+      if [ -f "$existing_skill_dir/skill.md" ]; then
+        # Check if this was a portable skill (existed in a previous sync)
+        if grep -q "^  SYNCED skill: $existing_skill" "$PROJECT_ROOT/method/.sync-changelog.md" 2>/dev/null || \
+           echo "$PORTABLE_SKILLS" | grep -qv "$existing_skill"; then
+          REMOVED_SKILLS="$REMOVED_SKILLS $existing_skill"
+        fi
+      fi
+    fi
+  done
+fi
+
 # --- Sync scripts ---
 echo ""
 echo "Scripts:"
 sync_file "$TEMP/scripts/drift-check.sh" "$PROJECT_ROOT/scripts/drift-check.sh" "drift-check.sh"
-# Make drift-check executable
-if [ -f "$PROJECT_ROOT/scripts/drift-check.sh" ]; then
-  chmod +x "$PROJECT_ROOT/scripts/drift-check.sh"
-fi
+# Also update the sync script itself
+sync_file "$TEMP/scripts/sync-method.sh" "$PROJECT_ROOT/scripts/sync-method.sh" "sync-method.sh"
+# Make scripts executable
+for script in drift-check.sh sync-method.sh; do
+  if [ -f "$PROJECT_ROOT/scripts/$script" ]; then
+    chmod +x "$PROJECT_ROOT/scripts/$script"
+  fi
+done
 
 # --- Check for method.config.md ---
 echo ""
@@ -174,6 +225,103 @@ if [ ! -f "$PROJECT_ROOT/method.config.md" ]; then
   fi
 fi
 
+# --- Post-sync: generate changelog ---
+if ! $DRY_RUN; then
+  # Compare method files
+  for f in method.md GUIDE.md STARTUP.md; do
+    dst="$PROJECT_ROOT/method/$f"
+    if [ -f "$dst" ]; then
+      old_hash=$(grep "$dst" "$SNAP/method.md5" 2>/dev/null | awk '{print $1}' || true)
+      new_hash=$(md5sum "$dst" 2>/dev/null | awk '{print $1}')
+      if [ "$old_hash" != "$new_hash" ]; then
+        UPDATED_FILES="$UPDATED_FILES $f"
+      fi
+    fi
+  done
+
+  # Write changelog
+  SYNC_DATE=$(date '+%Y-%m-%d %H:%M')
+  cat > "$CHANGELOG" << CHLOG
+# Sync Changelog
+
+**Synced:** $SYNC_DATE
+**Source:** $METHOD_REPO @ $REF
+
+## Skills
+
+CHLOG
+
+  if [ -n "$NEW_SKILLS" ]; then
+    echo "### New" >> "$CHANGELOG"
+    for s in $NEW_SKILLS; do
+      desc=""
+      if [ -f "$PROJECT_ROOT/.claude/skills/$s/skill.md" ]; then
+        desc=$(grep '^description:' "$PROJECT_ROOT/.claude/skills/$s/skill.md" 2>/dev/null | head -1 | sed 's/^description: *//')
+      fi
+      echo "- \`/$s\` — $desc" >> "$CHANGELOG"
+    done
+    echo "" >> "$CHANGELOG"
+  fi
+
+  if [ -n "$UPDATED_SKILLS" ]; then
+    echo "### Updated" >> "$CHANGELOG"
+    for s in $UPDATED_SKILLS; do
+      echo "- \`/$s\`" >> "$CHANGELOG"
+    done
+    echo "" >> "$CHANGELOG"
+  fi
+
+  if [ -n "$REMOVED_SKILLS" ]; then
+    echo "### Possibly Removed/Renamed" >> "$CHANGELOG"
+    for s in $REMOVED_SKILLS; do
+      echo "- \`/$s\` — exists locally but not in method repo (may be renamed or project-specific)" >> "$CHANGELOG"
+    done
+    echo "" >> "$CHANGELOG"
+  fi
+
+  if [ -z "$NEW_SKILLS" ] && [ -z "$UPDATED_SKILLS" ] && [ -z "$REMOVED_SKILLS" ]; then
+    echo "No skill changes." >> "$CHANGELOG"
+    echo "" >> "$CHANGELOG"
+  fi
+
+  echo "## Method Docs" >> "$CHANGELOG"
+  if [ -n "$UPDATED_FILES" ]; then
+    for f in $UPDATED_FILES; do
+      echo "- \`$f\` — updated" >> "$CHANGELOG"
+    done
+  else
+    echo "No doc changes." >> "$CHANGELOG"
+  fi
+  echo "" >> "$CHANGELOG"
+
+  echo "## Config" >> "$CHANGELOG"
+  # Check if template has fields not in project config
+  if [ -f "$PROJECT_ROOT/method.config.md" ] && [ -f "$TEMP/method.config.template.md" ]; then
+    new_fields=$(diff <(grep '^\| \*\*' "$PROJECT_ROOT/method.config.md" 2>/dev/null | sort) \
+                      <(grep '^\| \*\*' "$TEMP/method.config.template.md" 2>/dev/null | sort) \
+                      2>/dev/null | grep '^>' | sed 's/^> //' || true)
+    if [ -n "$new_fields" ]; then
+      echo "New fields in template (may need adding to method.config.md):" >> "$CHANGELOG"
+      echo "$new_fields" | while read -r line; do
+        echo "- $line" >> "$CHANGELOG"
+      done
+    else
+      echo "No new config fields." >> "$CHANGELOG"
+    fi
+  else
+    echo "No config comparison available." >> "$CHANGELOG"
+  fi
+  echo "" >> "$CHANGELOG"
+  echo "---" >> "$CHANGELOG"
+  echo "_Read by \`/pipekit-update\` for reconciliation. Safe to delete after review._" >> "$CHANGELOG"
+
+  echo ""
+  echo "Changelog written to: method/.sync-changelog.md"
+fi
+
+# Clean up snapshot
+rm -rf "$SNAP"
+
 # --- Summary ---
 echo ""
 echo "=== Sync Complete ==="
@@ -184,7 +332,7 @@ else
   echo "Synced from: $METHOD_REPO @ $REF"
   echo ""
   echo "Next steps:"
-  echo "  1. Edit method.config.md with your project's Linear workspace, state IDs, etc."
-  echo "  2. Commit the synced files"
-  echo "  3. Skills are ready to use"
+  echo "  1. Review method/.sync-changelog.md for what changed"
+  echo "  2. Run /pipekit-update reconciliation (restart Claude Code first)"
+  echo "  3. Commit the synced files"
 fi
