@@ -295,8 +295,8 @@ _"Linear's workflow states need to be configured in the UI. Here's exactly what 
    Open Linear → Settings → Team Settings → {Team} → General
    Turn on "Triage" (this adds a Triage inbox for incoming issues)
 
-2. Configure Workflow States:
-   Open Linear → Settings → Team Settings → {Team} → Workflow
+2. Configure Issue Statuses:
+   Open Linear → Settings → Team Settings → {Team} → Workflow → Issue Statuses
 
 3. Remove default states that Pipekit doesn't use:
    - Remove "Backlog" (Pipekit uses Ideas/Future Phases/On Deck/Needs Spec instead)
