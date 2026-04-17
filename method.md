@@ -260,7 +260,7 @@ Pipekit wraps VBW — it does not replace VBW's planning layer. The two systems 
 2. **Pipekit owns the visibility layer.** Linear issues, `linear-map.json`, `PHASES.md`, `NEXT.md`, strategy docs, and project config are Pipekit's. VBW does not write to these.
 3. **Initial merge happens once** — at `/roadmap-create`. Strategy-derived requirements are added **into** VBW's existing phase structure. VBW's phases, goals, and success criteria are preserved verbatim.
 4. **After the merge, the split is one-way.** Pipekit reads VBW state (plan progress, execution state) to update Linear. VBW does not read Linear — its source of truth is its own files.
-5. **Don't invoke VBW agents directly in Pipekit projects.** Use `/launch`, not `/vbw:lead` or `/vbw:dev`. `/launch` wraps the VBW agents and keeps Linear, `PHASES.md`, and `NEXT.md` in sync. Direct VBW invocation bypasses the Pipekit visibility layer and causes drift.
+5. **Don't invoke VBW agents directly in Pipekit projects.** Use `/launch`, not `/vbw:lead` or `/vbw:dev`. `/launch` wraps the VBW agents and keeps Linear, `PHASES.md`, and `NEXT.md` in sync. Direct VBW invocation bypasses the Pipekit visibility layer and causes drift. (Future: this wrapping could be replaced with event-based hooks, which would be more resilient to VBW command-surface changes. Tracked in [pipekit#2](https://github.com/ethan-piper/pipekit/issues/2) — not built speculatively.)
 6. **When drift is suspected, stop and reconcile.** Symptoms: Linear status doesn't match VBW execution state; a PLAN.md references a Linear issue that doesn't exist; a Linear issue has no corresponding plan. Resolve the mismatch before continuing — drift compounds.
 
 ### Known Drift Risks
