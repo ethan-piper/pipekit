@@ -27,11 +27,27 @@ This skill is invoked when the user says:
 
 Record the current timestamp for duration tracking.
 
-### 2. Review Recent Sessions
+### 2. Read and Display NEXT.md
+
+Check if `NEXT.md` exists at the project root. If it does, read and display it prominently at the top of the session — this tells the user what they were about to do before closing the last session.
+
+Format:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Picking up where you left off
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{Contents of NEXT.md — render as-is}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+If `NEXT.md` doesn't exist (fresh project or before the first pipeline step completes), skip this step silently and proceed.
+
+### 3. Review Recent Sessions
 
 List and read recent session logs from `Logs/Sessions/`.
 
-### 3. Query Linear Status
+### 4. Query Linear Status
 
 Use `mcp__linear-server__list_issues` with:
 - `team`: `"{team from method.config.md}"`
@@ -65,11 +81,11 @@ Display as a **Linear Status** block:
 
 If no issues are in progress or review, note that — it means the queue is clear.
 
-### 4. Present Recent Activity
+### 5. Present Recent Activity
 
 Show the user a concise summary combining: last session log + board status + Linear status.
 
-### 5. Rename cmux Workspace
+### 6. Rename cmux Workspace
 
 After the user states their intentions, rename the cmux workspace to reflect the current work context:
 
@@ -85,14 +101,14 @@ bash ~/.claude/scripts/cmux-workspace-name.sh "PROJ-XXX"
 
 Skip silently if cmux is unavailable.
 
-### 6. Ask for Session Intentions
+### 7. Ask for Session Intentions
 
 Prompt the user:
 1. What are you hoping to accomplish this session?
 2. How are you feeling about the project right now?
 3. Anything on your mind that might affect today's work?
 
-### 7. Record Their Response
+### 8. Record Their Response
 
 Acknowledge their intentions and store for end-of-session reflection.
 

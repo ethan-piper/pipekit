@@ -267,6 +267,12 @@ When you encounter these situations, take the safer path:
 
 ---
 
+## NEXT.md Output
+
+After launch completes (issue moved to Building, plan delegated to VBW or batch runner), overwrite `NEXT.md` at the project root. If there are more "Specced" issues in the current phase, point to `/launch {next issue}` or the UAT step for the current issue. If this was the last issue, point to `/strategy-sync` or the next phase's `/phase-plan`. See the NEXT.md convention in `sop/Skills_SOP.md`. Inline `➜ Next:` and `NEXT.md` content must match — emit them together.
+
+---
+
 ## Relationship to Other Skills
 
 | Skill | Relationship |

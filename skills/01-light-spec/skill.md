@@ -183,6 +183,10 @@ When you encounter these situations, take the safer path:
 - **Implicit decisions** → Put it in the Decisions section (defined or `[TBD]`). Context is not a contract — downstream agents can't read your mind.
 - **Assuming API behavior** → Check the installed version. Training data may not reflect the project's actual dependencies.
 
+## NEXT.md Output
+
+After the spec is drafted and posted to Linear, overwrite `NEXT.md` at the project root pointing to `/launch {issue-id}` if the spec is approved, or the next spec to draft if this one is still pending human review. See the NEXT.md convention in `sop/Skills_SOP.md`. Inline `➜ Next:` and `NEXT.md` content must match — emit them together.
+
 ## Related Skills
 
 - `/brainstorm` — lighter: feasibility-only, no structured spec

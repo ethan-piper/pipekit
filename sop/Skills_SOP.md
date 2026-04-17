@@ -88,6 +88,49 @@ description: One-line description of what the skill does
 3. **Use Linear MCP tools** for issue management (`mcp__linear-server__*`)
 4. **Use VBW agents** for planning and execution (`vbw:vbw-lead`, `vbw:vbw-dev`, `vbw:vbw-qa`)
 
+### The `NEXT.md` Convention
+
+Every Pipekit skill that produces a meaningful state transition (completes a pipeline step, promotes issues, ships a feature, etc.) MUST do two things in lockstep:
+
+1. **Print `➜ Next:` inline** in the terminal — tells the current user what command to run next and why.
+2. **Overwrite `NEXT.md` at the project root** with the same content — gives tomorrow's user (or a new session) the same pointer.
+
+Because both are written by the same code path in the same skill run, drift is impossible. The file is fresh whenever the user closed the session.
+
+**Required `NEXT.md` schema:**
+
+```markdown
+# Next Step
+
+**Last updated:** {timestamp} by {skill name}
+
+## Recommended next command
+`{command}`
+
+## Why this one
+{1-3 sentences on why this is the highest-leverage next action}
+
+## Parallelizable after this (optional)
+- {other commands that can run in parallel once this one starts}
+
+## Blocked, do later (optional)
+- {commands that depend on this one completing first}
+```
+
+**Which skills must write `NEXT.md`:**
+- `/startup` — after each step completes (always point to the next step or `/start-session` if done)
+- `/roadmap-create` — after roadmap is populated, point to `/phase-plan` or `/roadmap-review`
+- `/phase-plan` — after phase is planned, point to `/01-light-spec {first issue}`
+- `/01-light-spec` — after spec is drafted and approved, point to `/launch {issue}` or the next issue
+- `/launch` — after gates pass, point to VBW execution or the next issue to spec
+- `/strategy-sync` — after docs are updated, point to the next unshipped issue
+
+**`NEXT.md` lives at the project root** (not in `.vbw-planning/` — that directory is hidden and confusing for users). Visible alongside `concept-brief.md`, `project-definition.md`, `method.config.md`.
+
+**`/start-session` reads and displays it** automatically at session start, so users don't need to navigate to the file.
+
+---
+
 ### Writing Skill Prompts for Opus 4.7
 
 Opus 4.7 follows instructions more literally than prior models. It won't silently generalize "update the doc" into "update all three docs" — it'll update one. Skill authors must be explicit about scope:

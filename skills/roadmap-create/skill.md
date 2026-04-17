@@ -293,6 +293,10 @@ When you encounter these situations, take the safer path:
 - **Untraceable requirements** → Every requirement should trace to a strategy doc section. If it doesn't, either the strategy docs need updating or the requirement is an orphan.
 - **Flat issue lists** → Create the full Linear hierarchy (Initiatives/Projects/Milestones). Issues without structure become unsortable quickly.
 
+## NEXT.md Output
+
+After roadmap creation completes, overwrite `NEXT.md` at the project root pointing to `/roadmap-review` (for validation) or `/phase-plan` (if validation already passed). See the NEXT.md convention in `sop/Skills_SOP.md`. Inline `➜ Next:` and `NEXT.md` content must match — emit them together.
+
 ## Related
 
 - `/define` — previous step: creates the project definition
