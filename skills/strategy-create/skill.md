@@ -95,7 +95,7 @@ _"Open it in your editor, review it, and let me know what to change — or say '
 **Audience discipline:**
 - Conceptual Overview: Simple language. A stakeholder with no technical background should understand it completely. No code, no jargon.
 - Technical Architecture: Developer-level. Schema detail, API patterns, code conventions.
-- Design Direction: Practical. Developers and AI agents need clear aesthetic guidance. Ask for inspiration links, color preferences, typography direction, and anti-patterns. This doc is read by `/frontend-design` during execution.
+- Design Direction: Practical. Developers and AI agents need clear aesthetic guidance. Ask for inspiration links, color preferences, typography direction, and anti-patterns. **Explicitly probe for Opus 4.7's default aesthetic tendencies** — cream backgrounds, serif displays (Georgia/Fraunces/Playfair), terracotta accents, Space Grotesk, purple gradients, generic sans stacks. If the user's aesthetic doesn't counter these, the build agents will default to them. This doc is read by `/frontend-design` during execution.
 - Permissions: Technical but clear. Admins need to understand the access model.
 - Data Model: Developer-level. Entity relationships, constraints, calculations.
 - Workflow Examples: Step-by-step, concrete. All audiences.
