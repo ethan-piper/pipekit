@@ -386,7 +386,7 @@ Run a quick verification:
 3. List labels — should include all Type and Flag labels
 4. Confirm `method.config.md` has no empty state IDs
 
-If anything is missing, loop back to the relevant sub-step.
+If anything is missing, loop back to the specific sub-step that produces it: missing state IDs → 4d, missing labels → 4e, MCP disconnected → 4a, missing team info → 4b, incorrect workflow states → 4c.
 
 **Output:** Working infrastructure — repo builds, deploys, pre-deploy gate passes, Linear workspace fully configured
 

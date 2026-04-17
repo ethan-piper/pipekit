@@ -88,6 +88,19 @@ description: One-line description of what the skill does
 3. **Use Linear MCP tools** for issue management (`mcp__linear-server__*`)
 4. **Use VBW agents** for planning and execution (`vbw:vbw-lead`, `vbw:vbw-dev`, `vbw:vbw-qa`)
 
+### Writing Skill Prompts for Opus 4.7
+
+Opus 4.7 follows instructions more literally than prior models. It won't silently generalize "update the doc" into "update all three docs" — it'll update one. Skill authors must be explicit about scope:
+
+- **Quantify loops.** "For each strategy doc in the manifest" not "for strategy docs." Specify the source list (e.g., the `method.config.md` Strategy Docs table) so there's no ambiguity about which items.
+- **Name the fields.** "Populate these specific fields in method.config.md: Project name, Display name, Worktree prefix" not "update method.config.md with relevant values."
+- **Scope modifiers.** When something should apply broadly, say so: "Apply this formatting to every section in the document, not just the first one."
+- **Avoid relative qualifiers.** Words like "relevant," "appropriate," "as needed" let Opus 4.7 narrow scope. Replace with explicit criteria: "if the field is empty" rather than "update relevant fields."
+- **Batch questions in the first turn.** Don't drip-feed requirements across turns — it reduces both quality and token efficiency. Collect all clarifying questions and ask them together.
+- **State acceptance criteria explicitly.** "Done when X, Y, and Z are all true" — not "when this looks good."
+
+When a skill's behavior depends on tool calls or subagents, give explicit guidance on when to use them (see also: subagent guidance in individual skills).
+
 ---
 
 ## Syncing Portable Skills
