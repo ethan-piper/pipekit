@@ -177,6 +177,7 @@ pipekit/
     Skills_SOP.md                  #   Skill inventory and enforcement model
     VBW_Help.md                    #   VBW planning engine reference
     Anthropic - Prompting best practices.md  #   Prompt engineering reference
+    Session_Management_SOP.md     #   How to manage sessions, context, compaction
   templates/                       # Templates used by skills
     concept-brief.md               #   Project concept brief
     project-definition.md          #   Full project definition
