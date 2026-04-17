@@ -63,54 +63,87 @@ VBW's `/vbw:init` generates `.vbw-planning/ROADMAP.md` with phases derived from 
 
 ### Phase 2 — Draft ROADMAP.md
 
-**If merging with a VBW-generated roadmap:** preserve VBW's phase structure, add a `### Requirements` subsection to each phase populated from strategy docs, and add the Dependencies section. Don't remove VBW's existing content.
+**Important:** VBW's `/vbw:init` uses a different schema than Pipekit's original format:
+- **VBW schema:** phase-based with `goal`, `requirements` (free-text), `success_criteria`
+- **Pipekit schema:** stage-based with `REQ-IDs`, `feature clusters`, `dependencies`
 
-**If writing from scratch:** use the structure below.
+These overlap but aren't identical. The canonical merged format below keeps both.
 
-Write `.vbw-planning/ROADMAP.md` with this structure:
+**If merging with a VBW-generated roadmap (most common):**
+
+Preserve VBW's phase names, goals, and success criteria. Add Pipekit's requirement detail as subsections within each phase. Use the merged schema:
 
 ```markdown
 # Roadmap
 
 **Project:** {project name}
-**Created:** {date}
-**Source:** project-definition.md, Strategy/ docs
+**Last updated:** {date}
+**Source:** VBW codebase analysis + project-definition.md + Strategy/ docs
 
-## Stage 1: {Stage Name} (MVP)
+## Phase 1: {VBW's phase name}
 
-**Goal:** {from project definition}
-**Exit Criteria:** {from project definition}
+**Goal:** {VBW's phase goal}
+**Success Criteria:** {VBW's success criteria — preserve as-is}
 
-### {Feature Cluster 1}
-- REQ-001: {requirement} — ref: {Strategy doc §section}
+### Requirements
+- REQ-001: {requirement from strategy docs} — ref: {Strategy doc §section}
 - REQ-002: {requirement} — ref: {Strategy doc §section}
 
-### {Feature Cluster 2}
-- REQ-003: {requirement} — ref: {Strategy doc §section}
-- REQ-004: {requirement} — ref: {Strategy doc §section}
+### Feature Clusters
+- Data Foundation: REQ-001, REQ-002
+- Auth & Permissions: REQ-003
 
 ### Dependencies
 - REQ-003 blocked by REQ-001 (needs data model before CRUD)
 
-## Stage 2: {Stage Name}
-
-**Goal:** {from project definition}
-**Exit Criteria:** {from project definition}
-
-### {Feature Cluster 3}
-- REQ-010: {requirement} — ref: {Strategy doc §section}
-
-## Future (Parking Lot)
-- REQ-100: {deferred item} — target: Stage 3+
+## Phase 2: {VBW's phase name}
+...
 ```
 
-Present the draft roadmap to the user: _"Here's the requirements breakdown. Review the groupings, dependencies, and staging?"_
+**If writing from scratch (no VBW roadmap yet — rare):**
 
-Iterate until approved.
+Use the same merged schema but fill in phase names/goals from `project-definition.md` stages. Recommend running `/vbw:init` first next time.
+
+```markdown
+# Roadmap
+
+**Project:** {project name}
+**Last updated:** {date}
+**Source:** project-definition.md + Strategy/ docs
+
+## Phase 1: {Stage Name} (MVP)
+
+**Goal:** {from project definition}
+**Success Criteria:** {from project definition exit criteria}
+
+### Requirements
+- REQ-001: {requirement} — ref: {Strategy doc §section}
+
+### Feature Clusters
+- {cluster name}: REQ-001, REQ-002
+
+### Dependencies
+- REQ-003 blocked by REQ-001
+
+## Future (Parking Lot)
+- REQ-100: {deferred item} — target: later phase
+```
+
+**Write the file to `.vbw-planning/ROADMAP.md` and point the user to it** (per the "Documents, not terminal walls" rule from `/startup`). Tell them:
+
+_"Written merged roadmap to `.vbw-planning/ROADMAP.md`. Preserved VBW's N phases, added M requirements across K feature clusters with D dependencies. Review in your editor and let me know what to change."_
 
 ### Phase 3 — Linear Setup
 
-Determine what can be automated vs. what needs manual setup.
+**Preflight: check Linear MCP connection.** Try calling `mcp__linear-server__list_teams` or `list_issues`. If it fails:
+
+_"Linear MCP isn't connected. I can't create issues without it. Options:"_
+1. _"Reconnect now — run `claude mcp add --transport http --scope user linear-server https://mcp.linear.app/mcp` in terminal, restart Claude Code, then resume with `/roadmap-create --verify` to pick up where we stopped."_
+2. _"Continue without Linear — I'll write the roadmap and skip Linear population. You can re-run `/roadmap-create` later once Linear is connected."_
+
+**Do not fabricate Linear IDs.** If MCP is down, set all `linear_id` fields in `linear-map.json` to `null` and note "Linear population pending" in the final summary.
+
+Once Linear MCP is confirmed working, determine what can be automated vs. what needs manual setup.
 
 **Automate via MCP (do these):**
 
