@@ -29,11 +29,27 @@ Bridge the gap between "here's what the product does" (strategy docs) and "here 
 
 ## Execution Steps
 
+### Phase 0 — Reconcile with VBW Roadmap
+
+VBW's `/vbw:init` generates `.vbw-planning/ROADMAP.md` with phases derived from codebase analysis. If this file already exists, **reconcile — don't overwrite**.
+
+1. Check if `.vbw-planning/ROADMAP.md` exists and has content.
+2. If it does:
+   - Read the existing VBW roadmap — note its phases, structure, and any requirements already captured
+   - Tell the user: _"VBW has already drafted a roadmap with {N} phases from codebase analysis. I'll merge strategy-derived requirements into those phases rather than replace them. Proceed?"_
+   - Use VBW's phases as the canonical phase structure
+   - Add strategy-derived requirements to the appropriate phases
+   - Preserve any VBW-specific notes or structure
+3. If it doesn't exist (fresh project, no VBW init yet):
+   - Proceed with full generation from scratch
+   - Recommend the user run `/vbw:init` first for a richer starting point
+
 ### Phase 1 — Extract Requirements
 
 1. Read `project-definition.md` for stage breakdown, exit criteria, and workflows
 2. Read all Strategy docs listed in `method.config.md`'s Strategy Docs table
-3. For each stage defined in the project definition:
+3. **If VBW roadmap exists**: map its phases to the project definition stages. They should align — if they don't, flag the discrepancy to the user and resolve before proceeding.
+4. For each stage/phase:
    - Extract features, capabilities, and requirements from the strategy docs
    - Each requirement should be:
      - **Concrete** — "User can search properties by criteria" not "search functionality"
@@ -41,11 +57,15 @@ Bridge the gap between "here's what the product does" (strategy docs) and "here 
      - **Traceable** — references the strategy doc section it comes from
    - Identify dependencies between requirements
 
-4. Group requirements into **feature clusters** — logical groupings that will become Linear Projects:
+5. Group requirements into **feature clusters** — logical groupings that will become Linear Projects:
    - e.g., "Data Foundation", "Search & CRUD", "Auth & Permissions", "Reports"
    - Each cluster should be cohesive (related features) and focused (not a catch-all)
 
 ### Phase 2 — Draft ROADMAP.md
+
+**If merging with a VBW-generated roadmap:** preserve VBW's phase structure, add a `### Requirements` subsection to each phase populated from strategy docs, and add the Dependencies section. Don't remove VBW's existing content.
+
+**If writing from scratch:** use the structure below.
 
 Write `.vbw-planning/ROADMAP.md` with this structure:
 
