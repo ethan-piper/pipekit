@@ -556,6 +556,7 @@ Next steps:
 - **Decisions are the user's.** Present analysis, make recommendations, but never lock in a choice without explicit approval.
 - **Skip what's done.** If a step's output already exists, acknowledge and offer to skip. Mark it `⏭️ Skipped` in the tracker.
 - **Save as you go.** Update CLAUDE.md, method.config.md, Strategy docs, AND the tracker as decisions are made — don't batch to the end.
+- **Spawn subagents for bounded exploration, not orchestration.** The `/startup` flow itself is orchestration — it stays in the main session and manages state via the tracker file. But when a sub-step needs to ingest many documents (e.g., Step 1 with `/concept --docs`), do spawn an Explore subagent rather than reading files inline. Rule of thumb: will I need these tool outputs again, or just the conclusion? If just the conclusion, subagent. If the outputs inform the next orchestration step (tracker updates, decisions to confirm), stay in the main session.
 - **Clean up after decisions.** When the user chooses between alternatives (two-tier vs. three-tier, framework A vs. B, etc.), **remove or collapse the unchosen option** from the document. The chosen path should be clean and unambiguous. Specifically:
   1. Keep the chosen option's full detail in place.
   2. Remove the unchosen option's configuration blocks (environment tables, promotion skills, workflow details, etc.) so they don't look active.

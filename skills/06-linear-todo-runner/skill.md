@@ -152,6 +152,8 @@ For each issue at the front of the queue (up to max-agents):
 
 ### Phase 3 — Agent Spawn & Lifecycle
 
+**Subagent mandate for this skill:** spawn parallel worktree agents even though Opus 4.7 defaults to fewer subagents. The whole point of `/linear-todo-runner` is fanning out independent work across isolated worktrees. A single-session sequential loop would defeat the purpose. Spawn up to `max-agents` in the same turn when the dependency graph permits; don't serialize them.
+
 For each issue that passes the AC gate (up to max-agents concurrently):
 
 1. **Move issue to Building** via `mcp__linear-server__save_issue` with `stateId: {Building state ID from method.config.md}`
