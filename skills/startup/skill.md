@@ -47,8 +47,8 @@ The first thing `/startup` does is create (or read) a **`{folder-name}-startup.m
 | 8 | Roadmap | ⬜ Not started | — |
 | 9 | Project Skills | ⬜ Not started | — |
 | 10 | CLAUDE.md & Rules | ⬜ Not started | — |
-| 11 | Phase Plan | ⬜ Not started | — |
-| 12 | Validate | ⬜ Not started | — |
+| 11 | Validate | ⬜ Not started | — |
+| 12 | Phase Plan | ⬜ Not started | — |
 
 ## Project Summary
 
@@ -507,28 +507,33 @@ Create `.claude/rules/` files based on the stack:
 
 **Output:** CLAUDE.md and rules configured
 
-### Step 11 — Phase Plan
+### Step 11 — Validate
+
+Before selecting an execution phase, validate the full setup. Catching gaps here prevents starting execution on a broken foundation.
+
+Run `/roadmap-review` to validate:
+- Concept brief exists
+- Project definition exists
+- Strategy docs match config
+- ROADMAP.md populated
+- Linear board seeded (initiatives, projects, milestones, issues)
+- Dependencies correctly set
+- All method.config.md fields populated (no TBDs)
+- Linear MCP connected and workflow states configured
+
+If any check fails, diagnose and fix before proceeding to Step 12. Do not move issues into "Needs Spec" (Step 12's job) until validation passes.
+
+**Output:** All validation checks pass — pipeline is ready for execution
+
+### Step 12 — Phase Plan
 
 **Check:** Does `.vbw-planning/PHASES.md` exist?
 - If yes: _"Phase already planned. Skip or replan?"_
 - If no: Run `/phase-plan`
 
-**Output:** First phase defined, issues in "Needs Spec"
+`/phase-plan` selects 3-8 issues for the first execution phase and promotes them from "On Deck" → "Needs Spec" in Linear. This is the point where execution begins — the first issues become actionable.
 
-### Step 12 — Validate
-
-Run `/roadmap-review` to validate the full setup:
-- Concept brief exists
-- Project definition exists
-- Strategy docs match config
-- ROADMAP.md populated
-- Linear board seeded
-- Current phase defined
-- All checks pass
-
-If any check fails, diagnose and fix before declaring setup complete.
-
-**Output:** All validation checks pass — pipeline is ready
+**Output:** First phase defined, issues in "Needs Spec", ready for `/light-spec`
 
 ```
 ## Setup Complete
