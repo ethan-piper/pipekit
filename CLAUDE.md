@@ -40,6 +40,17 @@ Stage 0 takes a project from idea to first phase. Stages 1-5 repeat per phase/fe
 
 Projects pull from this repo using `sync-method.sh`. The sync copies `skills/`, `sop/`, `templates/`, and `method.md` into the project. It never touches project-specific files (`method.config.md`, `.claude/rules/`, `.vbw-planning/`, project-specific skills).
 
+## VBW / Pipekit Ownership
+
+Pipekit wraps VBW — it does not replace VBW's planning layer. The boundary is explicit:
+
+- **VBW owns** `.vbw-planning/ROADMAP.md`, `PLAN.md` files, and execution state.
+- **Pipekit owns** Linear issues, `linear-map.json`, `PHASES.md`, `NEXT.md`, strategy docs, and `method.config.md`.
+- **The two merge once**, at `/roadmap-create` — Pipekit adds strategy-derived requirements into VBW's phase structure without overwriting VBW's phases, goals, or success criteria.
+- **Don't invoke VBW agents directly in Pipekit projects.** Use `/launch`, not `/vbw:lead` or `/vbw:dev`. `/launch` wraps VBW and keeps Linear, `PHASES.md`, and `NEXT.md` in sync. Direct VBW invocation bypasses Pipekit's visibility layer and causes drift.
+
+Full ownership model in `method.md` (§ VBW / Pipekit Ownership Model).
+
 ## Editing Skills
 
 Skills live in `skills/{name}/skill.md` with YAML frontmatter (`name`, `description`). Portable skills must read `method.config.md` for project-specific values — never hardcode Linear IDs, team names, or paths. Skills that reference `skill.json` use it for metadata only.

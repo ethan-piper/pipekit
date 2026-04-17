@@ -16,6 +16,17 @@ Pipekit **does not replace VBW**. VBW handles planning, execution, and QA. Pipek
 
 VBW doesn't need the full project plan — it's designed for bounded scope. Pipekit makes sure the input going into VBW is clean and unambiguous, and tracks what comes out.
 
+### Ownership split
+
+To avoid drift between the two systems, the boundaries are explicit:
+
+- **VBW owns the planning layer** — `.vbw-planning/ROADMAP.md`, `PLAN.md` files, and execution state. Pipekit reads these but does not overwrite them.
+- **Pipekit owns the visibility layer** — Linear issues, `linear-map.json`, `PHASES.md`, `NEXT.md`, strategy docs, and `method.config.md`. VBW does not touch these.
+- **The merge happens once**, at `/roadmap-create`. Strategy-derived requirements are added **into** VBW's phase structure; VBW's phases, goals, and success criteria are preserved.
+- **Don't invoke VBW agents directly.** Use `/launch`, not `/vbw:lead` or `/vbw:dev`. `/launch` wraps VBW and keeps Linear, `PHASES.md`, and `NEXT.md` in sync. Direct VBW invocation bypasses the visibility layer.
+
+Full ownership table and drift-risk mitigations in [method.md](method.md#vbw--pipekit-ownership-model).
+
 ## Core Principle
 
 **No stage may introduce guesswork into the next stage.**

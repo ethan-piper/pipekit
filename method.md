@@ -236,6 +236,46 @@ Skills are convenience wrappers. They automate the same conventions documented i
 
 ---
 
+## VBW / Pipekit Ownership Model
+
+Pipekit wraps VBW — it does not replace VBW's planning layer. The two systems must not compete for the same source of truth, or you'll spend more time reconciling than building. The boundaries below make ownership explicit.
+
+### Ownership Table
+
+| File / System | Owned by | Writers | Readers |
+|---|---|---|---|
+| `.vbw-planning/ROADMAP.md` | VBW | `/vbw:init` creates it; `/roadmap-create` merges strategy-derived requirements **into** it (never overwrites) | All Pipekit skills, VBW agents |
+| `.vbw-planning/phases/*/PLAN.md` | VBW | VBW Lead Agent (spawned by `/launch`) | `/launch`, `/phase-plan --status`, VBW Dev/QA agents |
+| `.vbw-planning/.execution-state.json` | VBW | VBW Dev/QA agents | `/phase-plan --status` |
+| `.vbw-planning/linear-map.json` | Pipekit | `/roadmap-create`, `/sync-linear` | All Pipekit skills |
+| `.vbw-planning/PHASES.md` | Pipekit | `/phase-plan` | All Pipekit skills |
+| `NEXT.md` (project root) | Pipekit | Every skill that emits `➜ Next:` | `/start-session`, humans |
+| Linear issues | Pipekit | `/light-spec`, `/launch`, `/roadmap-create`, `/phase-plan` | Everyone |
+| `concept-brief.md`, `project-definition.md`, `Strategy/` | Pipekit | `/concept`, `/define`, `/strategy-create`, `/strategy-sync` | `/light-spec`, VBW Lead |
+| `method.config.md` | Pipekit | `/startup` (populates); human (edits) | All Pipekit skills |
+
+### Rules of Engagement
+
+1. **VBW owns the planning layer.** `.vbw-planning/ROADMAP.md`, `PLAN.md` files, and execution state are VBW's. Pipekit reads them but does not overwrite them.
+2. **Pipekit owns the visibility layer.** Linear issues, `linear-map.json`, `PHASES.md`, `NEXT.md`, strategy docs, and project config are Pipekit's. VBW does not write to these.
+3. **Initial merge happens once** — at `/roadmap-create`. Strategy-derived requirements are added **into** VBW's existing phase structure. VBW's phases, goals, and success criteria are preserved verbatim.
+4. **After the merge, the split is one-way.** Pipekit reads VBW state (plan progress, execution state) to update Linear. VBW does not read Linear — its source of truth is its own files.
+5. **Don't invoke VBW agents directly in Pipekit projects.** Use `/launch`, not `/vbw:lead` or `/vbw:dev`. `/launch` wraps the VBW agents and keeps Linear, `PHASES.md`, and `NEXT.md` in sync. Direct VBW invocation bypasses the Pipekit visibility layer and causes drift.
+6. **When drift is suspected, stop and reconcile.** Symptoms: Linear status doesn't match VBW execution state; a PLAN.md references a Linear issue that doesn't exist; a Linear issue has no corresponding plan. Resolve the mismatch before continuing — drift compounds.
+
+### Known Drift Risks
+
+| Risk | Trigger | Mitigation |
+|---|---|---|
+| Plan state ≠ Linear state | Running VBW agents directly, not via `/launch` | Use `/launch`. Route all execution through Pipekit. |
+| Spec in Linear updated after plan generated | Someone edits issue description post-plan | Re-run `/light-spec PROJ-XXX --rebase` (regenerates plan from current spec) |
+| Orphan plans | Plan generated for an issue that's since been deleted | Detected via future `/drift-check` skill |
+| Orphan Linear issues | Issue created in Linear UI, no corresponding roadmap entry | Caught at `/roadmap-review` |
+
+If drift becomes a recurring pattern in practice, add a `/drift-check` skill for on-demand detection. Don't build it speculatively — measure first.
+
+---
+
 ## Tooling
 
 ### Interactive Skills (for hands-on sessions)
