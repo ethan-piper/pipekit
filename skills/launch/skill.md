@@ -22,6 +22,24 @@ You are a launch gate controller. Your job is to transition a human-approved Lin
 | `--project <name>` | Launch all ready issues in a project |
 | `--dry-run` | Validate gates and show routing plan without executing |
 | `--force` | Skip milestone readiness gate (use with caution) |
+| `--deep` | Escalate the VBW Dev agent from Sonnet to Opus (see Model Selection). Use for known-complex debugging: race conditions, silent failures, cross-layer state bugs. |
+
+---
+
+## Model Selection
+
+Skills that spawn subagents must **explicitly pin the model** on each `Agent()` call — subagents default-inherit the parent's model, which is not what you want when planning and execution have different cost/quality trade-offs. This skill uses the following defaults:
+
+| Step | Agent | Default model | Rationale |
+|------|-------|---------------|-----------|
+| 7b | `vbw:vbw-lead` | `opus` | Planning is the leverage point — over-spending here saves re-work later. |
+| 7b | `plan-reviewer` | `opus` | Review has to catch what planning missed; same reasoning budget. |
+| 8 | `vbw:vbw-dev` | `sonnet` | Execution is mechanical once the plan is good. Sonnet is ~5× cheaper with similar code quality on well-specced tasks. |
+| 9 | `vbw:vbw-qa` | `sonnet` | QA runs verifiable checks against AC; no novel reasoning. |
+
+**Escape hatch:** when `--deep` is passed, the Dev agent runs on `opus` instead of `sonnet`. Use this for tasks with known-hard debugging characteristics — race conditions, silent failures, cross-layer state bugs, anything where Sonnet has shown it struggles.
+
+This defaults-plus-flag pattern is the forerunner of Anthropic's model-use decision tree (in beta). When that ships, this section should be replaced with a reference to it.
 
 ---
 
@@ -117,6 +135,7 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
    ```
    Agent(
      subagent_type: "vbw:vbw-lead",
+     model: "opus",
      description: "Plan PROJ-XXX: {title}",
      prompt: "Create a PLAN.md for PROJ-XXX based on the following approved spec from Linear:
      
@@ -131,6 +150,7 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
    ```
    Agent(
      subagent_type: "plan-reviewer",
+     model: "opus",
      description: "Review plan for PROJ-XXX",
      prompt: "Review the PLAN.md just created for PROJ-XXX. 
      Stress-test scope, dependencies, success criteria, and risks.
@@ -143,10 +163,11 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
 
 ### Step 8 — VBW Execution
 
-1. Spin up the **VBW Dev Agent** (`vbw:vbw-dev`) for each task in the approved plan:
+1. Spin up the **VBW Dev Agent** (`vbw:vbw-dev`) for each task in the approved plan. Default to `model: "sonnet"`; use `"opus"` instead when `--deep` was passed on the launch command (see Model Selection):
    ```
    Agent(
      subagent_type: "vbw:vbw-dev",
+     model: "sonnet",  // or "opus" if --deep
      description: "PROJ-XXX task N: {task title}",
      prompt: "Execute task N from the plan at {plan path}.
      Read CLAUDE.md for conventions. Atomic commit per task.
@@ -164,6 +185,7 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
    ```
    Agent(
      subagent_type: "vbw:vbw-qa",
+     model: "sonnet",
      description: "Verify PROJ-XXX: {title}",
      prompt: "Verify PROJ-XXX against the acceptance criteria in the spec.
      Use goal-backward methodology. Check each AC item.

@@ -146,6 +146,24 @@ When a skill's behavior depends on tool calls or subagents, give explicit guidan
 
 ---
 
+### Pinning models on subagents
+
+Any skill that invokes `Agent()` should **explicitly pass `model:`** rather than relying on default inheritance. A skill that runs inside an Opus session will otherwise silently run execution agents on Opus too — expensive and usually unnecessary.
+
+Defaults we've found to work well:
+
+| Agent role | Default model |
+|------------|---------------|
+| Planning (`vbw:vbw-lead`, `plan-reviewer`, spec reviewers) | `opus` |
+| Execution (`vbw:vbw-dev`, batch runners) | `sonnet` |
+| Verification (`vbw:vbw-qa`) | `sonnet` |
+
+Add an escape hatch (e.g., a `--deep` flag) when the skill routes to an execution agent that sometimes needs heavier reasoning — race conditions, silent failures, cross-layer bugs. See `skills/launch/skill.md` for a worked example.
+
+This defaults-plus-flag pattern is the forerunner of Anthropic's model-use decision tree (in beta). When that ships, individual skills should migrate to it; this SOP section will point there instead.
+
+---
+
 ## Syncing Portable Skills
 
 Portable skills are maintained in the method repo and synced into projects via `scripts/sync-method.sh`. After syncing, the skills appear in `.claude/skills/` alongside project-specific skills.

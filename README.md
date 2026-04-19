@@ -186,6 +186,7 @@ pipekit/
     Git_and_Deployment.md          #   Branch strategy, release flow, worktrees
     Linear_SOP.md                  #   Linear workspace model and workflow states
     Skills_SOP.md                  #   Skill inventory and enforcement model
+    Hooks_SOP.md                   #   Claude Code hooks — per-machine install, not synced
     VBW_Help.md                    #   VBW planning engine reference
     Anthropic - Prompting best practices.md  #   Prompt engineering reference
     Session_Management_SOP.md     #   How to manage sessions, context, compaction
@@ -207,6 +208,7 @@ pipekit/
       verify-library-api.md        #     Check installed versions before using APIs
       ad-hoc-plan-gate.md          #     Lightweight plan gate for interactive sessions
   skills/                          # Portable Claude Code skills (25 total)
+  hooks/                           # Reference Claude Code hooks (install per-machine, see sop/Hooks_SOP.md)
   scripts/
     sync-method.sh                 # Pull method into a consuming project
     drift-check.sh                 # Detect stale references in documentation
