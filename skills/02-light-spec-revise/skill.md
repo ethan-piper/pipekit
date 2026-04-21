@@ -53,18 +53,54 @@ Apply **only** the fixes the agent asked for, preserving everything else. Detect
 
 Extract structured fields from the newest comment's `body`:
 
-| Field | Locator |
-|-------|---------|
-| Verdict | `### Verdict\n\n(Pass\|Revise)` |
-| Readiness Score | `### Readiness Score\n\n(\d+)/10` |
-| Blocking Issues | content between `### Blocking Issues` and `### Non-Blocking Improvements` |
-| Non-Blocking Improvements | content between `### Non-Blocking Improvements` and `### Fast Path to Pass` |
-| Fast Path to Pass | content between `### Fast Path to Pass` and `### Decomposition Readiness` |
-| Decomposition Readiness | `### Decomposition Readiness\n\n(Yes\|No)` |
+The agent emits two formats in the wild. Both must be handled:
+
+**Format A — heading-based** (common for Revise verdicts, Score ≤ 8):
+```
+### Verdict
+
+Revise
+
+### Readiness Score
+
+8/10
+
+### Blocking Issues
+
+* <blocker text>
+
+### Non-Blocking Improvements
+...
+```
+
+**Format B — inline-bullet** (observed on Pass verdicts, Score ≥ 9, minimal content):
+```
+* **Verdict:** Pass
+* **Recommended Flag:** Ready
+* **Readiness Score:** 9/10
+* **Decomposition Readiness:** Yes
+* **Final Recommendation:** Proceed to planning.
+```
+
+Field locators must match **either** format:
+
+| Field | Locator (alternation covers both formats) |
+|-------|-------------------------------------------|
+| Verdict | `(?:###\s+Verdict\s*\n+\|\*\s+\*\*Verdict:\*\*\s*)(Pass\|Revise)` |
+| Readiness Score | `(?:###\s+Readiness Score\s*\n+\|\*\s+\*\*Readiness Score:\*\*\s*)(\d+)/10` |
+| Decomposition Readiness | `(?:###\s+Decomposition Readiness\s*\n+\|\*\s+\*\*Decomposition Readiness:\*\*\s*)(Yes\|No)` |
+| Blocking Issues | Format A: content between `### Blocking Issues` and the next `###` heading. Format B: absent (treat as empty list). |
+| Non-Blocking Improvements | Format A: content between `### Non-Blocking Improvements` and the next `###` heading. Format B: scan for `### Non-Blocking Improvements` anywhere in body; if absent, treat as empty list. |
+| Fast Path to Pass | Format A: content between `### Fast Path to Pass` and the next `###` heading. Format B: often absent — treat as optional. |
 
 Parse bulleted lists (`*` or `-` prefix) into per-item strings.
 
-If required headings are missing or the shape is unrecognisable → report to user; ask whether to abort or proceed with manual analysis.
+**Robustness rules:**
+
+- Always detect format first: if `### Verdict` heading exists anywhere in the body → Format A; else if `* **Verdict:**` inline bullet exists → Format B; else → unrecognised, abort and report the raw body to the user.
+- Format B is valid only when `Verdict` is `Pass`. A Format B body with `Verdict: Revise` is malformed — report to user, ask whether to abort or treat as manual-analysis input.
+- Missing Blocking Issues in Format B is expected (Pass verdicts have none); missing Blocking Issues in Format A is a parse failure.
+- If a required field (Verdict, Readiness Score) is missing under either format → abort and report the raw body.
 
 ### Phase 3 — Verdict-gated branching
 
