@@ -102,28 +102,40 @@ Before presenting to the user, audit every section:
 
 Ask the user: _"Want Linear's Spec Review Agent to review this before planning?"_
 
-If yes, post a comment via `mcp__linear-server__save_comment` that triggers the agent with `@linear`:
+**Do NOT post the trigger comment via `mcp__linear-server__save_comment`.** The MCP tool only accepts a markdown string body; it cannot create Linear's structured mention node. A plaintext `@linear` renders as visible text but carries no mention metadata, so the Spec Review Agent never receives the event and never runs.
 
-   ```
-   @linear review this spec using Spec Review Agent (v5).
+Verified twice:
+- 2026-04-19: MCP-posted `@linear` comments on RS-5 and RS-6 produced no agent response; manual UI re-triggers worked within minutes.
+- 2026-04-21: URL-mention auto-conversion (posting `https://linear.app/<workspace>/profiles/<handle>` in the body, with or without markdown link wrapping) also fails via the MCP — URLs render as plain links, not mention pills. Auto-conversion is a UI-editor feature that does not apply to API-posted content.
 
-   Assess whether it is safe and ready for VBW planning. Focus on planning readiness, scope clarity, authority/source of truth, edge cases, financial correctness if relevant, and decomposition readiness.
+Instead, give the user a ready-to-paste trigger and ask them to run it in Linear's UI, where `@` opens the mention picker and inserts a real mention node.
 
-   Return:
+Output to the user:
 
-   Verdict: Pass or Revise
-   Recommended Flag: Blocked, Quick Win, Spec: Needed, Spec: Pass, or Spec: Revise
-   Readiness Score out of 10
-   Blocking Issues
-   Non-Blocking Improvements
-   Fast Path to Pass
-   Decomposition Readiness: Yes or No
-   Final Recommendation
+> Open [PROJ-XXX] in Linear and paste this as a new comment. Type `@` and pick **Linear** from the picker (don't just type the characters `@linear` — the mention has to be a structured node for the agent to fire).
+>
+> ```
+> @linear review this spec using Spec Review Agent (v5).
+>
+> Assess whether it is safe and ready for VBW planning. Focus on planning readiness, scope clarity, authority/source of truth, edge cases, financial correctness if relevant, and decomposition readiness.
+>
+> Return:
+>
+> Verdict: Pass or Revise
+> Recommended Flag: Blocked, Quick Win, Spec: Needed, Spec: Pass, or Spec: Revise
+> Readiness Score out of 10
+> Blocking Issues
+> Non-Blocking Improvements
+> Fast Path to Pass
+> Decomposition Readiness: Yes or No
+> Final Recommendation
+>
+> Then update the issue description by replacing the existing ## Agent Review section with the new review.
+> ```
+>
+> Once the agent posts its review (usually within a minute), run `/light-spec PROJ-XXX` again to pull in its feedback, or go straight to planning mode.
 
-   Then update the issue description by replacing the existing ## Agent Review section with the new review.
-   ```
-
-Tell the user: _"Linear's agent is reviewing. Once it updates the description, run `/light-spec PROJ-XXX` again to pull in its feedback, or go straight to planning mode."_
+**Future alternative (unverified):** Linear shipped `agentSessionCreateOnComment` and `agentSessionCreateOnIssue` GraphQL mutations in March 2026 for programmatic agent-session invocation. These would bypass the mention-node requirement entirely but require a direct GraphQL call with `LINEAR_API_KEY` — no MCP tool exposes them yet. Not wired up here; manual paste remains primary until this is tested against Linear's built-in Spec Review Agent.
 
 ### Phase 7 — VBW Ingestion Pointer
 
