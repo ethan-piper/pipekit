@@ -37,6 +37,7 @@ These skills work across any project that follows the method. They read `method.
 | `/brainstorm` | Feature-level feasibility exploration | Stage 1: Definition |
 | `/brainstorm-review` | Triage untriaged Linear issues | Stage 1: Definition |
 | `/light-spec` | Structured spec generation with agent review | Stage 1: Definition |
+| `/light-spec-revise` | Apply Spec Review Agent feedback surgically; detect stalemate loops | Stage 1: Definition |
 | `/launch` | Formalized trigger: gates → routing → execution | Stage 2: Launch & Planning |
 | `/linear-todo-runner` | Batch execution of specced issues | Stage 3: Execution |
 | `/linear` | Linear issue workflow | Anytime |

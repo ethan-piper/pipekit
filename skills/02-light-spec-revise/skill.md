@@ -1,0 +1,237 @@
+---
+name: light-spec-revise
+description: Apply Spec Review Agent feedback to an existing Light Spec. Surgical edits only, detects stalemate loops, refuses to rewrite from scratch.
+---
+
+# Light Spec Revise Skill
+
+Close the feedback loop between Linear's Spec Review Agent and a published Light Spec. Reads the latest agent comment, diffs it against the current description, and either applies targeted fixes for unresolved blockers or reports that the agent's verdict is stale.
+
+## Triggers
+
+- `/light-spec-revise PROJ-123` — revise based on the latest Spec Review Agent comment on that issue
+
+## Purpose
+
+Apply **only** the fixes the agent asked for, preserving everything else. Detects **stalemate loops** where the agent keeps flagging issues the description already addresses, and avoids the spec drift that comes from re-running the full `/light-spec` capture-and-redraft flow just to patch one blocker.
+
+## When to Use
+
+- The spec has already been published (via `/light-spec` Phase 5).
+- The Spec Review Agent has posted at least one review comment (via the manual-paste trigger from `/light-spec` Phase 6).
+- You want to incorporate that feedback without rewriting the spec from scratch.
+
+## When NOT to Use
+
+- The issue has no agent review comment yet → use `/light-spec` first, then trigger the agent.
+- The latest agent verdict is `Pass` → no revision needed; proceed to planning.
+- You want to substantially rethink the spec → use `/light-spec` for a full redraft; this skill only handles incremental agent-driven revisions.
+
+## Inputs
+
+| Input | Source | Required |
+|-------|--------|----------|
+| Issue ID (e.g., `PROJ-123`) | Argument | Yes |
+
+## Execution Steps
+
+### Phase 1 — Fetch issue and comments
+
+1. Fetch the issue via `mcp__linear-server__get_issue` (`id: "PROJ-123"`, `includeRelations: true`). Extract `description` and `title`.
+2. Fetch comments via `mcp__linear-server__list_comments` (`issueId: "PROJ-123"`). `get_issue` does **not** return comments — they must be fetched separately.
+3. Filter to Spec Review Agent comments. Identify by **either**:
+   - `author.name` contains `Linear` or `Agent` (case-insensitive), **or**
+   - `body` starts with `### Verdict` (regex: `^###\s+Verdict`).
+
+   Body-matching is the safer signal — author names vary across workspaces.
+
+4. Sort matched comments by `createdAt` descending. The newest is the authoritative review. Older comments are historical and must never be treated as current feedback (they belong to superseded revisions).
+
+5. If zero agent comments found → abort. Tell the user: _"No Spec Review Agent comment found on PROJ-XXX. Use `/light-spec PROJ-XXX` to trigger one first."_
+
+### Phase 2 — Parse the latest agent comment
+
+Extract structured fields from the newest comment's `body`:
+
+| Field | Locator |
+|-------|---------|
+| Verdict | `### Verdict\n\n(Pass\|Revise)` |
+| Readiness Score | `### Readiness Score\n\n(\d+)/10` |
+| Blocking Issues | content between `### Blocking Issues` and `### Non-Blocking Improvements` |
+| Non-Blocking Improvements | content between `### Non-Blocking Improvements` and `### Fast Path to Pass` |
+| Fast Path to Pass | content between `### Fast Path to Pass` and `### Decomposition Readiness` |
+| Decomposition Readiness | `### Decomposition Readiness\n\n(Yes\|No)` |
+
+Parse bulleted lists (`*` or `-` prefix) into per-item strings.
+
+If required headings are missing or the shape is unrecognisable → report to user; ask whether to abort or proceed with manual analysis.
+
+### Phase 3 — Verdict-gated branching
+
+**If Verdict is `Pass`:**
+
+1. Report: _"Latest agent verdict is **Pass** (score: X/10). No revision needed."_
+2. If Non-Blocking Improvements exist, offer to apply them opt-in **per item** (see Phase 7 rules).
+3. Exit if user declines.
+
+**If Verdict is `Revise`:**
+
+Proceed to Phase 4.
+
+### Phase 4 — Blocker diff
+
+For each Blocking Issue in the agent's comment:
+
+1. **Extract the concrete demand.** Usually 1-3 sentences. Identify:
+   - Which section of the description is affected (Scope, Decisions, Requirements, Acceptance Criteria, Technical Context, etc.)?
+   - What concrete change does the agent want — added, changed, or removed?
+
+2. **Check the current description for evidence the demand is already addressed.**
+   - Search the description for keywords and constraints the agent names.
+   - Classify as:
+     - **Resolved-Stale** — description already has the fix.
+     - **Unresolved** — description does not have the fix.
+     - **Ambiguous** — the fix may be partial or hidden; ask user.
+
+3. **Stalemate detection.** Compare the latest agent comment's Blocking Issues against the **second-newest** agent comment's Blocking Issues (if one exists). For each blocker where:
+   - The same issue is flagged in both comments (fuzzy match on first 20 tokens), **and**
+   - The current description addresses it,
+
+   → mark the blocker as **Stalemate**.
+
+### Phase 5 — Report before editing
+
+Present a summary to the user **before making any changes**. Format:
+
+```
+Agent verdict: Revise (Score: N/10)
+Latest review: <timestamp>
+
+Blocking Issues:
+
+  1. [Resolved-Stale | Unresolved | Ambiguous | Stalemate]
+     "<first line of blocker>"
+     → <evidence: line/section in description that addresses or fails to address it>
+     → <stalemate note, if applicable>
+
+  2. ...
+```
+
+Then list the user's options:
+
+```
+Options:
+  [1] Apply surgical fixes for Unresolved blockers (I'll show each patch before applying)
+  [2] Post nudge comment for Stalemate blockers (draft below)
+  [3] Override agent verdict (append note to Agent Review section)
+  [4] Manual review — show me each flagged section and let me decide
+  [5] Abort
+```
+
+Do not proceed to Phase 6/7 until the user chooses.
+
+### Phase 6 — Act on stalemate / override / manual choices
+
+- **Post nudge (option 2)**: draft a short comment (under 50 words) pointing at the specific line in the description that addresses the stalemate blocker. Output it for the user to **paste manually in Linear's UI** — do NOT post via `mcp__linear-server__save_comment` (plaintext `@linear` doesn't trigger the agent; see `/light-spec` Phase 6 for the full rationale). Format:
+
+  > Open the Linear issue and paste this as a new comment. Type `@` and pick **Linear** from the picker.
+  >
+  > ```
+  > @linear this blocker has been addressed in the description — see the [section name] section where [specific line or text]. Please re-review.
+  > ```
+
+- **Override (option 3)**: append a note to the `## Agent Review` section of the description documenting that the latest verdict is stale. Include:
+  - Date of the stale review being overridden.
+  - Link back to the specific description content that addresses each flagged blocker.
+  - Who overrode it (the user).
+  - Update the issue description via `mcp__linear-server__save_issue`.
+
+- **Manual review (option 4)**: for each blocker, show the user the flagged description section alongside the agent's demand. Let the user tell the skill what (if anything) to change. Treat each user-directed change as a patch to apply in Phase 7.
+
+### Phase 7 — Apply surgical fixes (Unresolved blockers only)
+
+For each **Unresolved** blocker:
+
+1. Identify the exact section(s) of the description to patch.
+2. Draft a **minimal** patch — the smallest change that resolves the blocker. Do not touch surrounding text.
+3. Present the patch as a diff (before/after) to the user.
+4. User approves or rejects per blocker.
+5. Apply approved patches to the in-memory description.
+
+**Hard constraints:**
+
+- Never rewrite sections the agent did not flag.
+- Never delete existing user commentary from the `## Agent Review` section.
+- Never merge multiple blockers into a single rewrite; each patch stays distinct for reviewability.
+- If applying a patch would require changes beyond the flagged section (e.g. a blocker on AC that forces a Scope edit), surface the cross-section dependency to the user and get explicit approval before touching the second section.
+
+### Phase 8 — Non-Blocking Improvements (opt-in)
+
+After blocker fixes (or immediately, if verdict was `Pass`):
+
+1. List each Non-Blocking Improvement.
+2. For each one, ask the user: _"Apply this improvement? (y/N)"_
+3. For approved improvements, draft a minimal patch and apply with the same constraints as Phase 7.
+
+Do **not** apply Non-Blocking Improvements silently or in bulk.
+
+### Phase 9 — Publish
+
+1. Update the issue description via `mcp__linear-server__save_issue`.
+2. Append to the `## Agent Review` section of the description:
+
+   ```markdown
+   *Revised {YYYY-MM-DD} in response to Spec Review Agent feedback (pass N). Fixes applied:*
+   - [fix 1 — one-line summary]
+   - [fix 2 — one-line summary]
+
+   *Non-blocking improvements applied:*
+   - [improvement — one-line summary]
+
+   *Stalemate blockers surfaced to user:*
+   - [blocker — noted as addressed in {section}]
+
+   *Ready for next-pass review.*
+   ```
+
+   Omit sub-sections that had zero entries.
+
+3. Offer to re-trigger the Spec Review Agent using the same manual-paste pattern as `/light-spec` Phase 6. Output the ready-to-paste trigger comment and remind the user: _"Paste in Linear's UI, not via MCP — the mention has to be a structured node for the agent to fire."_
+
+### Phase 10 — NEXT.md output
+
+Overwrite `NEXT.md` at the project root:
+
+- If the revision is expected to pass on next review → `/launch PROJ-XXX`
+- If another pass is likely (some Unresolved blockers remain, or the user deferred fixes) → `/light-spec-revise PROJ-XXX`
+- If stalemate was surfaced and the user chose override → `/launch PROJ-XXX` (override clears the path)
+
+Emit inline `➜ Next:` line matching `NEXT.md` content. See the NEXT.md convention in `sop/Skills_SOP.md`.
+
+---
+
+## Stalemate Loop Policy
+
+If the same blocker has been flagged in **≥ 2 consecutive agent comments** AND the description already addresses it, the skill MUST NOT apply further revisions. Available options reduce to:
+
+- Post nudge comment
+- Override verdict
+- Manual review
+
+Rationale: blind re-revision compounds drift. A stuck agent is a data problem (agent didn't re-read the updated description, or its parser is missing a recent addition), not a spec problem. The fix is to unstick the agent, not to rewrite the spec a third time.
+
+## Output Contract
+
+The skill MUST NEVER:
+
+- Rewrite sections the agent did not flag.
+- Delete user commentary from the `## Agent Review` section.
+- Apply Non-Blocking Improvements without explicit per-item user approval.
+- Post `@linear` trigger comments via `mcp__linear-server__save_comment` (the MCP cannot create structured mention nodes; see `/light-spec` Phase 6).
+- Proceed past Phase 5 without user choice.
+
+## Related Skills
+
+- `/light-spec` — creates the spec; Phase 6 sets up the feedback loop this skill closes.
+- `/launch` — consumes `Pass`-verdict specs for planning + execution.
+- `/spec-validator` — heavier validator for full Strategy docs (not Light Specs).

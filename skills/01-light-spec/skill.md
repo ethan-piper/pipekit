@@ -133,7 +133,7 @@ Output to the user:
 > Then update the issue description by replacing the existing ## Agent Review section with the new review.
 > ```
 >
-> Once the agent posts its review (usually within a minute), run `/light-spec PROJ-XXX` again to pull in its feedback, or go straight to planning mode.
+> Once the agent posts its review (usually within a minute), run `/light-spec-revise PROJ-XXX` to apply its feedback surgically (handles stalemate loops), or go straight to planning mode if the verdict is Pass.
 
 **Future alternative (unverified):** Linear shipped `agentSessionCreateOnComment` and `agentSessionCreateOnIssue` GraphQL mutations in March 2026 for programmatic agent-session invocation. These would bypass the mention-node requirement entirely but require a direct GraphQL call with `LINEAR_API_KEY` — no MCP tool exposes them yet. Not wired up here; manual paste remains primary until this is tested against Linear's built-in Spec Review Agent.
 

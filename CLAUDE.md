@@ -84,6 +84,7 @@ VBW agents don't call skills — they read the consuming project's CLAUDE.md dir
 |-------|---------|
 | `/launch` | Validates gates, routes by complexity, triggers execution |
 | `/light-spec` | Generates structured specs as AI-to-AI contracts |
+| `/light-spec-revise` | Applies Spec Review Agent feedback surgically; detects stalemate loops |
 | `/strategy-sync` | Updates Strategy docs post-ship to match what was actually built |
 | `/pipekit-update` | Pull latest Pipekit from GitHub into project (supports `--push`) |
 
