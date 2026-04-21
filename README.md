@@ -208,7 +208,6 @@ pipekit/
       verify-library-api.md        #     Check installed versions before using APIs
       ad-hoc-plan-gate.md          #     Lightweight plan gate for interactive sessions
   skills/                          # Portable Claude Code skills (25 total)
-  hooks/                           # Reference Claude Code hooks (install per-machine, see sop/Hooks_SOP.md)
   scripts/
     sync-method.sh                 # Pull method into a consuming project
     drift-check.sh                 # Detect stale references in documentation
