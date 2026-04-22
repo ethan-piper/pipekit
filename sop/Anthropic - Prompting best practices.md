@@ -1,4 +1,4 @@
-# Prompting best practices
+# Prompting best practices - 2026.04.10
 
 Comprehensive guide to prompt engineering techniques for Claude's latest models, covering clarity, examples, XML structuring, thinking, and agentic systems.
 
