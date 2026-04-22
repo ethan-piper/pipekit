@@ -38,3 +38,21 @@ Advanced
     /vbw:whats-new           View changelog
 
 Getting Started: /vbw:init → /vbw:vibe → /vbw:vibe --archive
+
+--
+
+Known quirks (VBW v1.35.0)
+
+    .vbw-planning/.agent-pids (and siblings) leak into git status
+        Cause: planning-git.sh sync-ignore only writes the nested
+               .vbw-planning/.gitignore when planning_tracking=commit.
+               In manual mode (the default), the transient-files
+               gitignore is never written.
+        Workaround: flip mode to commit then back to manual:
+               /vbw:config planning_tracking commit
+               /vbw:config planning_tracking manual
+               The nested .gitignore persists across the flip.
+               Commit .vbw-planning/.gitignore once; you're done forever.
+        Upstream: filed via /vbw:report against
+                  yidakee/vibe-better-with-claude-code-vbw.
+
