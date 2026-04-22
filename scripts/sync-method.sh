@@ -41,15 +41,40 @@ echo "Source: $METHOD_REPO @ $REF"
 echo "Target: $PROJECT_ROOT"
 echo ""
 
-# Clone to temp directory
-TEMP=$(mktemp -d)
-trap "rm -rf $TEMP" EXIT
+# Clone to temp directory (or reuse one passed from a self-update re-exec)
+if [ -n "${SYNC_METHOD_TEMP:-}" ] && [ -d "$SYNC_METHOD_TEMP" ]; then
+  TEMP="$SYNC_METHOD_TEMP"
+  unset SYNC_METHOD_TEMP
+  trap "rm -rf $TEMP" EXIT
+  echo "Reusing repo clone from self-update re-exec."
+else
+  TEMP=$(mktemp -d)
+  trap "rm -rf $TEMP" EXIT
 
-echo "Fetching method repo..."
-git clone --depth 1 --branch "$REF" "$METHOD_REPO" "$TEMP" 2>/dev/null || {
-  echo "ERROR: Failed to clone $METHOD_REPO at ref $REF"
-  exit 1
-}
+  echo "Fetching method repo..."
+  git clone --depth 1 --branch "$REF" "$METHOD_REPO" "$TEMP" 2>/dev/null || {
+    echo "ERROR: Failed to clone $METHOD_REPO at ref $REF"
+    exit 1
+  }
+fi
+
+# --- Self-update guard: if the upstream sync-method.sh differs from the one we're
+# running, install the new version and re-exec with it. This makes single-invocation
+# syncs always use the latest logic, even when new files or sync steps are added.
+# The SYNC_METHOD_REEXEC flag prevents an infinite re-exec loop.
+if [ -z "${SYNC_METHOD_REEXEC:-}" ] && [ -f "$TEMP/scripts/sync-method.sh" ]; then
+  SELF_PATH=$(cd "$(dirname "$0")" 2>/dev/null && pwd -P)/$(basename "$0")
+  if [ -f "$SELF_PATH" ] && ! cmp -s "$TEMP/scripts/sync-method.sh" "$SELF_PATH"; then
+    echo ""
+    echo "=== sync-method.sh self-update detected — installing and re-execing ==="
+    cp "$TEMP/scripts/sync-method.sh" "$SELF_PATH"
+    chmod +x "$SELF_PATH"
+    export SYNC_METHOD_REEXEC=1
+    export SYNC_METHOD_TEMP="$TEMP"
+    trap - EXIT   # keep TEMP alive for the re-exec
+    exec "$SELF_PATH" "$@"
+  fi
+fi
 
 # --- Pre-sync: snapshot current state for changelog ---
 SNAP=$(mktemp -d)
