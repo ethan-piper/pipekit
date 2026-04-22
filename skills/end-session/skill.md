@@ -28,6 +28,55 @@ This skill is invoked when the user says:
 
 ## Execution Steps
 
+### Step 0 — Branch Preflight
+
+Session logs and `NEXT.md` are project-wide artifacts. If `/end-session` runs on a feature branch that later gets squash-merged and deleted, those artifacts get orphaned. Verify the branch state before doing anything else.
+
+1. Detect the current branch and the project's default branch:
+   ```bash
+   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo main)
+   ```
+
+2. If `CURRENT_BRANCH == MAIN_BRANCH`, skip to Step 1.
+
+3. Otherwise, check PR state for the current branch:
+   ```bash
+   gh pr view --json state,mergedAt,url 2>/dev/null
+   ```
+
+   Three cases — present them as an AskUserQuestion-style choice:
+
+   | PR state | Message | Choices |
+   |----------|---------|---------|
+   | **Merged** | "Your PR for `{branch}` is merged. The shutdown sequence normally switches to `{main}` before `/end-session` so session artifacts land there instead of orphaning on this branch." | `switch` (recommended) / `hold` |
+   | **Open** | "PR for `{branch}` is still open: `{url}`. Merge it first, or hold to end the session on this branch anyway." | `hold` / `cancel` |
+   | **No PR found** | "You're on `{branch}` but there's no PR for it. If this branch gets deleted later, your session log and NEXT.md will go with it." | `switch` / `hold` / `cancel` |
+
+4. Handle the response:
+
+   - **`switch`**: run
+     ```bash
+     git checkout "$MAIN_BRANCH"
+     git pull --ff-only
+     # Only delete the branch if the PR was merged
+     if [ "$PR_STATE" = "MERGED" ]; then
+       git branch -d "$CURRENT_BRANCH" 2>/dev/null || git branch -D "$CURRENT_BRANCH"
+       git fetch --prune
+     fi
+     ```
+     Then proceed to Step 1 on `main`.
+
+   - **`hold`**: warn the user:
+     > Ending session on `{branch}`. Session log and `NEXT.md` will live on this branch only. Cherry-pick them to `{main}` before deleting the branch to avoid orphans:
+     > `git checkout {main} && git checkout {branch} -- Logs/Sessions/ NEXT.md && git commit -m "chore(log): preserve session artifacts"`
+     
+     Then proceed to Step 1.
+
+   - **`cancel`**: stop here. The user handles the PR or branch state themselves and reruns `/end-session`.
+
+---
+
 ### Step 1 — Auto-Review Session Work
 
 Without asking the user anything yet, automatically:
