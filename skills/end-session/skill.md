@@ -28,52 +28,176 @@ This skill is invoked when the user says:
 
 ## Execution Steps
 
-### Step 0 — Branch Preflight
+### Step 0 — Session Shutdown Preflight
 
-Session logs and `NEXT.md` are project-wide artifacts. If `/end-session` runs on a feature branch that later gets squash-merged and deleted, those artifacts get orphaned. Verify the branch state before doing anything else.
+This step is **transparent and confirmatory**: it scans the workspace for everything that typically needs cleanup after a ship (feature branch, agent worktrees, stale locks, orphan branches), presents a plan, and waits for approval before executing anything destructive. No silent cleanup.
 
-1. Detect the current branch and the project's default branch:
-   ```bash
-   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-   MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo main)
-   ```
+#### Step 0a — Read the project's git architecture
 
-2. If `CURRENT_BRANCH == MAIN_BRANCH`, skip to Step 1.
+Read `method.config.md` → `## Git Architecture` to determine:
 
-3. Otherwise, check PR state for the current branch:
-   ```bash
-   gh pr view --json state,mergedAt,url 2>/dev/null
-   ```
+- **Integration branch** — where session artifacts should land. For `two-tier` or `three-tier` models this is `dev`. For projects with no `dev` branch (main-only), it's `main`.
+- **Production branch** — always `main` unless the config explicitly says otherwise.
 
-   Three cases — present them as an AskUserQuestion-style choice:
+Fallback order when `method.config.md` is missing or unparseable:
 
-   | PR state | Message | Choices |
-   |----------|---------|---------|
-   | **Merged** | "Your PR for `{branch}` is merged. The shutdown sequence normally switches to `{main}` before `/end-session` so session artifacts land there instead of orphaning on this branch." | `switch` (recommended) / `hold` |
-   | **Open** | "PR for `{branch}` is still open: `{url}`. Merge it first, or hold to end the session on this branch anyway." | `hold` / `cancel` |
-   | **No PR found** | "You're on `{branch}` but there's no PR for it. If this branch gets deleted later, your session log and NEXT.md will go with it." | `switch` / `hold` / `cancel` |
+```bash
+INTEGRATION=$(git show-ref --verify --quiet refs/remotes/origin/dev && echo dev || echo "")
+if [ -z "$INTEGRATION" ]; then
+  INTEGRATION=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo main)
+fi
+```
 
-4. Handle the response:
+#### Step 0b — Classify current state and scan for cleanup targets
 
-   - **`switch`**: run
-     ```bash
-     git checkout "$MAIN_BRANCH"
-     git pull --ff-only
-     # Only delete the branch if the PR was merged
-     if [ "$PR_STATE" = "MERGED" ]; then
-       git branch -d "$CURRENT_BRANCH" 2>/dev/null || git branch -D "$CURRENT_BRANCH"
-       git fetch --prune
-     fi
-     ```
-     Then proceed to Step 1 on `main`.
+Run these scans **silently** — output is for Step 0c:
 
-   - **`hold`**: warn the user:
-     > Ending session on `{branch}`. Session log and `NEXT.md` will live on this branch only. Cherry-pick them to `{main}` before deleting the branch to avoid orphans:
-     > `git checkout {main} && git checkout {branch} -- Logs/Sessions/ NEXT.md && git commit -m "chore(log): preserve session artifacts"`
-     
-     Then proceed to Step 1.
+```bash
+CURRENT=$(git rev-parse --abbrev-ref HEAD)
 
-   - **`cancel`**: stop here. The user handles the PR or branch state themselves and reruns `/end-session`.
+# PR state for the current branch (if not on integration or production)
+if [ "$CURRENT" != "$INTEGRATION" ] && [ "$CURRENT" != "main" ]; then
+  PR_STATE=$(gh pr view --json state --jq .state 2>/dev/null || echo "UNKNOWN")
+  PR_URL=$(gh pr view --json url --jq .url 2>/dev/null || echo "")
+fi
+
+# Merged feature branches (excluding integration + production)
+MERGED_BRANCHES=$(git branch --merged "$INTEGRATION" 2>/dev/null \
+  | sed 's/^[ *]*//' \
+  | grep -v -E "^($INTEGRATION|main|master)$" \
+  | grep -v -E "^worktree-agent-" || true)
+
+# VBW agent worktrees (locked and unlocked)
+AGENT_WORKTREES=$(git worktree list --porcelain 2>/dev/null \
+  | awk '/^worktree / {wt=$2} /^locked/ {print wt} /^$/ {wt=""}' \
+  | grep "/.claude/worktrees/agent-" || true)
+
+# Orphan worktree-agent-* branches (left behind after worktree removal)
+ORPHAN_AGENT_BRANCHES=$(git branch 2>/dev/null \
+  | sed 's/^[ *]*//' \
+  | grep -E "^worktree-agent-" || true)
+
+# Uncommitted changes (affects whether we can safely switch branches)
+DIRTY=$(git status --porcelain 2>/dev/null)
+```
+
+For each locked agent worktree, determine if the lock PID is alive:
+
+```bash
+# Parse lock reason for PID (format: "claude agent agent-X (pid NNNN)")
+for wt in $AGENT_WORKTREES; do
+  LOCK_REASON=$(git worktree list --porcelain | awk -v wt="$wt" '$2==wt {found=1} found && /^locked/ {sub(/^locked /,""); print; exit}')
+  PID=$(echo "$LOCK_REASON" | grep -oE 'pid [0-9]+' | awk '{print $2}')
+  if [ -n "$PID" ] && ! kill -0 "$PID" 2>/dev/null; then
+    # Dead PID — safe to force-remove
+    echo "$wt DEAD_PID $PID"
+  fi
+done
+```
+
+#### Step 0c — Present the cleanup plan
+
+Show the user everything that was found and what the skill proposes:
+
+```markdown
+## Session Shutdown Plan
+
+**Current state**
+- Branch: `{CURRENT}`
+- Integration branch: `{INTEGRATION}`
+- PR: {status — e.g., "PR #14 merged" | "PR #15 open at {url}" | "no PR"}
+- Uncommitted: {none | N files}
+
+**Proposed cleanup**
+{Only include sections with findings}
+
+### Branch switch
+- Switch to `{INTEGRATION}` + `git pull --ff-only`
+- Delete local `{CURRENT}` (PR merged ✓)
+
+### Merged feature branches to prune
+- `feature/rs-8` (merged to dev)
+- `feature/rs-16` (merged to dev)
+
+### VBW agent worktrees (dead locks)
+- `.claude/worktrees/agent-ad8b8a0e` (PID 15986 dead)
+- `.claude/worktrees/agent-ff23c912` (PID 15987 dead)
+
+### Orphan worktree branches
+- `worktree-agent-ad8b8a0e`
+- `worktree-agent-ff23c912`
+
+**Choose:**
+- `proceed` — run all of the above
+- `selective` — approve each cleanup type individually
+- `skip-cleanup` — leave the workspace as-is and continue to session log
+- `cancel` — stop, I'll clean up manually
+```
+
+If there are no findings (user already ran the cleanup sequence manually, or is already on integration with a clean tree), say so and skip to Step 1:
+
+> Workspace is clean — no branch/worktree cleanup needed. Proceeding to session log.
+
+#### Step 0d — Handle uncommitted changes
+
+If `DIRTY` is non-empty and the user chose to switch branches, **stop and ask**:
+
+> You have uncommitted changes:
+> ```
+> {git status --short output}
+> ```
+> These would be carried into `{INTEGRATION}` on checkout. Commit them first, stash them, or cancel? [commit / stash / cancel]
+
+- `commit` → ask for a message, commit on current branch, then proceed
+- `stash` → `git stash push -m "end-session auto-stash {timestamp}"`, note it in the session log, proceed
+- `cancel` → stop
+
+#### Step 0e — Execute the approved plan
+
+Run operations in this order, stopping on any failure:
+
+```bash
+# 1. Switch + pull (only if the user approved the switch)
+git checkout "$INTEGRATION"
+git pull --ff-only
+
+# 2. Delete the current feature branch (only if PR was merged)
+git branch -d "$FEATURE_BRANCH" 2>/dev/null || git branch -D "$FEATURE_BRANCH"
+
+# 3. Prune other merged feature branches
+for b in $MERGED_BRANCHES; do
+  git branch -d "$b" 2>/dev/null || echo "skipped $b (not fully merged)"
+done
+
+# 4. Remove stale VBW agent worktrees
+for wt in $DEAD_WORKTREES; do
+  git worktree remove -f -f "$wt"
+done
+
+# 5. Delete orphan worktree-agent-* branches
+for b in $ORPHAN_AGENT_BRANCHES; do
+  git branch -D "$b"
+done
+
+# 6. Prune remote-tracking refs
+git fetch --prune
+```
+
+Display a compact summary of what was actually done:
+
+```
+✓ Switched to dev (up to date at 3d6edeb)
+✓ Deleted RS-9 (merged)
+✓ Removed 2 stale agent worktrees
+✓ Deleted 2 orphan worktree-agent-* branches
+✓ Pruned remote refs
+```
+
+If the user chose `hold` or `skip-cleanup`: warn about orphan risks (session log + NEXT.md will live on the feature branch) and print the cherry-pick recipe from the old Step 0:
+
+> `git checkout {INTEGRATION} && git checkout {CURRENT} -- Logs/Sessions/ NEXT.md && git commit -m "chore(log): preserve session artifacts"`
+
+Then proceed to Step 1 regardless.
 
 ---
 
@@ -202,9 +326,35 @@ Create file: `Logs/Sessions/YYYY-MM-DD_HHMM.md` with personal reflections and te
 
 ---
 
+### Step 7b — Refresh NEXT.md
+
+Previous `NEXT.md` likely points at the issue that just shipped. Recompute and overwrite per the schema in `sop/Skills_SOP.md` → `The NEXT.md Convention`.
+
+Source for the next action, in priority order:
+
+1. **Current phase has more Approved issues?** — recommend `/launch {next Approved issue}`. Pick the one whose dependency graph (via Linear `blocked_by` relations) unblocks the most downstream work. Briefly name what it unblocks in the "Why this one" field.
+2. **Current phase fully shipped but has unshipped `Specced` issues?** — recommend moving the top-priority one to Approved (human review gate).
+3. **Current phase fully shipped and specced?** — recommend `/strategy-sync` if there's a pending-strategy-sync marker at `.pipekit/pending-strategy-sync`, otherwise recommend `/phase-plan` to select the next phase.
+4. **No phase active?** — recommend `/phase-plan`.
+
+Write `NEXT.md` at the project root using the exact schema (`# Next Step` / `**Last updated:**` / `## Recommended next command` / `## Why this one` / optional parallelizable and blocked sections). Include this session's `YYYY-MM-DD_HHMM` as the timestamp and `/end-session` as the writer.
+
+If you can't confidently pick the next action (Linear unreachable, no clear sequence), write a NEXT.md that says "Unclear — run `/phase-plan --status` to see state" rather than leaving the file stale.
+
+---
+
 ### Step 8 — Git Commit & Push
 
 Check for uncommitted changes and confirm with the user before committing.
+
+Commit the session log **and** the refreshed NEXT.md together so they move as a unit:
+
+```bash
+git add "Logs/Sessions/YYYY-MM-DD_HHMM.md" NEXT.md
+# Include Strategy/Doc4_Changelog.md if it was updated in Step 2 or 3
+git commit -m "chore(log): session YYYY-MM-DD (duration)"
+git push
+```
 
 ---
 

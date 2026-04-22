@@ -125,6 +125,7 @@ Because both are written by the same code path in the same skill run, drift is i
 - `/01-light-spec` — after spec is drafted and approved, point to `/launch {issue}` or the next issue
 - `/launch` — after gates pass, point to VBW execution or the next issue to spec
 - `/strategy-sync` — after docs are updated, point to the next unshipped issue
+- `/end-session` — after session log is written, recompute based on Linear state (next Approved issue, `/strategy-sync` if pending marker exists, or `/phase-plan` if phase complete). Prevents stale NEXT.md pointing at a just-shipped issue.
 
 **`NEXT.md` lives at the project root** (not in `.vbw-planning/` — that directory is hidden and confusing for users). Visible alongside `concept-brief.md`, `project-definition.md`, `method.config.md`.
 
