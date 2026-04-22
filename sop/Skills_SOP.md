@@ -103,7 +103,7 @@ Because both are written by the same code path in the same skill run, drift is i
 ```markdown
 # Next Step
 
-**Last updated:** {timestamp} by {skill name}
+**Last updated:** {YYYY-MM-DD HH:MM local} by {skill name}
 
 ## Recommended next command
 `{command}`
@@ -117,6 +117,8 @@ Because both are written by the same code path in the same skill run, drift is i
 ## Blocked, do later (optional)
 - {commands that depend on this one completing first}
 ```
+
+Always include both date and time in the `Last updated` line. A bare date hides multi-session days (common when shipping more than one issue) and makes it ambiguous whether `NEXT.md` is fresh or held over from morning. Local time is fine — users read this in their terminal, not machine-parse it.
 
 **Which skills must write `NEXT.md`:**
 - `/startup` — after each step completes (always point to the next step or `/start-session` if done)
