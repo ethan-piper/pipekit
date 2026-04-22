@@ -274,6 +274,26 @@ Pipekit wraps VBW — it does not replace VBW's planning layer. The two systems 
 
 If drift becomes a recurring pattern in practice, add a `/drift-check` skill for on-demand detection. Don't build it speculatively — measure first. Full spec tracked in [pipekit#1](https://github.com/ethan-piper/pipekit/issues/1).
 
+### Event Hook: Post-Archive → Strategy Sync
+
+VBW v1.35.0 added a post-archive lifecycle hook (PR #481) that fires after `/vbw:vibe --archive` completes. Pipekit ships `scripts/pipekit-post-archive.sh` to wire this into the strategy-sync loop — when a milestone is archived, the hook writes a `.pipekit/pending-strategy-sync` marker that `/start-session` surfaces on the next session, nudging the user to run `/strategy-sync`.
+
+This is the first concrete instance of the event-based wrapping discussed in Rule 5 above. It replaces the previous convention ("remember to run /strategy-sync after shipping") with a hook that fires deterministically without Pipekit re-implementing VBW's archive flow.
+
+**Registration.** Add the hook to `.vbw-planning/config.json`:
+
+```json
+{
+  "hooks": {
+    "post_archive": "scripts/pipekit-post-archive.sh"
+  }
+}
+```
+
+VBW resolves the path relative to the project root. The hook is fail-open — if it errors, VBW continues the archive.
+
+**Why a marker instead of auto-running /strategy-sync?** Strategy sync requires human-in-the-loop diff approval (see `/strategy-sync` Phase 5). A hook cannot own human approval, so it nudges rather than acts. The marker is cleared by `/strategy-sync` once updates are applied.
+
 ---
 
 ## Tooling

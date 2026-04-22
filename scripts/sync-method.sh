@@ -139,6 +139,13 @@ sync_file "$TEMP/method.md" "$PROJECT_ROOT/method/method.md" "method.md"
 sync_file "$TEMP/GUIDE.md" "$PROJECT_ROOT/method/GUIDE.md" "GUIDE.md"
 sync_file "$TEMP/STARTUP.md" "$PROJECT_ROOT/method/STARTUP.md" "STARTUP.md"
 
+# --- Sync Pipekit hook scripts (VBW lifecycle integration) ---
+echo ""
+echo "Hook scripts:"
+mkdir -p "$PROJECT_ROOT/scripts"
+sync_file "$TEMP/scripts/pipekit-post-archive.sh" "$PROJECT_ROOT/scripts/pipekit-post-archive.sh" "scripts/pipekit-post-archive.sh"
+[ -f "$PROJECT_ROOT/scripts/pipekit-post-archive.sh" ] && chmod +x "$PROJECT_ROOT/scripts/pipekit-post-archive.sh"
+
 # --- Sync portable skills ---
 echo ""
 echo "Portable skills:"

@@ -181,19 +181,54 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
 
 ### Step 9 — VBW QA
 
-1. After all tasks complete, spin up the **VBW QA Agent** (`vbw:vbw-qa`):
+As of VBW v1.35.0, the QA agent (`vbw-qa`) enforces NON-NEGOTIABLE contracts for phase-scoped verification: every check must carry a `plan_ref`, the output must include a `plans_verified` array covering every `*-PLAN.md` in the phase dir, and `VERIFICATION.md` must be written via the deterministic `write-verification.sh` script (manual writes are rejected). The agent needs plugin-root, phase-dir, and output-path context to satisfy these invariants.
+
+**Canonical path (preferred):** delegate to `/vbw:vibe --verify` after execution. VBW's integrated flow resolves plugin-root, picks the output path, and handles QA + UAT routing:
+
+```
+After Step 8 completes, inform the user:
+
+  PROJ-XXX execution complete. Run `/vbw:vibe --verify {phase-number}` to run phase-scoped QA.
+  When QA passes, return here and I'll proceed to Step 10 (UAT transition).
+```
+
+**Direct-invocation path (when orchestrating QA inline):** resolve plugin-root first, then spawn `vbw:vbw-qa` with full context. The agent will fail loudly rather than silently if any NON-NEGOTIABLE input is missing.
+
+1. Resolve the VBW plugin root (needed for `write-verification.sh`):
+   ```bash
+   VBW_CACHE_ROOT="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache/vbw-marketplace/vbw"
+   PLUGIN_ROOT=$(find "$VBW_CACHE_ROOT" -maxdepth 1 -mindepth 1 -type d 2>/dev/null \
+     | awk -F/ '{print $NF}' | grep -E '^[0-9]+(\.[0-9]+)*$' \
+     | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
+   PLUGIN_ROOT="$VBW_CACHE_ROOT/$PLUGIN_ROOT"
+   ```
+2. Identify the phase dir (created by vbw-lead in Step 7b): `.vbw-planning/phases/{phase-slug}/`
+3. Spin up the **VBW QA Agent**:
    ```
    Agent(
      subagent_type: "vbw:vbw-qa",
      model: "sonnet",
      description: "Verify PROJ-XXX: {title}",
-     prompt: "Verify PROJ-XXX against the acceptance criteria in the spec.
-     Use goal-backward methodology. Check each AC item.
-     Run the pre-deploy gate: pnpm turbo run check-types && pnpm turbo run lint && pnpm turbo run test"
+     prompt: "Phase-scoped verification for PROJ-XXX.
+
+     Plugin root: {PLUGIN_ROOT}
+     Phase dir: .vbw-planning/phases/{phase-slug}
+     Output path: .vbw-planning/phases/{phase-slug}/{phase}-VERIFICATION.md
+     Tier: standard
+
+     Plans to verify: all `*-PLAN.md` files in the phase dir (must appear in plans_verified).
+     Each check in checks_detail MUST include plan_ref.
+
+     Acceptance criteria from the Linear spec (for cross-reference):
+     {paste AC section from issue description}
+
+     Pre-deploy gate to run: pnpm turbo run check-types && pnpm turbo run lint && pnpm turbo run test
+
+     Persist VERIFICATION.md via write-verification.sh as specified in your agent contract. Do NOT write the file manually."
    )
    ```
-2. If QA passes: proceed to Step 10
-3. If QA fails: return to Step 8 for the failing tasks, with QA feedback
+4. If QA passes: proceed to Step 10
+5. If QA fails: return to Step 8 for the failing tasks, with QA feedback
 
 ### Step 10 — Move to UAT
 

@@ -43,6 +43,21 @@ Picking up where you left off
 
 If `NEXT.md` doesn't exist (fresh project or before the first pipeline step completes), skip this step silently and proceed.
 
+### 2b. Check Pending Strategy Sync Marker
+
+Check if `.pipekit/pending-strategy-sync` exists. It is written by `scripts/pipekit-post-archive.sh` after VBW archives a milestone. When present, surface it before session planning:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Pending: strategy sync
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Milestone {milestone_slug} archived on {timestamp} (tag: {tag}).
+Strategy docs may be out of date. Run `/strategy-sync` when ready.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Do not auto-run `/strategy-sync` — the user decides when. The marker is cleared by `/strategy-sync` on completion.
+
 ### 3. Review Recent Sessions
 
 List and read recent session logs from `Logs/Sessions/`.
