@@ -111,9 +111,15 @@ Once Pipekit is at target state, audit what to pull into piper. Candidates alrea
 |------|--------|
 | Session 0 (gaps closed earlier) | ✅ Done (plan-reviewer, end-session, sync self-update, post-archive hook, VBW 1.35 docs) |
 | Tier 1 — Rules Infrastructure | ✅ Done (commits `f31a2ff`, `96c3b1e`, `dcacaa4`, `7b7454c`) |
-| Tier 2 — Skill Enhancements | ⏳ Next up |
-| Tier 3 — /launch Refactor | ⏳ Pending Tier 2 |
+| Tier 2 — Skill Enhancements | ✅ Done (commits `474f296`, `635a1ee`, `dc43b95`) |
+| Tier 3 — /launch Refactor | ⏳ Next up |
 | Session 4 — Piper backport | ⏳ Pending Pipekit completion |
+
+### Tier 2 recap
+
+- **Red Flags sections** added to `/launch`, `/light-spec`, `/brainstorm` — five skill-specific thought-pattern flags each, paired with the portable `discipline.md` set.
+- **Brainstorm disposition** formalized: unified parseable trigger grammar (`{ISSUE-ID} ships` | `Stage N UAT passes` | `Phase N ships` | `date:YYYY-MM-DD` | `manual`), auto-creation of the `Parked` label across both `/brainstorm` and `/brainstorm-review`, and real trigger-evaluation logic in `/roadmap-review` with four output buckets (triggered / not-yet / manual-review / parse errors).
+- **Drift-check hook installer** via `--install-hook` / `--uninstall-hook`, with coexistence handling for pre-existing user hooks. New `--quick` mode skips the staleness check so hook runs fast.
 
 ### Tier 1 recap
 
