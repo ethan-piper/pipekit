@@ -185,6 +185,20 @@ Same as `/brainstorm`, but with planning implications:
 - **Medium (~6-10h):** Benefits from a single VBW plan (1 PLAN.md). The light spec provides enough for the lead agent to generate tasks.
 - **High (~12-20h+):** Likely needs multiple VBW plans across a phase. The light spec seeds the architect agent's phase decomposition.
 
+## Red Flags
+
+Thoughts that mean "slow down and widen scope." Paired with `.claude/rules/discipline.md`.
+
+| Flag | What it actually means |
+|------|------------------------|
+| "The AC is short because the feature is simple" | Short AC = high risk of planning-time ambiguity. Simple features are where "obvious" behavior diverges between spec author and planner. Be explicit. |
+| "The user said they want X, so I'll just write that" | The spec has to be decomposable without guessing. If you'd have to guess a decision, mark it `[TBD]` and ask — don't paper over. |
+| "The POC shows the answer already" | POC is reference, not spec. Translate observable behaviors into testable requirements; don't assume the planner reads POC code. |
+| "Authority is obvious from context" | It isn't. Specs without an explicit authoritative layer (DB, utils, API) are the #1 cause of spec revision. Name it. |
+| "I'll skip the review agent, the spec is clear" | Clear-seeming specs fail planning review most often — the clarity is in your head, not on the page. Run the review. |
+
+---
+
 ## Common Drifts to Avoid
 
 When you encounter these situations, take the safer path:

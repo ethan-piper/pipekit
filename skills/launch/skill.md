@@ -326,6 +326,20 @@ Downstream transitions (not owned by `/launch`):
 
 ---
 
+## Red Flags
+
+Thoughts that mean "go slower, not faster." If you catch yourself thinking one of these, follow the full gate sequence *more* strictly, not less. Paired with `.claude/rules/discipline.md` for the portable set.
+
+| Flag | What it actually means |
+|------|------------------------|
+| "This launch is straightforward, skip the gate check" | The gates exist because past issues shipped broken without them. Run them. |
+| "The spec is obvious enough" | Obvious specs hide [TBD]-blocking ambiguity. If planning would require guessing, route back to `/light-spec-revise`. |
+| "I'll skip the plan-reviewer just this once" | Never. Plan-reviewer catches the class of mistake Lead structurally cannot see in its own work. |
+| "Low complexity, no need for QA" | Every shipped change lands on users. Run the pre-deploy gate regardless of complexity tier. |
+| "This issue has been sitting, just push it through" | Staleness is not a gate override. Re-validate the spec against current codebase state before launch. |
+
+---
+
 ## Common Drifts to Avoid
 
 When you encounter these situations, take the safer path:
