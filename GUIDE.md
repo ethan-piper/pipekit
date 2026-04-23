@@ -1077,34 +1077,42 @@ Skills with Red Flags: `/concept`, `/define`, `/strategy-create`, `/roadmap-crea
 
 ## Portable Rule Templates
 
-The method includes rule templates in `templates/rules/` that consuming projects can copy into their `.claude/rules/` directory. These are auto-loaded every session by Claude Code.
+The method includes rule templates in `templates/rules/` that consuming projects sync into their `.claude/rules/` directory. These are auto-loaded every session by Claude Code under the **hub-and-spoke model** (CLAUDE.md hub → rules/ auto-loaded → method/sop/ demand-loaded).
 
-### Verify Library API (`templates/rules/verify-library-api.md`)
+Three canonical topic files ship from Pipekit:
 
-Before using any library API, check the installed version and read `node_modules/` source as ground truth. Not docs, not training data.
+### `discipline.md`
 
-**Process:**
-1. Check installed version: `cat node_modules/{package}/package.json | grep version`
-2. Read the actual source for the function/component you're using
-3. Never assume signatures, config options, or import paths haven't changed
+Cross-cutting AI coding discipline:
 
-**When:** Any library call you haven't verified this session. Especially after upgrades. Especially for fast-moving libraries (Next.js, shadcn, Supabase SDK).
+- **Red Flags** — thoughts that mean "go slower, not faster" (e.g., "this is simple, I don't need a plan" → you do)
+- **Ad-hoc Plan Gate** — 3-5 bullet plan template for non-VBW interactive changes, with When-This-Applies / Does-Not-Apply scope
+- **Scope hygiene** — no features/abstractions beyond the task, no speculative error handling, no backwards-compat shims
+- **Comment & commit discipline** — default to no comments, one atomic change per commit, never amend published
 
-### Ad-hoc Plan Gate (`templates/rules/ad-hoc-plan-gate.md`)
+### `tooling.md`
 
-For non-VBW interactive work (quick fixes, bug fixes, exploratory changes), present a 3-5 bullet plan and get user approval before writing code:
+Library/tool/CI constraints:
 
-```
-## Plan: {what you're doing}
-1. What changes: {files/areas}
-2. What doesn't change: {preserved}
-3. Approach: {strategy}
-4. Key decisions: {trade-offs}
-5. Verify: {how to confirm}
-Proceed? (y/n)
-```
+- **Verify Library API before use** — installed-version check sequence (pnpm/npm/yarn list, read `node_modules/` source, prefer `context7` MCP). Never-assume list: signatures, config options, import paths, default behaviors.
+- **Package manager pinning** — read from `method.config.md` or lockfile; never mix
+- **Pre-deploy gate** — project's gate (`method.config.md` → `## Pre-Deploy Gate`) is authoritative; no `--no-verify` workarounds
+- **Use package.json scripts** over ad-hoc CLI invocations
 
-**Why:** VBW handles planned work with verify/done criteria. Interactive sessions have no gate. This lightweight plan prevents scope creep, wrong-direction work, and silent assumptions.
+### `security.md`
+
+Non-negotiable security baseline:
+
+- **Secrets** — never commit; `.env` always gitignored; rotate if accidentally published
+- **Input validation at boundaries only** — internal code trusts internal code
+- **Authorization must be explicit** at every layer (RLS / policies / ACLs); never rely on UI restrictions
+- **SQL/injection** — always parameterized; never `eval` on untrusted input
+- **OWASP Top 10** awareness — 10-item quick-reference checklist
+- **Feature flags / kill switches** for fail-unsafe features (financial, bulk destructive, data leak potential)
+
+### Adding project-specific rules
+
+Consumers add new files directly to their `.claude/rules/` — `sync-method.sh` won't touch them. See `templates/rules/README.md` for naming conventions (`patterns.md`, `file-structure.md`, `{library}-pitfalls.md`).
 
 ---
 
