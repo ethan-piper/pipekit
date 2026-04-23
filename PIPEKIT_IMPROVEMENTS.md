@@ -109,8 +109,16 @@ Once Pipekit is at target state, audit what to pull into piper. Candidates alrea
 
 | Tier | Status |
 |------|--------|
-| Session 0 (gaps closed this session) | ✅ Done (plan-reviewer, end-session, sync self-update, post-archive hook, VBW 1.35 docs) |
-| Tier 1 — Rules Infrastructure | ⏳ Pending approval |
-| Tier 2 — Skill Enhancements | ⏳ Pending Tier 1 |
+| Session 0 (gaps closed earlier) | ✅ Done (plan-reviewer, end-session, sync self-update, post-archive hook, VBW 1.35 docs) |
+| Tier 1 — Rules Infrastructure | ✅ Done (commits `f31a2ff`, `96c3b1e`, `dcacaa4`, `7b7454c`) |
+| Tier 2 — Skill Enhancements | ⏳ Next up |
 | Tier 3 — /launch Refactor | ⏳ Pending Tier 2 |
 | Session 4 — Piper backport | ⏳ Pending Pipekit completion |
+
+### Tier 1 recap
+
+- `templates/rules/` now ships three canonical topic files: `discipline.md` (Red Flags, Ad-hoc Plan Gate, scope hygiene), `tooling.md` (Verify Library API, package manager, pre-deploy gate), `security.md` (secrets, boundary validation, OWASP baseline) + a `README.md` explaining the hub-and-spoke model.
+- `templates/CLAUDE.md.template` — portable hub-and-spoke template with placeholders, Routing Pointers table, Source of Truth hierarchy, VBW Rules block. ~120 lines, well under piper's pre-thinning 363.
+- `/startup` Step 10 rewritten as 10a/10b/10c — verify canonical rules landed, fill CLAUDE.md template, add project-specific rules, final review.
+- `sync-method.sh` now installs canonical rules to `.claude/rules/` on every sync using per-file `sync_file` (not `sync_dir --delete`), so project-specific additions like `patterns.md` / `naming.md` / `{library}-pitfalls.md` survive untouched. Verified in sandbox.
+- Self-update re-exec pattern (from earlier) continues to work cleanly in combination with the new rules block.
