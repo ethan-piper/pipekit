@@ -84,11 +84,15 @@ Disposition:
 6. Assign to correct project/initiative
 
 **Later:**
-1. Ask for trigger condition (e.g., "revisit when PROJ-3 ships")
+1. Ask for **trigger type** from the grammar (same table as `/brainstorm` Phase 2 HOLD — see that skill for the full list). In short: `{ISSUE-ID} ships` | `Stage {N} UAT passes` | `Phase {N} ships` | `date: YYYY-MM-DD` | `manual`
 2. Ask for target phase/stage
 3. Move to "Ideas" or "Future Phases"
-4. Add `Parked` label
-5. Post Linear comment: `"Parked: Revisit when {trigger}. Target: {phase/stage}."`
+4. Add `Parked` label (create it if missing via `mcp__linear-server__create_issue_label`, color `#EAB308`)
+5. Post the Linear comment in the **exact parseable format** — `/roadmap-review` greps for this prefix:
+   ```
+   **Parked:** Revisit when {trigger}. Target: {phase/stage}.
+   ```
+   Do not paraphrase. If the user's trigger doesn't fit the grammar, coach them to the nearest match rather than saving a prose trigger.
 
 **Kill:**
 1. Ask for rationale

@@ -53,15 +53,26 @@ Immediately after creating the issue, force a disposition decision:
 - Inform: _"Ready for `/light-spec {issue}` when you start the phase."_
 
 **If Later:**
-- Ask for a **trigger condition** — what must be true before revisiting? (e.g., "revisit when PROJ-56 ships", "revisit after Stage 1 UAT")
-- Ask for a **target phase/stage** (e.g., "Phase 4+", "Stage 2")
+- Ask for a **trigger type** from the grammar below (parsable triggers are what let `/roadmap-review` auto-surface this later — prose triggers get flagged as manual-review)
+- Ask for a **target phase/stage**
 - Move issue to "Ideas" or "Future Phases" based on target
-- Add a `Parked` label if available
-- Post a Linear comment with the trigger condition:
+- Add the `Parked` label. If the label doesn't exist in the Linear workspace, create it first via `mcp__linear-server__create_issue_label` with name `Parked`, color `#EAB308` (amber).
+- Post a Linear comment using the **exact parseable format** below (do not paraphrase — `/roadmap-review` greps for it):
   ```
-  **Parked:** Revisit when {trigger condition}. Target: {phase/stage}.
+  **Parked:** Revisit when {trigger}. Target: {phase/stage}.
   ```
-- These are surfaced by `/roadmap-review` when trigger conditions are met.
+
+**Trigger grammar (pick one):**
+
+| Trigger form | Meaning | Example |
+|--------------|---------|---------|
+| `{ISSUE-ID} ships` | Fires when the referenced issue is in `Done` state | `Parked: Revisit when PROJ-56 ships. Target: Phase 4.` |
+| `Stage {N} UAT passes` | Fires when all Stage N issues are past UAT | `Parked: Revisit when Stage 1 UAT passes. Target: Stage 2.` |
+| `Phase {N} ships` | Fires when all Phase N issues are Done | `Parked: Revisit when Phase 3 ships. Target: Phase 4.` |
+| `date: YYYY-MM-DD` | Fires on a calendar date | `Parked: Revisit when date: 2026-06-01. Target: Phase 5.` |
+| `manual` | No auto-trigger; surfaced only on explicit `/brainstorm-review` | `Parked: Revisit manual. Target: icebox.` |
+
+If the user describes a trigger that doesn't match the grammar, coach them toward the nearest match (e.g., "revisit when auth is solid" → propose "Revisit when {auth-epic-issue} ships") rather than saving a prose trigger that won't parse.
 
 **If Kill:**
 - Ask for rationale (one sentence)

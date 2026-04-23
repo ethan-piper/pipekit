@@ -185,16 +185,51 @@ Present a summary dashboard:
 
 ### Parked Items (trigger check)
 
-Parked items are brainstorm dispositions marked "Later" with trigger conditions. Check if any triggers have fired:
+Parked items are brainstorm dispositions marked "Later" with parseable triggers. Check if any triggers have fired.
 
-| Issue | Trigger Condition | Target | Triggered? |
-|-------|------------------|--------|-----------|
-| {issue} | "revisit when {X} ships" | Phase {N} | ✓ {X} is Done |
-| {issue} | "revisit after Stage 1 UAT" | Stage 2 | ✗ Stage 1 in progress |
+**Step 1 — Fetch parked items:**
+Use `mcp__linear-server__list_issues` filtered by the `Parked` label. For each, read the latest comment matching the parseable prefix `**Parked:** Revisit when ...`. If a parked issue has no such comment (older disposition, pre-grammar), flag it for manual review and continue.
 
-**Triggered items need re-disposition** — run `/brainstorm-review` on them or add to the current phase via `/phase-plan --rebalance`.
+**Step 2 — Parse the trigger per the grammar** (authored by `/brainstorm` Phase 2):
 
-To find parked items: fetch issues with `Parked` label, read the trigger condition from their Linear comments.
+| Regex pattern | Evaluation |
+|---------------|------------|
+| `(\w+-\d+) ships` | Fetch that issue; trigger fires if state is `Done` |
+| `Stage (\d+) UAT passes` | Fetch all issues in Stage N; trigger fires if all are past UAT (state in {UAT, Done} for the entire set) |
+| `Phase (\d+) ships` | Fetch all issues in Phase N; trigger fires if all are `Done` |
+| `date: (\d{4}-\d{2}-\d{2})` | Trigger fires when today ≥ the date |
+| `manual` | Never auto-fires; always show under "Manual-review parked" |
+
+**Step 3 — Present the report:**
+
+```
+### Parked Items
+
+**Triggered (ready for re-disposition):**
+| Issue | Title | Trigger | Why it fired |
+|-------|-------|---------|--------------|
+| PROJ-18 | AI matching | `PROJ-3 ships` | PROJ-3 moved to Done on 2026-04-20 |
+| PROJ-25 | Export to PDF | `Phase 2 ships` | All Phase 2 issues Done as of 2026-04-22 |
+
+**Not yet triggered:**
+| Issue | Title | Trigger | Status |
+|-------|-------|---------|--------|
+| PROJ-22 | Real-time collab | `Stage 1 UAT passes` | 3 Stage 1 issues still in Building |
+
+**Manual-review parked (no auto-trigger):**
+| Issue | Title | Notes |
+|-------|-------|-------|
+| PROJ-30 | Gmail agent | No fit with current roadmap yet |
+
+**Trigger parse errors (fix these):**
+| Issue | Comment snippet | Action |
+|-------|-----------------|--------|
+| PROJ-40 | "Revisit when auth is solid" | Prose trigger — ask user for a parseable form |
+```
+
+**Triggered items** need re-disposition: either add to the current phase via `/phase-plan --rebalance`, or revisit in `/brainstorm-review` for full Now/Later/Kill re-evaluation. Either way, the `Parked` label should be removed once the item is re-dispositioned.
+
+**Parse errors** indicate a parked issue was disposed before the grammar was enforced or with a prose trigger. Prompt the user to update the comment to a parseable form, or accept "manual" if no concrete trigger exists.
 
 ### Strategy Doc Freshness
 | Doc | Version | Last Updated | Features Since |
