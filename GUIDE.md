@@ -1079,9 +1079,9 @@ Skills with Red Flags: `/concept`, `/define`, `/strategy-create`, `/roadmap-crea
 
 The method includes rule templates in `templates/rules/` that consuming projects sync into their `.claude/rules/` directory. These are auto-loaded every session by Claude Code under the **hub-and-spoke model** (CLAUDE.md hub → rules/ auto-loaded → method/sop/ demand-loaded).
 
-Three canonical topic files ship from Pipekit:
+Canonical files use a `pipekit-` prefix so they never collide with project-specific rule filenames. Three canonical topic files ship from Pipekit:
 
-### `discipline.md`
+### `pipekit-discipline.md`
 
 Cross-cutting AI coding discipline:
 
@@ -1090,7 +1090,7 @@ Cross-cutting AI coding discipline:
 - **Scope hygiene** — no features/abstractions beyond the task, no speculative error handling, no backwards-compat shims
 - **Comment & commit discipline** — default to no comments, one atomic change per commit, never amend published
 
-### `tooling.md`
+### `pipekit-tooling.md`
 
 Library/tool/CI constraints:
 
@@ -1099,7 +1099,7 @@ Library/tool/CI constraints:
 - **Pre-deploy gate** — project's gate (`method.config.md` → `## Pre-Deploy Gate`) is authoritative; no `--no-verify` workarounds
 - **Use package.json scripts** over ad-hoc CLI invocations
 
-### `security.md`
+### `pipekit-security.md`
 
 Non-negotiable security baseline:
 

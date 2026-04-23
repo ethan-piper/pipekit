@@ -172,17 +172,24 @@ sync_file "$TEMP/scripts/pipekit-post-archive.sh" "$PROJECT_ROOT/scripts/pipekit
 [ -f "$PROJECT_ROOT/scripts/pipekit-post-archive.sh" ] && chmod +x "$PROJECT_ROOT/scripts/pipekit-post-archive.sh"
 
 # --- Sync canonical .claude/rules/ files ---
-# Contract: Pipekit owns three canonical rule files (discipline, tooling,
-# security) plus the README that documents the hub-and-spoke model.
-# These get overwritten on every sync — changes must round-trip through
-# pipekit. Any OTHER file the user creates in .claude/rules/ is untouched
-# (we use sync_file, not sync_dir --delete, so project-specific rules
-# like patterns.md, naming.md, or {library}-pitfalls.md persist).
+# Contract: Pipekit owns three canonical rule files prefixed `pipekit-`
+# (pipekit-discipline, pipekit-tooling, pipekit-security) plus the README
+# that documents the hub-and-spoke model. These get overwritten on every
+# sync — changes must round-trip through pipekit.
+#
+# The `pipekit-` prefix exists specifically to avoid collision with common
+# project-specific filenames (security.md, tooling.md are typical names
+# consumers use for app-specific rules). Before the prefix, sync would
+# silently overwrite project content.
+#
+# Any OTHER file in .claude/rules/ is untouched (we use sync_file, not
+# sync_dir --delete, so project-specific rules like patterns.md, naming.md,
+# security.md (project-authored), or {library}-pitfalls.md persist).
 if [ -d "$TEMP/templates/rules" ]; then
   echo ""
   echo "Canonical rules (.claude/rules/):"
   mkdir -p "$PROJECT_ROOT/.claude/rules"
-  for canonical in README.md discipline.md tooling.md security.md; do
+  for canonical in README.md pipekit-discipline.md pipekit-tooling.md pipekit-security.md; do
     if [ -f "$TEMP/templates/rules/$canonical" ]; then
       sync_file "$TEMP/templates/rules/$canonical" "$PROJECT_ROOT/.claude/rules/$canonical" ".claude/rules/$canonical"
     fi

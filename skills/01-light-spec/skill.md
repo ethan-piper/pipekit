@@ -187,7 +187,7 @@ Same as `/brainstorm`, but with planning implications:
 
 ## Red Flags
 
-Thoughts that mean "slow down and widen scope." Paired with `.claude/rules/discipline.md`.
+Thoughts that mean "slow down and widen scope." Paired with `.claude/rules/pipekit-discipline.md`.
 
 | Flag | What it actually means |
 |------|------------------------|

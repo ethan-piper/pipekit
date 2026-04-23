@@ -123,7 +123,7 @@ Format the Linear issue description as:
 
 ## Red Flags
 
-Thoughts that indicate brainstorm backlog rot is about to start. Paired with `.claude/rules/discipline.md`.
+Thoughts that indicate brainstorm backlog rot is about to start. Paired with `.claude/rules/pipekit-discipline.md`.
 
 | Flag | What it actually means |
 |------|------------------------|

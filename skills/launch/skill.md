@@ -344,7 +344,7 @@ Downstream transitions (not owned by `/launch`):
 
 ## Red Flags
 
-Thoughts that mean "go slower, not faster." If you catch yourself thinking one of these, follow the full gate sequence *more* strictly, not less. Paired with `.claude/rules/discipline.md` for the portable set.
+Thoughts that mean "go slower, not faster." If you catch yourself thinking one of these, follow the full gate sequence *more* strictly, not less. Paired with `.claude/rules/pipekit-discipline.md` for the portable set.
 
 | Flag | What it actually means |
 |------|------------------------|

@@ -81,10 +81,10 @@ Feedback-derived rules this project has learned to follow. Add new rules when pa
 
 | Topic | Auto-loaded | File |
 |-------|-------------|------|
-| AI coding discipline (Red Flags, Plan Gate, scope) | Yes | `.claude/rules/discipline.md` |
-| Tooling, library-API verification, pre-deploy gate | Yes | `.claude/rules/tooling.md` |
-| Security, auth, secrets, OWASP baseline | Yes | `.claude/rules/security.md` |
-| {Project-specific rules go here} | Yes | `.claude/rules/{name}.md` |
+| AI coding discipline (Red Flags, Plan Gate, scope) | Yes | `.claude/rules/pipekit-discipline.md` |
+| Tooling, library-API verification, pre-deploy gate | Yes | `.claude/rules/pipekit-tooling.md` |
+| Security, auth, secrets, OWASP baseline | Yes | `.claude/rules/pipekit-security.md` |
+| {Project-specific rules go here — e.g., `security.md` for app-specific auth} | Yes | `.claude/rules/{name}.md` |
 | Git & deployment SOP | On demand | `method/sop/Git_and_Deployment.md` |
 | Linear workflow | On demand | `method/sop/Linear_SOP.md` |
 | Skills authoring | On demand | `method/sop/Skills_SOP.md` |

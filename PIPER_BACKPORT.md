@@ -54,7 +54,7 @@ From a piper-side session (`~/Projects/piper/`):
 **Doesn't have**:
 - 9 Stage 0 / admin skills (`concept`, `define`, `strategy-create`, `startup`, `roadmap-create`, `phase-plan`, `pipekit-update`, `02-light-spec-revise`, `launch-native`)
 - `scripts/pipekit-post-archive.sh`
-- Canonical `discipline.md` rule
+- Pipekit's canonical rule baselines (`.claude/rules/pipekit-{discipline,tooling,security}.md`)
 - Drift-check hook installer
 
 ### Stale MCP names in piper — fix during backport
@@ -123,45 +123,59 @@ Source: pipekit commit 85988b1."
 
 **Rollback:** `git revert <commit>` and `jq 'del(.hooks.post_archive)' .vbw-planning/config.json`.
 
-### P1-A2. Canonical `discipline.md` rule
+### P1-A2. Canonical rule files (`pipekit-*.md`)
 
-**Why:** Net-new portable rule file — Red Flags + Ad-hoc Plan Gate + scope hygiene + comment/commit discipline. Piper doesn't have this topic covered anywhere today.
+**Why:** Net-new portable baseline. Pipekit canonical rules now use a `pipekit-` prefix specifically so they sit alongside piper's existing `security.md` and `tooling.md` without collision. Adds AI-coding discipline, Verify Library API, OWASP Top 10 that piper doesn't have today.
 
-**Source:** `~/Projects/pipekit/templates/rules/discipline.md`
-**Destination:** `~/Projects/piper/.claude/rules/discipline.md`
+**Source:** `~/Projects/pipekit/templates/rules/pipekit-{discipline,tooling,security}.md` + `~/Projects/pipekit/templates/rules/README.md`
+**Destination:** `~/Projects/piper/.claude/rules/pipekit-{discipline,tooling,security}.md` + `~/Projects/piper/.claude/rules/README.md`
 
 **Commands:**
 ```bash
-cp ~/Projects/pipekit/templates/rules/discipline.md ~/Projects/piper/.claude/rules/discipline.md
+cp ~/Projects/pipekit/templates/rules/pipekit-discipline.md ~/Projects/piper/.claude/rules/pipekit-discipline.md
+cp ~/Projects/pipekit/templates/rules/pipekit-tooling.md    ~/Projects/piper/.claude/rules/pipekit-tooling.md
+cp ~/Projects/pipekit/templates/rules/pipekit-security.md   ~/Projects/piper/.claude/rules/pipekit-security.md
+cp ~/Projects/pipekit/templates/rules/README.md             ~/Projects/piper/.claude/rules/README.md
 ```
 
-Add a row to piper's CLAUDE.md Routing Pointers table. Find the routing table (around line 173-188 in piper's CLAUDE.md) and insert:
+Add rows to piper's CLAUDE.md Routing Pointers table (around line 173-188). Insert before piper's existing rule rows:
 
 ```markdown
-| AI coding discipline (Red Flags, Plan Gate, scope) | Yes                | `.claude/rules/discipline.md` |
+| AI coding discipline (Red Flags, Plan Gate, scope) | Yes | `.claude/rules/pipekit-discipline.md` |
+| Tooling baseline (Verify Library API, package manager) | Yes | `.claude/rules/pipekit-tooling.md` |
+| Security baseline (secrets, OWASP Top 10, boundary validation) | Yes | `.claude/rules/pipekit-security.md` |
 ```
 
-Place it as the first row since it's the most cross-cutting.
+Keep piper's existing `security.md` and `tooling.md` rows — they're project-specific content that sits alongside the canonical baselines.
 
 **Verify:**
 ```bash
-test -f .claude/rules/discipline.md && grep -q "discipline.md" CLAUDE.md && echo OK
+test -f .claude/rules/pipekit-discipline.md \
+  && test -f .claude/rules/pipekit-tooling.md \
+  && test -f .claude/rules/pipekit-security.md \
+  && grep -q "pipekit-discipline" CLAUDE.md \
+  && echo OK
 ```
 
 **Commit:**
 ```
-git add .claude/rules/discipline.md CLAUDE.md
-git commit -m "feat(rules): add discipline.md (Red Flags, Ad-hoc Plan Gate, scope hygiene)
+git add .claude/rules/pipekit-*.md .claude/rules/README.md CLAUDE.md
+git commit -m "feat(rules): install pipekit canonical rule baselines
 
-Ports pipekit's canonical discipline.md rule. Auto-loaded every
-session. Adds:
-- Red Flags table (thoughts that mean 'go slower')
-- Ad-hoc Plan Gate (3-5 bullet plan format for non-VBW interactive work)
-- Scope hygiene (no features/abstractions beyond task, boundary-only validation)
-- Comment/commit discipline
+Ports pipekit's canonical rule files as pipekit-prefixed additions.
+They sit alongside piper's existing security.md and tooling.md
+(unchanged) — prefix avoids name collision.
 
-Addresses METHOD_IMPROVEMENTS.md #1 (Red Flags), #3 (Ad-hoc Plan Gate).
-Source: pipekit commit f31a2ff."
+Adds:
+- pipekit-discipline.md: Red Flags, Ad-hoc Plan Gate, scope hygiene
+- pipekit-tooling.md: Verify Library API, package manager pinning
+- pipekit-security.md: secrets, OWASP Top 10, boundary validation
+
+Addresses METHOD_IMPROVEMENTS.md #1 (Red Flags), #2 (Verify Library
+API), #3 (Ad-hoc Plan Gate). OWASP checklist previously identified
+as 'append to existing security.md' now ships as standalone file.
+
+Source: pipekit commits f31a2ff + {rename commit SHA}."
 ```
 
 **Rollback:** `git revert <commit>`.
@@ -398,70 +412,9 @@ Adapted from pipekit commit 635a1ee."
 
 **Rollback:** `mv .claude/skills/brainstorm/skill.md.pre-disposition .claude/skills/brainstorm/skill.md`.
 
-### P2-C1. Append Verify Library API to piper's `tooling.md`
+### P2-C1 / C2 — obsolete (superseded by P1-A2)
 
-**Why:** Piper's `tooling.md` is richer than pipekit's portable baseline (monorepo filters, concrete turbo commands) — don't replace it. But piper doesn't have the Verify Library API / never-assume guidance. Append that section.
-
-**Source section (from pipekit):** `~/Projects/pipekit/templates/rules/tooling.md` — the `## Verify Library API Before Use` section + the "Never assume:" list (roughly lines 5-38 of pipekit's tooling.md).
-
-**Destination:** Append to `~/Projects/piper/.claude/rules/tooling.md`.
-
-**Commands:**
-
-Open piper's `.claude/rules/tooling.md`. Scroll to the end (after the existing content). Append the entire Verify Library API section from pipekit's `tooling.md`. Do not add the Package Manager, Pre-Deploy Gate, or CLI Commands sections — piper already covers those better.
-
-**Verify:**
-```bash
-grep -c "Verify Library API" .claude/rules/tooling.md
-# Expected: at least 1
-```
-
-**Commit:**
-```
-git add .claude/rules/tooling.md
-git commit -m "feat(rules): add Verify Library API section to tooling.md
-
-Closes METHOD_IMPROVEMENTS.md #2. Appends the Verify Library API
-sequence (check installed version, read node_modules source, use
-context7 MCP) + never-assume list (signatures, config options,
-import paths, default behaviors) to piper's existing tooling.md.
-
-Piper's existing tooling.md content (monorepo, pre-deploy gate,
-CLI commands) unchanged — this is additive only.
-
-Source: pipekit templates/rules/tooling.md, commit f31a2ff."
-```
-
-**Rollback:** `git revert <commit>`.
-
-### P2-C2. Append OWASP checklist to piper's `security.md`
-
-**Why:** Same pattern as C1. Piper's `security.md` has specific finance-platform invariants (User ID invariant, RLS pattern). Pipekit's has a portable OWASP Top 10 awareness list. Append, don't replace.
-
-**Source section:** `~/Projects/pipekit/templates/rules/security.md` — the `## OWASP Top 10 Awareness` section (roughly lines 43-57).
-
-**Destination:** Append to `~/Projects/piper/.claude/rules/security.md`.
-
-**Verify:**
-```bash
-grep -c "OWASP Top 10" .claude/rules/security.md
-# Expected: at least 1
-```
-
-**Commit:**
-```
-git add .claude/rules/security.md
-git commit -m "feat(rules): add OWASP Top 10 checklist to security.md
-
-Appends pipekit's portable OWASP Top 10 awareness list to piper's
-existing security.md. Piper's finance-platform-specific content
-(User ID invariant, RLS-on-every-table, service-role prohibition)
-unchanged — this is additive only.
-
-Source: pipekit templates/rules/security.md, commit f31a2ff."
-```
-
-**Rollback:** `git revert <commit>`.
+The earlier plan called for appending Verify Library API to piper's `tooling.md` and OWASP Top 10 to piper's `security.md`. Pipekit's rename of canonical files to `pipekit-*.md` made those appends unnecessary — the canonical baselines now ship as standalone files (via P1-A2) and sit alongside piper's existing `security.md` / `tooling.md` without collision. Skip these items.
 
 ---
 

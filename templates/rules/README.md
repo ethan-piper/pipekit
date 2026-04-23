@@ -28,21 +28,25 @@ CLAUDE.md points to rules for "how do I build correctly here?" Rules point to SO
 
 ## Canonical rules shipped by Pipekit
 
+Canonical files use a `pipekit-` prefix so they never collide with project-specific rule filenames.
+
 | File | Topic | Portable |
 |------|-------|----------|
-| `discipline.md` | AI coding discipline: Red Flags, Ad-hoc Plan Gate, scope hygiene | ✅ |
-| `tooling.md` | Verify installed library APIs, pin package manager, pre-deploy gate | ✅ |
-| `security.md` | Secrets, boundary validation, OWASP, auth must be explicit | ✅ |
+| `pipekit-discipline.md` | AI coding discipline: Red Flags, Ad-hoc Plan Gate, scope hygiene | ✅ |
+| `pipekit-tooling.md` | Verify installed library APIs, pin package manager, pre-deploy gate | ✅ |
+| `pipekit-security.md` | Secrets, boundary validation, OWASP, auth must be explicit | ✅ |
 
-These are synced by `scripts/sync-method.sh` from Pipekit. They only get overwritten when you run `/pipekit-update`.
+These are synced by `scripts/sync-method.sh` from Pipekit on every run. Changes must round-trip through pipekit — local edits to `pipekit-*.md` files will be overwritten on next sync. If you need to override a canonical rule, create a companion file (e.g., `security.md`) whose content takes precedence per your CLAUDE.md Routing Pointers ordering.
 
 ## Adding project-specific rules
 
-Create new files directly in this directory — `sync-method.sh` won't touch them. Naming conventions used in real projects:
+Create new files directly in this directory — `sync-method.sh` won't touch anything outside the four canonical names above. Common project-specific patterns:
 
+- `security.md` — project-specific auth, RLS, secrets; sits alongside `pipekit-security.md` baseline
+- `tooling.md` — project-specific commands, monorepo filters, pre-deploy gate; sits alongside `pipekit-tooling.md` baseline
 - `patterns.md` — data-layer patterns, component conventions, state management
+- `naming.md` — file and code naming conventions
 - `file-structure.md` — directory layout, import alias rules
-- `security.md` — RLS strategy, secrets in edge functions (project-specific additions)
 - `{library}-pitfalls.md` — counter-intuitive API behaviors (e.g., `ag-grid-pitfalls.md`, `react-query-pitfalls.md`)
 
-Reference CLAUDE.md's routing table so rules are discoverable.
+Reference CLAUDE.md's routing table so both canonical and project-specific rules are discoverable.

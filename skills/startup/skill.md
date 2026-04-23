@@ -495,11 +495,11 @@ Create each skill with the user's input. Test after creation.
 
 #### Step 10a — Scaffold from templates
 
-`sync-method.sh` should have already copied Pipekit's canonical rule templates into `.claude/rules/`:
+`sync-method.sh` should have already copied Pipekit's canonical rule templates into `.claude/rules/`. Canonical files use a `pipekit-` prefix so they never collide with project-specific rule filenames:
 
-- `discipline.md` — Red Flags, Ad-hoc Plan Gate, scope hygiene (portable AI-coding discipline)
-- `tooling.md` — Verify Library API, package manager pinning, pre-deploy gate (portable tooling discipline)
-- `security.md` — secrets, boundary validation, OWASP Top 10 baseline (portable security discipline)
+- `pipekit-discipline.md` — Red Flags, Ad-hoc Plan Gate, scope hygiene (portable AI-coding discipline)
+- `pipekit-tooling.md` — Verify Library API, package manager pinning, pre-deploy gate (portable tooling discipline)
+- `pipekit-security.md` — secrets, boundary validation, OWASP Top 10 baseline (portable security discipline)
 - `README.md` — hub-and-spoke model explanation
 
 Verify these exist. If missing, re-run `bash scripts/sync-method.sh` or copy from `templates/rules/` manually.

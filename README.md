@@ -206,9 +206,9 @@ pipekit/
       ux-reference.md
     rules/                         #   Portable rule templates for .claude/rules/
       README.md                    #     Hub-and-spoke model explanation
-      discipline.md                #     Red Flags, Ad-hoc Plan Gate, scope hygiene
-      tooling.md                   #     Verify Library API, package manager, pre-deploy gate
-      security.md                  #     Secrets, boundary validation, OWASP, explicit auth
+      pipekit-discipline.md        #     Red Flags, Ad-hoc Plan Gate, scope hygiene
+      pipekit-tooling.md           #     Verify Library API, package manager, pre-deploy gate
+      pipekit-security.md          #     Secrets, boundary validation, OWASP, explicit auth
   skills/                          # Portable Claude Code skills (25 total)
   scripts/
     sync-method.sh                 # Pull method into a consuming project
