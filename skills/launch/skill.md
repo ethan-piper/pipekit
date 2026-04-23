@@ -370,7 +370,16 @@ When you encounter these situations, take the safer path:
 
 ## NEXT.md Output
 
-After launch completes (issue moved to Building, plan delegated to VBW or batch runner), overwrite `NEXT.md` at the project root. If there are more "Specced" issues in the current phase, point to `/launch {next issue}` or the UAT step for the current issue. If this was the last issue, point to `/strategy-sync` or the next phase's `/phase-plan`. See the NEXT.md convention in `sop/Skills_SOP.md`. Inline `➜ Next:` and `NEXT.md` content must match — emit them together.
+With Tier 3's hand-off model, `/launch` pauses at Steps 8 and 9 rather than completing in one invocation. Write `NEXT.md` at each pause point so the user's next action is never lost if they close the session:
+
+| Pause point | `NEXT.md` should point to |
+|-------------|----------------------------|
+| End of Step 7b (plan approved) | `/vbw:vibe --execute {phase-slug}` |
+| End of Step 8 (execute handed off, awaiting return) | `/vbw:vibe --execute {phase-slug}` if user hasn't run it yet; `/vbw:vibe --verify {phase-slug}` once user reports execute done |
+| End of Step 9 (verify handed off, awaiting return) | `/vbw:vibe --verify {phase-slug}` if user hasn't run it; return to `/launch PROJ-XXX` once user reports verify status |
+| End of Step 10 (UAT transition complete) | Next Specced issue in phase → `/launch {next issue}`; or `/strategy-sync` if phase complete with pending marker; or `/phase-plan` if phase complete and synced |
+
+At each pause, emit inline `➜ Next:` and overwrite `NEXT.md` together — the SOP rule is that both must match. See the NEXT.md convention and schema in `sop/Skills_SOP.md` (Routing Pointers → NEXT.md). Use the `YYYY-MM-DD HH:MM local` timestamp format.
 
 ---
 
