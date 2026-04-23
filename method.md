@@ -62,10 +62,10 @@ Stage 0 runs once per project. `/startup` orchestrates the full flow.
 | 2 | **Agent Review** | Linear Spec Review Agent | Light spec | Pass/Revise verdict with readiness score | Spec must be unambiguous and decomposable without guessing |
 | 3 | **Human Review** | You in Linear | Agent-reviewed spec | Approved spec with product decisions locked | Human signs off on scope, decisions, and priority |
 | 4 | **Launch** | `/launch {ISSUE}` | Approved spec | Gates validated, complexity routed, issue → Building | Spec exists, deps met, milestone siblings all specced |
-| 5 | **VBW Plan** | VBW Lead Agent (via `/launch`) | Approved spec from Linear | `PLAN.md` with task decomposition, verify/done criteria | — (Low complexity skips to batch runner) |
-| 6 | **Plan Review** | `plan-reviewer` agent (via `/launch`) | PLAN.md | Validated plan or revision requests | Plan must be executable step-by-step without ambiguity |
-| 7 | **Execution** | VBW Dev Agent or `/linear-todo-runner` (via `/launch`) | Approved plan or AC | Atomic commits per task | Each task passes its own verify/done criteria |
-| 8 | **QA** | VBW QA Agent (via `/launch`) | Completed tasks | Verification report, issue → UAT | All tasks verified against goals |
+| 5 | **VBW Plan** | VBW Lead Agent (spawned by `/launch`) | Approved spec from Linear | `PLAN.md` with task decomposition, verify/done criteria | — (Low complexity skips to batch runner) |
+| 6 | **Plan Review** | `plan-reviewer` agent (spawned by `/launch`) | PLAN.md | Validated plan or revision requests | Plan must be executable step-by-step without ambiguity |
+| 7 | **Execution** | `/vbw:vibe --execute` (user-triggered after `/launch` handoff) or `/linear-todo-runner` (for Low complexity) | Approved plan or AC | Atomic commits per task | Each task passes its own verify/done criteria |
+| 8 | **QA** | `/vbw:vibe --verify` (user-triggered after Step 7 returns) | Completed tasks | Verification report, `/launch` resumes and moves issue → UAT | All tasks verified against goals |
 | 9 | **UAT** | You | Built feature | Accepted or rejected | Feature matches spec AC under real usage |
 | 10 | **Ship** | Promotion skills | Accepted feature | Production release | CI gates pass, smoke tests pass |
 | 11 | **Strategy Sync** | `/strategy-sync` | Shipped features, current Strategy docs | Updated docs reflecting reality | Code is truth; diffs approved before apply |
@@ -260,7 +260,9 @@ Pipekit wraps VBW — it does not replace VBW's planning layer. The two systems 
 2. **Pipekit owns the visibility layer.** Linear issues, `linear-map.json`, `PHASES.md`, `NEXT.md`, strategy docs, and project config are Pipekit's. VBW does not write to these.
 3. **Initial merge happens once** — at `/roadmap-create`. Strategy-derived requirements are added **into** VBW's existing phase structure. VBW's phases, goals, and success criteria are preserved verbatim.
 4. **After the merge, the split is one-way.** Pipekit reads VBW state (plan progress, execution state) to update Linear. VBW does not read Linear — its source of truth is its own files.
-5. **Don't invoke VBW agents directly in Pipekit projects.** Use `/launch`, not `/vbw:lead` or `/vbw:dev`. `/launch` wraps the VBW agents and keeps Linear, `PHASES.md`, and `NEXT.md` in sync. Direct VBW invocation bypasses the Pipekit visibility layer and causes drift. (Future: this wrapping could be replaced with event-based hooks, which would be more resilient to VBW command-surface changes. Tracked in [pipekit#2](https://github.com/ethan-piper/pipekit/issues/2) — not built speculatively.)
+5. **`/launch` is the entry point; `/vbw:vibe --execute` and `--verify` are handoff targets.** After Pipekit's plan-gate (vbw-lead + plan-reviewer) passes, `/launch` instructs the user to run `/vbw:vibe --execute {phase}` and then `/vbw:vibe --verify {phase}`, resuming between phases to update Linear. Do NOT invoke `vbw:vbw-dev` or `vbw:vbw-qa` directly from `/launch` or ad-hoc — `/vbw:vibe` owns their contracts (plan_ref, plans_verified, write-verification.sh) and those contracts tighten every VBW release. Direct invocation drifts and breaks.
+
+   **Exception:** `vbw:vbw-lead` and `plan-reviewer` are spawned directly by `/launch` in Step 7b because Pipekit's plan-gate (human-approved spec → Lead draft → independent review → human approval) is the Pipekit-specific value-add that `/vbw:vibe --plan` does not replicate. Keep those two pinned via `Agent(subagent_type: ..., model: "opus")`.
 6. **When drift is suspected, stop and reconcile.** Symptoms: Linear status doesn't match VBW execution state; a PLAN.md references a Linear issue that doesn't exist; a Linear issue has no corresponding plan. Resolve the mismatch before continuing — drift compounds.
 
 ### Known Drift Risks
