@@ -341,6 +341,14 @@ Project-specific promotion and deploy skills are defined per project (not in thi
 | Docs | Documentation generation |
 | Scout | Research and codebase scanning |
 
+### Pipekit Agent Roster (for pipeline review)
+
+Agents shipped by Pipekit (synced to consumer projects via `sync-method.sh` → `.claude/agents/`):
+
+| Agent | Role | Invoked by |
+|-------|------|------------|
+| `plan-reviewer` | Independent review of VBW Lead's `PLAN.md` before Dev execution. Fills the gap VBW Lead's Stage 3 self-review can't cover: scope drift, framing errors, atomicity failures, test meaningfulness, risk/trap coverage. Read-only. | `/launch` Step 7b |
+
 ### External Systems
 
 | System | Role in Pipeline |

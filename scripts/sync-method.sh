@@ -171,6 +171,14 @@ mkdir -p "$PROJECT_ROOT/scripts"
 sync_file "$TEMP/scripts/pipekit-post-archive.sh" "$PROJECT_ROOT/scripts/pipekit-post-archive.sh" "scripts/pipekit-post-archive.sh"
 [ -f "$PROJECT_ROOT/scripts/pipekit-post-archive.sh" ] && chmod +x "$PROJECT_ROOT/scripts/pipekit-post-archive.sh"
 
+# --- Sync Pipekit agents (subagents spawned by Pipekit skills) ---
+if [ -d "$TEMP/agents" ]; then
+  echo ""
+  echo "Agents:"
+  mkdir -p "$PROJECT_ROOT/.claude/agents"
+  sync_dir "$TEMP/agents" "$PROJECT_ROOT/.claude/agents" "agents/"
+fi
+
 # --- Sync portable skills ---
 echo ""
 echo "Portable skills:"

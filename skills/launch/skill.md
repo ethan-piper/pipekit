@@ -146,17 +146,31 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
      Decompose into atomic tasks with verify/done criteria derived from the AC."
    )
    ```
-3. After the lead agent returns, run the **plan-reviewer** agent:
+3. After the lead agent returns, run the **plan-reviewer** agent with the full input contract the agent expects (see `.claude/agents/plan-reviewer.md` → Input Contract section):
    ```
    Agent(
      subagent_type: "plan-reviewer",
      model: "opus",
      description: "Review plan for PROJ-XXX",
-     prompt: "Review the PLAN.md just created for PROJ-XXX. 
-     Stress-test scope, dependencies, success criteria, and risks.
-     The spec is: {brief spec summary}"
+     prompt: "Independent review of VBW Lead's plan for PROJ-XXX before Dev execution.
+
+     Plan path(s): .vbw-planning/phases/{phase-slug}/*-PLAN.md
+     Approved spec (verbatim from Linear):
+     <<<SPEC
+     {full Light Spec and Acceptance Criteria section from the issue description}
+     SPEC
+
+     Project context:
+     - CLAUDE.md at repo root
+     - method.config.md at repo root
+     - PHASES.md at .vbw-planning/PHASES.md (if present)
+     - CONCERNS.md at .vbw-planning/codebase/CONCERNS.md (if present)
+
+     Follow the Review Protocol in your agent definition. Return the structured markdown output. If you return Block or Revise, the orchestrator will relay your Fast Path to Pass back to Lead; do not attempt to rewrite the plan yourself."
    )
    ```
+
+   **Graceful fallback:** if the orchestrator cannot find the `plan-reviewer` agent (pre-install state or older Pipekit sync), it should note this transparently — "No dedicated plan-reviewer agent installed; relying on Lead's Stage 3 self-review" — and present the plan to the user directly for approval. Do not silently skip the review gate.
 4. Present the plan and review to the user for approval
 5. If user approves, proceed to Step 8
 6. If user requests changes, iterate on the plan
