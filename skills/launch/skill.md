@@ -28,16 +28,16 @@ You are a launch gate controller. Your job is to transition a human-approved Lin
 
 ## Model Selection
 
-Skills that spawn subagents must **explicitly pin the model** on each `Agent()` call — subagents default-inherit the parent's model, which is not what you want when planning and execution have different cost/quality trade-offs. This skill uses the following defaults:
+Pipekit only spawns two subagents directly — the rest of the pipeline (execute, verify) is delegated to `/vbw:vibe`, which owns its own model decisions per VBW's config. Subagents default-inherit the parent's model, so explicit pins are non-negotiable:
 
 | Step | Agent | Default model | Rationale |
 |------|-------|---------------|-----------|
 | 7b | `vbw:vbw-lead` | `opus` | Planning is the leverage point — over-spending here saves re-work later. |
 | 7b | `plan-reviewer` | `opus` | Review has to catch what planning missed; same reasoning budget. |
-| 8 | `vbw:vbw-dev` | `sonnet` | Execution is mechanical once the plan is good. Sonnet is ~5× cheaper with similar code quality on well-specced tasks. |
-| 9 | `vbw:vbw-qa` | `sonnet` | QA runs verifiable checks against AC; no novel reasoning. |
 
-**Escape hatch:** when `--deep` is passed, the Dev agent runs on `opus` instead of `sonnet`. Use this for tasks with known-hard debugging characteristics — race conditions, silent failures, cross-layer state bugs, anything where Sonnet has shown it struggles.
+**VBW-side agents (not pinned here):** `vbw:vbw-dev` and `vbw:vbw-qa` run inside `/vbw:vibe --execute` / `--verify`. VBW v1.35+ manages their model selection through `/vbw:config`; configure there, not here. The old behavior of spawning these agents directly from `/launch` has been removed — see the Tier 3 refactor note in `PIPEKIT_IMPROVEMENTS.md`.
+
+**Escape hatch:** `--deep` previously escalated the Dev agent from sonnet to opus. Now that Dev execution is under `/vbw:vibe`, achieve the same effect via `/vbw:vibe --execute --effort=max` or the equivalent VBW profile. `--deep` on `/launch` is now a no-op preserved for backward compatibility; emit a one-line warning recommending the VBW flag.
 
 This defaults-plus-flag pattern is the forerunner of Anthropic's model-use decision tree (in beta). When that ships, this section should be replaced with a reference to it.
 
@@ -175,84 +175,100 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
 5. If user approves, proceed to Step 8
 6. If user requests changes, iterate on the plan
 
-### Step 8 — VBW Execution
+### Step 8 — Hand Off to `/vbw:vibe --execute`
 
-1. Spin up the **VBW Dev Agent** (`vbw:vbw-dev`) for each task in the approved plan. Default to `model: "sonnet"`; use `"opus"` instead when `--deep` was passed on the launch command (see Model Selection):
-   ```
-   Agent(
-     subagent_type: "vbw:vbw-dev",
-     model: "sonnet",  // or "opus" if --deep
-     description: "PROJ-XXX task N: {task title}",
-     prompt: "Execute task N from the plan at {plan path}.
-     Read CLAUDE.md for conventions. Atomic commit per task.
-     Include PROJ-XXX in all commit messages."
-   )
-   ```
-2. After each task completes, post a Linear comment with progress:
-   ```
-   **Build progress:** Task {N}/{total} complete — {task title}
-   ```
+Pipekit's plan-gate passed (Step 7b). Execution is VBW's job, not Pipekit's. Do **not** orchestrate `vbw:vbw-dev` spawns manually — VBW v1.35's `/vbw:vibe --execute` handles task-sequencing, atomic commits, execution-state updates, and known-issues tracking natively.
 
-### Step 9 — VBW QA
-
-As of VBW v1.35.0, the QA agent (`vbw-qa`) enforces NON-NEGOTIABLE contracts for phase-scoped verification: every check must carry a `plan_ref`, the output must include a `plans_verified` array covering every `*-PLAN.md` in the phase dir, and `VERIFICATION.md` must be written via the deterministic `write-verification.sh` script (manual writes are rejected). The agent needs plugin-root, phase-dir, and output-path context to satisfy these invariants.
-
-**Canonical path (preferred):** delegate to `/vbw:vibe --verify` after execution. VBW's integrated flow resolves plugin-root, picks the output path, and handles QA + UAT routing:
+**Hand off to the user** with a clear boundary — Pipekit pauses until they come back:
 
 ```
-After Step 8 completes, inform the user:
+## Plan approved — handing off to VBW execution
 
-  PROJ-XXX execution complete. Run `/vbw:vibe --verify {phase-number}` to run phase-scoped QA.
-  When QA passes, return here and I'll proceed to Step 10 (UAT transition).
+PROJ-XXX is ready to build. Next action:
+
+  /vbw:vibe --execute {phase-slug}
+
+VBW will:
+- Execute each task in the plan with atomic commits per task
+- Update .vbw-planning/STATE.md and the execution-state tracker
+- Surface any blockers or deviations
+
+When /vbw:vibe --execute completes, come back and tell me "done with execute".
+I'll move to QA handoff (Step 9) and then transition the Linear issue to UAT on success.
+
+If execution fails or surfaces blockers, tell me what went wrong — we'll decide
+whether to send it back to Lead for plan revision (stay in Building) or escalate.
 ```
 
-**Direct-invocation path (when orchestrating QA inline):** resolve plugin-root first, then spawn `vbw:vbw-qa` with full context. The agent will fail loudly rather than silently if any NON-NEGOTIABLE input is missing.
+While paused, do not spawn any VBW agents yourself. If the user asks for progress, read `.vbw-planning/STATE.md` and `.vbw-planning/phases/{phase-slug}/*-SUMMARY.md` if present.
 
-1. Resolve the VBW plugin root (needed for `write-verification.sh`):
-   ```bash
-   VBW_CACHE_ROOT="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache/vbw-marketplace/vbw"
-   PLUGIN_ROOT=$(find "$VBW_CACHE_ROOT" -maxdepth 1 -mindepth 1 -type d 2>/dev/null \
-     | awk -F/ '{print $NF}' | grep -E '^[0-9]+(\.[0-9]+)*$' \
-     | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
-   PLUGIN_ROOT="$VBW_CACHE_ROOT/$PLUGIN_ROOT"
+**On return:**
+
+1. Quickly verify execution actually completed by checking `.vbw-planning/STATE.md` (or equivalent) shows the phase as executed, not just "in progress."
+2. Post a Linear comment noting execution complete:
    ```
-2. Identify the phase dir (created by vbw-lead in Step 7b): `.vbw-planning/phases/{phase-slug}/`
-3. Spin up the **VBW QA Agent**:
+   **Build progress:** VBW execution complete. Moving to QA.
+   - Branch: {branch name}
+   - Tasks completed: {N}/{total} (from SUMMARY.md)
    ```
-   Agent(
-     subagent_type: "vbw:vbw-qa",
-     model: "sonnet",
-     description: "Verify PROJ-XXX: {title}",
-     prompt: "Phase-scoped verification for PROJ-XXX.
+3. Proceed to Step 9.
 
-     Plugin root: {PLUGIN_ROOT}
-     Phase dir: .vbw-planning/phases/{phase-slug}
-     Output path: .vbw-planning/phases/{phase-slug}/{phase}-VERIFICATION.md
-     Tier: standard
+### Step 9 — Hand Off to `/vbw:vibe --verify`
 
-     Plans to verify: all `*-PLAN.md` files in the phase dir (must appear in plans_verified).
-     Each check in checks_detail MUST include plan_ref.
+Same pattern as Step 8 — delegate to VBW rather than orchestrating QA manually.
 
-     Acceptance criteria from the Linear spec (for cross-reference):
-     {paste AC section from issue description}
+VBW v1.35 tightened QA contracts (`plan_ref`, `plans_verified`, `write-verification.sh` enforcement). `/vbw:vibe --verify` satisfies these natively; hand-orchestrated `vbw:vbw-qa` spawns drift against the contract every version bump. Delegating is both safer and less maintenance.
 
-     Pre-deploy gate to run: pnpm turbo run check-types && pnpm turbo run lint && pnpm turbo run test
+**Hand off:**
 
-     Persist VERIFICATION.md via write-verification.sh as specified in your agent contract. Do NOT write the file manually."
-   )
+```
+## Execution complete — handing off to VBW verification
+
+Next action:
+
+  /vbw:vibe --verify {phase-slug}
+
+VBW will:
+- Run goal-backward QA against PLAN.md must_haves
+- Execute the pre-deploy gate (types, lint, test)
+- Write VERIFICATION.md via write-verification.sh
+- Surface any failures as FAIL checks
+
+When /vbw:vibe --verify completes, come back and tell me the verdict:
+  "verify passed" → I'll transition the Linear issue to UAT
+  "verify failed" → tell me which checks failed; we'll decide whether to
+                    route back to /vbw:vibe --execute for fixes or escalate
+```
+
+**On return (verify passed):** proceed to Step 10.
+
+**On return (verify failed):**
+
+1. Read the failed check list from the user or `.vbw-planning/phases/{phase-slug}/*-VERIFICATION.md`
+2. Classify:
+   - **Fixable in execute:** missing code changes, wrong behavior, failed tests → tell user to re-run `/vbw:vibe --execute` with the fix scope
+   - **Plan-level:** spec/AC misinterpreted, scope gap, wrong approach → route back to `/vbw:vibe --plan` or `/light-spec-revise`
+3. Keep the Linear issue in **Building** — don't advance status on failure.
+4. Post a Linear comment with the failure summary:
    ```
-4. If QA passes: proceed to Step 10
-5. If QA fails: return to Step 8 for the failing tasks, with QA feedback
+   **QA failed:** {N} check(s) failed.
+   - {check ID}: {brief}
+   - ...
+   
+   Re-entering execution with fix scope. Status remains Building.
+   ```
 
 ### Step 10 — Move to UAT
+
+Triggered only when Step 9 returns with "verify passed."
 
 1. Move issue to **UAT** ({UAT state ID from method.config.md}) via `mcp__linear-server__save_issue`
 2. Post a Linear comment:
    ```
    **Build complete.** Moved to UAT.
-   - All {N} tasks complete
-   - QA: passed
-   - Pre-deploy gate: ✓ types, ✓ lint, ✓ test
+   - VBW execute: ✓
+   - VBW verify: ✓ (via /vbw:vibe --verify)
+   - Pre-deploy gate: ✓ (run inside verify)
    - Branch: {branch name}
    
    Ready for human acceptance testing.
