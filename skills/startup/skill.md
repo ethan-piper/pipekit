@@ -493,19 +493,55 @@ Create each skill with the user's input. Test after creation.
 
 ### Step 10 — CLAUDE.md & Rules
 
-Update or create CLAUDE.md with all decisions made:
-- Stack, conventions, structure, environments, common commands
+#### Step 10a — Scaffold from templates
 
-Create `.claude/rules/` files based on the stack:
-- `security.md` — auth patterns, env var rules
-- `naming.md` — file naming, code naming, DB naming
-- `patterns.md` — data layer, API routes, mutations
-- `file-structure.md` — directory layout
-- `tooling.md` — commands, CI, pre-deploy gate
+`sync-method.sh` should have already copied Pipekit's canonical rule templates into `.claude/rules/`:
 
-**Final `method.config.md` review:** Read back to the user, confirm all fields populated, flag TBD values.
+- `discipline.md` — Red Flags, Ad-hoc Plan Gate, scope hygiene (portable AI-coding discipline)
+- `tooling.md` — Verify Library API, package manager pinning, pre-deploy gate (portable tooling discipline)
+- `security.md` — secrets, boundary validation, OWASP Top 10 baseline (portable security discipline)
+- `README.md` — hub-and-spoke model explanation
 
-**Output:** CLAUDE.md and rules configured
+Verify these exist. If missing, re-run `bash scripts/sync-method.sh` or copy from `templates/rules/` manually.
+
+If `CLAUDE.md` does not exist at the project root, copy it from `templates/CLAUDE.md.template` and fill in placeholders with values from `method.config.md`:
+
+```bash
+cp method/templates/CLAUDE.md.template CLAUDE.md
+```
+
+Then fill in:
+
+- `{PROJECT_DISPLAY_NAME}`, `{ONE_LINE_TAGLINE}`, description — from `concept-brief.md` and `project-definition.md`
+- **Stack** — from Step 3 tracker entries
+- **Repo Structure** — from actual repo tree (run `tree -L 2` for reference)
+- **Environments & Branch Strategy** — from `method.config.md` → `## Git Architecture`
+- **Working Style** step 3 — project-specific reference reading (e.g., "Read POC in `src_poc/`") or delete the bullet if not applicable
+- **Decision-Making Protocol** — start with the two baseline rules; add project-specific rules here as feedback patterns emerge
+- **Routing Pointers table** — keep the three canonical rules rows; add rows for project-specific rules as they're created in Step 10b
+
+#### Step 10b — Project-specific rules
+
+Based on the stack and domain, create project-specific `.claude/rules/*.md` files as needed. These sit alongside the canonical files and cover what the portable rules cannot:
+
+| Topic | File | Triggered by |
+|-------|------|--------------|
+| Naming conventions | `naming.md` | Any project with file-naming conventions (kebab-case, camelCase decisions) |
+| Data layer patterns | `patterns.md` | React Query / SWR / tRPC / ORM conventions |
+| File structure | `file-structure.md` | Monorepos or non-trivial directory layouts |
+| DB migration patterns | `patterns.md` or `migrations.md` | Projects using migrations |
+| Hooks & realtime | `hooks-realtime.md` | WebSocket / Supabase Realtime / SSE |
+| Library pitfalls | `{library}-pitfalls.md` | Counter-intuitive APIs that bit you in production |
+
+Keep each file under ~100 lines. Add a row to CLAUDE.md's Routing Pointers table for every new rule file so it's discoverable.
+
+**Do not duplicate what's in the canonical files.** If the canonical `security.md` already covers RLS baseline, extend it with project-specific RLS patterns in a dedicated `security-rls.md` or append to the canonical (the sync script won't clobber additions; it only overwrites lines it knows about — verify this behavior per your sync tooling).
+
+#### Step 10c — Final review
+
+Read `method.config.md` back to the user, confirm all fields populated, flag TBD values.
+
+**Output:** CLAUDE.md filled in from template; `.claude/rules/` contains the three canonical files plus any project-specific additions; Routing Pointers table reflects all rules.
 
 ### Step 11 — Validate
 
