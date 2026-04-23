@@ -1,0 +1,113 @@
+# {PROJECT_DISPLAY_NAME}
+
+{ONE_LINE_TAGLINE}
+
+{1-3 sentence description of what this project does, who it serves, and what makes it distinctive. Keep it under 60 words — details belong in Strategy docs.}
+
+## Stack
+
+- **Framework:** {e.g., Next.js 15 App Router}
+- **Language:** {e.g., TypeScript strict mode}
+- **Database:** {e.g., Supabase (PostgreSQL + Auth + RLS)}
+- **Deployment:** {e.g., Vercel}
+- **Package manager:** {pnpm | npm | yarn} — **never mix**
+- **Testing:** {e.g., Vitest + Playwright}
+- **Error tracking:** {e.g., Sentry}
+
+## Repo Structure
+
+```
+{PROJECT_SLUG}/
+  {primary_app_path}/        -- Main app
+  {shared_packages_path}/    -- Shared code
+  {db_path}/                 -- Migrations, seed data
+  method/                    -- Pipekit methodology (synced from pipekit)
+  .claude/
+    rules/                   -- Auto-loaded constraint files (see Routing Pointers)
+    skills/                  -- Portable skills
+    agents/                  -- Pipekit-shipped agents (e.g., plan-reviewer)
+  .vbw-planning/             -- VBW planning state (ROADMAP, PLAN.md, STATE)
+  NEXT.md                    -- Next-action pointer (written by every major skill)
+  method.config.md           -- Project-specific config (workflow state IDs, git arch, etc.)
+```
+
+## Environments & Branch Strategy
+
+{Fill from method.config.md → Git Architecture. Two-tier example:}
+
+| Environment | Branch | URL | Purpose |
+|-------------|--------|-----|---------|
+| Production  | `main` | {prod URL} | Live |
+| Development | `dev`  | {dev URL}  | Active development |
+| Preview     | `feature/*`, `fix/*` | per-PR | Feature review |
+
+**Core principle: no code reaches a long-lived branch without a PR.**
+
+Promotion commands: `/g-promote-dev`, {`/g-promote-beta`,} `/g-promote-main`.
+
+## Pipeline
+
+This project uses **Pipekit** (a portable AI-delivery methodology) wrapping **VBW** (planning and execution engine) with **Linear** (review and tracking layer).
+
+The full pipeline is documented in `method/method.md`. Core loop:
+
+```
+/concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create
+  → /phase-plan → /light-spec → /launch → VBW execution → QA → UAT → ship
+  → /strategy-sync
+```
+
+Interactive skills live in `.claude/skills/`. VBW commands live under `/vbw:*`.
+
+## Working Style
+
+Before writing or modifying any code, gather full context first:
+
+1. **Read the Linear issue and its comments.** Acceptance criteria, design decisions, and discussion history live there. Use `mcp__linear-server__get_issue` with `includeRelations: true`.
+2. **Read the existing codebase.** The file you'll modify and its neighbors. Look for existing patterns before creating new ones.
+3. **{Project-specific reference reading}** — e.g., "Read the POC reference in `src_poc/` before porting a feature."
+
+Code written without context produces rework.
+
+## Decision-Making Protocol
+
+Feedback-derived rules this project has learned to follow. Add new rules when patterns emerge; never remove without explicit decision.
+
+1. **Never make decisions for the user.** Present analysis and wait for explicit approval before committing a direction.
+2. **Always review plans before execution.** After any `PLAN.md` is created, invoke the `plan-reviewer` agent before starting execution (`/launch` does this automatically).
+3. {Add project-specific rules here as they emerge.}
+
+## Routing Pointers
+
+| Topic | Auto-loaded | File |
+|-------|-------------|------|
+| AI coding discipline (Red Flags, Plan Gate, scope) | Yes | `.claude/rules/discipline.md` |
+| Tooling, library-API verification, pre-deploy gate | Yes | `.claude/rules/tooling.md` |
+| Security, auth, secrets, OWASP baseline | Yes | `.claude/rules/security.md` |
+| {Project-specific rules go here} | Yes | `.claude/rules/{name}.md` |
+| Git & deployment SOP | On demand | `method/sop/Git_and_Deployment.md` |
+| Linear workflow | On demand | `method/sop/Linear_SOP.md` |
+| Skills authoring | On demand | `method/sop/Skills_SOP.md` |
+| VBW commands | On demand | `method/sop/VBW_Help.md` |
+
+Add new rules as topics emerge in this project. See `.claude/rules/README.md` for naming conventions.
+
+## Source of Truth
+
+**Hierarchy (inverted — auto-loaded wins):**
+
+1. **`.claude/rules/*`** — authoritative for coding conventions and app patterns. Auto-loaded every session.
+2. **CLAUDE.md (this file)** — project hub and routing. High-level only; defer implementation detail to rules.
+3. **`method/sop/*`** — deep reference. Demand-loaded.
+
+If CLAUDE.md and a rules file conflict on implementation detail, the rules file wins. If a rules file and an SOP conflict, raise it — one of them is drifting.
+
+## VBW Rules
+
+- Plans reference CLAUDE.md conventions. VBW agents follow them during execution.
+- Skills are for interactive sessions, not agent execution paths.
+- All VBW artifacts live in `.vbw-planning/`. Agents do not modify product code without a plan.
+- Agents must validate against the pre-deploy gate before marking work complete.
+- Do not invoke VBW agents directly in Pipekit projects. Use `/launch`, not `/vbw:lead` / `/vbw:dev`. `/launch` wraps VBW and keeps Linear/PHASES.md/NEXT.md in sync.
+
+See `method/method.md` § "VBW / Pipekit Ownership Model" for details.
