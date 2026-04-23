@@ -11,6 +11,9 @@
 #   ./scripts/drift-check.sh --stale      # Staleness check only
 #   ./scripts/drift-check.sh --scripts    # Script/command check only
 #   ./scripts/drift-check.sh --ci         # Exit 1 if any drift found (for CI)
+#   ./scripts/drift-check.sh --quick      # Skip staleness check; fast mode for hooks
+#   ./scripts/drift-check.sh --install-hook    # Install as post-commit hook
+#   ./scripts/drift-check.sh --uninstall-hook  # Remove post-commit hook
 #
 # Context detection:
 #   - In the method repo: checks skills, templates, SOPs, method.md, GUIDE.md
@@ -41,12 +44,98 @@ DRIFT_COUNT=0
 WARN_COUNT=0
 OK_COUNT=0
 
+# --- Hook management (handled before other flag parsing so they exit early) ---
+HOOK_MARKER="# pipekit-drift-check"
+HOOK_PATH=".git/hooks/post-commit"
+
+install_hook() {
+  if [ ! -d ".git" ]; then
+    echo "ERROR: not a git repo root. Run from the project root." >&2
+    exit 1
+  fi
+
+  if [ -f "$HOOK_PATH" ] && grep -q "$HOOK_MARKER" "$HOOK_PATH" 2>/dev/null; then
+    echo "Drift-check hook already installed at $HOOK_PATH."
+    exit 0
+  fi
+
+  mkdir -p "$(dirname "$HOOK_PATH")"
+
+  if [ -f "$HOOK_PATH" ]; then
+    # Existing hook — append
+    {
+      echo ""
+      echo "$HOOK_MARKER"
+      echo 'bash "$(git rev-parse --show-toplevel)/scripts/drift-check.sh" --quick --ci >/dev/null 2>&1 || echo "drift-check: issues found; run scripts/drift-check.sh for details"'
+    } >> "$HOOK_PATH"
+    echo "Appended drift-check block to existing $HOOK_PATH."
+  else
+    # New hook
+    cat > "$HOOK_PATH" <<EOF
+#!/bin/bash
+$HOOK_MARKER
+bash "\$(git rev-parse --show-toplevel)/scripts/drift-check.sh" --quick --ci >/dev/null 2>&1 || echo "drift-check: issues found; run scripts/drift-check.sh for details"
+EOF
+    chmod +x "$HOOK_PATH"
+    echo "Installed post-commit drift-check hook at $HOOK_PATH."
+  fi
+
+  echo ""
+  echo "Each commit will now run a fast drift check and warn on issues."
+  echo "Uninstall with: bash scripts/drift-check.sh --uninstall-hook"
+  exit 0
+}
+
+uninstall_hook() {
+  if [ ! -f "$HOOK_PATH" ]; then
+    echo "No post-commit hook found."
+    exit 0
+  fi
+
+  if ! grep -q "$HOOK_MARKER" "$HOOK_PATH"; then
+    echo "Hook at $HOOK_PATH is not a pipekit drift-check hook. Leaving it alone."
+    exit 0
+  fi
+
+  # Remove the marker line + the next line (the actual check command)
+  local tmp
+  tmp=$(mktemp)
+  awk -v marker="$HOOK_MARKER" '
+    $0 == marker { skip=2 }
+    skip > 0 { skip--; next }
+    { print }
+  ' "$HOOK_PATH" > "$tmp"
+
+  # If the remaining hook is empty or just a shebang, remove the whole file
+  local remaining_lines
+  remaining_lines=$(grep -cvE '^(#!.*|[[:space:]]*)$' "$tmp" || true)
+  if [ "$remaining_lines" -eq 0 ]; then
+    rm "$HOOK_PATH"
+    rm "$tmp"
+    echo "Removed $HOOK_PATH (drift-check was the only content)."
+  else
+    mv "$tmp" "$HOOK_PATH"
+    chmod +x "$HOOK_PATH"
+    echo "Removed drift-check block from $HOOK_PATH (other hook content preserved)."
+  fi
+  exit 0
+}
+
+# Handle hook management first
+for arg in "$@"; do
+  case "$arg" in
+    --install-hook)   install_hook ;;
+    --uninstall-hook) uninstall_hook ;;
+  esac
+done
+
 # --- Parse arguments ---
 for arg in "$@"; do
   case "$arg" in
     --paths)   CHECK_STALE=false; CHECK_SCRIPTS=false ;;
     --stale)   CHECK_PATHS=false; CHECK_SCRIPTS=false ;;
     --scripts) CHECK_PATHS=false; CHECK_STALE=false ;;
+    --quick)   CHECK_STALE=false ;;  # skip the git log-heavy staleness check
     --ci)      CI_MODE=true ;;
   esac
 done
