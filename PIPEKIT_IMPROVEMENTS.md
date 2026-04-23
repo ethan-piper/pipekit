@@ -112,8 +112,17 @@ Once Pipekit is at target state, audit what to pull into piper. Candidates alrea
 | Session 0 (gaps closed earlier) | ✅ Done (plan-reviewer, end-session, sync self-update, post-archive hook, VBW 1.35 docs) |
 | Tier 1 — Rules Infrastructure | ✅ Done (commits `f31a2ff`, `96c3b1e`, `dcacaa4`, `7b7454c`) |
 | Tier 2 — Skill Enhancements | ✅ Done (commits `474f296`, `635a1ee`, `dc43b95`) |
-| Tier 3 — /launch Refactor | ⏳ Next up |
+| Tier 3 — /launch Refactor | ✅ Done (commits `f0db16d`, `ac8a3ed`, `5b468dc`) |
 | Session 4 — Piper backport | ⏳ Pending Pipekit completion |
+
+### Tier 3 recap
+
+- **Steps 8 and 9 refactored** from direct `vbw:vbw-dev` / `vbw:vbw-qa` spawns to handoff-and-resume against `/vbw:vibe --execute` and `/vbw:vibe --verify`. Eliminates the contract-drift risk that hit hard on VBW v1.35 (plan_ref, plans_verified, write-verification.sh).
+- **Step 7b preserved** — `vbw:vbw-lead` + `plan-reviewer` remain Pipekit-spawned because the plan-gate is Pipekit's value-add, not a VBW feature.
+- **Failure paths** in Step 9 classify verify failures as fixable-in-execute (route back to `/vbw:vibe --execute`) vs plan-level (route back to `/vbw:vibe --plan` or `/light-spec-revise`). Linear issue stays in Building on failure.
+- **NEXT.md schedule** — `/launch` now pauses at handoffs, so `NEXT.md` is written at each pause point (handoff to execute, handoff to verify, UAT transition) so the user's next action survives session close.
+- **Model Selection table** trimmed to the two agents `/launch` still pins (`vbw-lead`, `plan-reviewer`). `--deep` flag preserved as a no-op with a warning directing users to `/vbw:vibe --execute --effort=max`.
+- **method.md** pipeline table + Rule 5 updated to reflect `/launch` as the entry-point-and-resume-point, `/vbw:vibe` as the handoff target.
 
 ### Tier 2 recap
 
