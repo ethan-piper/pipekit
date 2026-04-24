@@ -98,10 +98,32 @@ Once Pipekit is at target state, audit what to pull into piper. Candidates alrea
 
 ## Out of Scope (for now)
 
-- Auto-merge / coordinator agent (piper-side experiment first — see `followup_pipeline_skill.md` memory)
-- /pipeline skill (higher-level orchestrator)
 - Cross-agent coordination via SendMessage
 - /launch-native deprecation (keep as spike reference)
+- Auto-merge on green CI (piper-side experiment first — see `followup_pipeline_skill.md` memory)
+
+---
+
+## Tier 4 — Post-RS-8 findings (discovered 2026-04-24)
+
+Shipped RS-8 in rs-vault end-to-end surfaced a set of issues in how Pipekit currently interacts with VBW, promotes work, and paces the human. All deferred for a dedicated session.
+
+| # | Item | Effort | Why |
+|---|------|--------|-----|
+| 4.1 | `/launch` Step 9 VBW-readiness probe | ~30 min | Tier 3 refactor assumed every consumer has VBW's verify flow wired. rs-vault has a Linear-per-issue nested phase layout; `phase-detect.sh` returns `phase_count=0` and `/vbw:vibe --verify` fails at its guard ("no SUMMARY.md"). Fix: Step 9 probes the flow state before delegating, falls back to a precedent path (skip-to-UAT, rely on Dev self-verification + /g-test-vercel + manual UAT) when not wired. Document both paths. |
+| 4.2 | `/launch` Step 10 batch-promote messaging | ~20 min | Current text implies per-issue chain ("Accept with: move to Done, then /g-promote-dev"). Users feel pushed to promote-now when they want to accumulate 2-5 dev-landed issues and batch-promote to main. Update messaging to offer explicit options: ship now / accumulate / hold in UAT. Note batch is the default for feature-heavy phases. |
+| 4.3 | Batch-promote SOP | ~30 min | New section in `sop/Git_and_Deployment.md` (or a new `sop/Promotion_SOP.md`). Cover: when to batch vs per-issue, how DB migrations apply during accumulation, when to cut the batch, three-tier adaptation for projects with beta. |
+| 4.4 | VBW upstream tracking — issue #506 | ~5 min when fix ships | VBW team acknowledged my `/vbw:report` (issue #506). Fix will make `ensure_transient_ignore` fire in all three tracking modes (manual, ignore, commit), closing the nested gitignore gap. When the fix ships: update `sop/VBW_Help.md` to remove the flip-flip workaround and point at the bundled fix version. |
+| 4.5 | `/pipeline` skill (tier 4 proper) | ~2-3 hours | Higher-level orchestrator that wraps /launch's gate layer and auto-progresses through courier-role pauses (execute → verify → UAT move). Preserves judgment-role pauses: plan-reviewer verdict, verify failure classification, PR description writing. Falls back to explicit pause-and-prompt on any non-success signal. Rationale: RS-8 hit three courier pauses ("proceed with /vbw:vibe --verify?" etc.); each is mechanical click-to-continue with no judgment involved. Should only pause where human eyes add irreplaceable value. |
+
+**Risk:** Low-medium per item. 4.1 is the most load-bearing (blocks the current Tier 3 refactor on non-VBW-wired consumers). 4.5 is the biggest scope.
+
+### Suggested execution order
+
+1. **4.4 first** — trivial when fix ships, and unblocks removing the quirk workaround from consumer SOPs.
+2. **4.1 next** — fixes the concrete RS-8 friction. No consumer can reliably /vbw:vibe --verify today.
+3. **4.2 + 4.3 together** — messaging change pairs naturally with the SOP write-up.
+4. **4.5 last** — biggest design; wants a full session.
 
 ---
 
@@ -113,7 +135,9 @@ Once Pipekit is at target state, audit what to pull into piper. Candidates alrea
 | Tier 1 — Rules Infrastructure | ✅ Done (commits `f31a2ff`, `96c3b1e`, `dcacaa4`, `7b7454c`) |
 | Tier 2 — Skill Enhancements | ✅ Done (commits `474f296`, `635a1ee`, `dc43b95`) |
 | Tier 3 — /launch Refactor | ✅ Done (commits `f0db16d`, `ac8a3ed`, `5b468dc`) |
-| Session 4 — Piper backport | ⏳ Pending Pipekit completion |
+| Canonical rule rename | ✅ Done (commits `93e14c8`, `174f446`) |
+| Tier 4 — Post-RS-8 findings | ⏳ Pending (5 items, see above) |
+| Session 4 — Piper backport | ⏳ Pending (runbook in `PIPER_BACKPORT.md`) |
 
 ### Tier 3 recap
 

@@ -53,6 +53,12 @@ Known quirks (VBW v1.35.0)
                /vbw:config planning_tracking manual
                The nested .gitignore persists across the flip.
                Commit .vbw-planning/.gitignore once; you're done forever.
-        Upstream: filed via /vbw:report against
-                  yidakee/vibe-better-with-claude-code-vbw.
+        Upstream: tracked as swt-labs/vibe-better-with-claude-code-vbw
+               issue #506. Fix accepted 2026-04-24: ensure_transient_ignore
+               will fire across all three planning_tracking modes (manual,
+               ignore, commit) with regression coverage in
+               tests/planning-git.bats. When that fix ships, this
+               workaround becomes obsolete — drop this section and
+               remove the now-unused flip-flip recipe from any project
+               docs that reference it.
 
