@@ -104,40 +104,80 @@ Once Pipekit is at target state, audit what to pull into piper. Candidates alrea
 
 ---
 
-## Tier 4 — Post-RS-8 findings (discovered 2026-04-24)
+## Tier 1 (NEW) — Option 3: Pipekit owns gates, VBW owns build
 
-Shipped RS-8 in rs-vault end-to-end surfaced a set of issues in how Pipekit currently interacts with VBW, promotes work, and paces the human. All deferred for a dedicated session.
+**Strategic decision (2026-04-25):** Pipekit had a small but real orchestration wrap around VBW. After mapping the steering surface (5 touchpoints: one direct agent spawn, one bootstrap chain, read-only state observation, one lifecycle hook, text handoffs), every recent bug came from the wrap fighting VBW's contract on each release. Decision: cut the one direct agent spawn, move plan-reviewer to a standalone skill, let `/vbw:vibe` run end-to-end after Pipekit's gate passes.
+
+**Effect:** Pipekit's surface area on VBW drops from 5 touchpoints to 3 (no direct spawn, no execution-flow wrapping). VBW upgrades stop touching Pipekit code.
+
+### Scope
+
+| # | Item | Effort | Output |
+|---|------|--------|--------|
+| 1.1 | Create `/review-plan` skill | ~45 min | New `skills/review-plan/skill.md`. Calls `plan-reviewer` agent against the most recent `PLAN.md` in `.vbw-planning/phases/{phase-slug}/`. Same Input Contract as today's `/launch` Step 7b call. ~80 lines. |
+| 1.2 | Refactor `/launch` into open + close | ~60 min | Steps 1-6 unchanged (Linear gate). Step 7b (vbw-lead spawn + plan-reviewer call) DELETED — user runs `/vbw:vibe --plan` and `/review-plan` themselves. Steps 8-9 (handoff text) unchanged. New explicit close phase: `/launch RS-X --close` transitions Linear to UAT after user confirms verify passed. |
+| 1.3 | Verify-probe text (was Tier 4.1) | ~10 min | Inline paragraph in `/launch`'s post-handoff text: "if your project uses VBW-native layout, run `/vbw:vibe --execute` then `/vbw:vibe --verify`; if not, follow your project's precedent (Dev self-verification + `/g-test-vercel` + manual UAT)." Replaces the dedicated probe-detection logic from Tier 4.1. |
+| 1.4 | Update method.md ownership model | ~15 min | Pipeline table reflects new flow (no Pipekit-spawned vbw-lead). Rule 5 in ownership model documents the 3-touchpoint surface (down from 5). Note: `/launch` open + close model. |
+| 1.5 | Update PIPER_BACKPORT.md | ~10 min | Backport runbook becomes lighter — fewer skill modifications, no plan-reviewer integration into /launch. |
+
+**Risk:** Low. Removing complexity, not adding.
+
+**Verify by:** Run `/launch RS-X` on a fresh issue, confirm gate validation works without spawning vbw-lead, run `/review-plan` separately, run `/vbw:vibe --execute --verify`, run `/launch RS-X --close`, confirm Linear lands at UAT.
+
+### What this folds in / cancels
+
+- **Cancels Tier 4.5 (`/pipeline` skill)** — Lanes covers the visible-courier problem at the UI layer. Don't rebuild it as a skill.
+- **Folds Tier 4.1 (verify probe)** — becomes 1.3 (a paragraph, not a probe).
+- **Does NOT touch Tier 2/3 below** — batch-promote messaging and SOP are independent of the Option 3 refactor.
+
+---
+
+## Tier 2 — Batch-promote messaging
 
 | # | Item | Effort | Why |
 |---|------|--------|-----|
-| 4.1 | `/launch` Step 9 VBW-readiness probe | ~30 min | Tier 3 refactor assumed every consumer has VBW's verify flow wired. rs-vault has a Linear-per-issue nested phase layout; `phase-detect.sh` returns `phase_count=0` and `/vbw:vibe --verify` fails at its guard ("no SUMMARY.md"). Fix: Step 9 probes the flow state before delegating, falls back to a precedent path (skip-to-UAT, rely on Dev self-verification + /g-test-vercel + manual UAT) when not wired. Document both paths. |
-| 4.2 | `/launch` Step 10 batch-promote messaging | ~20 min | Current text implies per-issue chain ("Accept with: move to Done, then /g-promote-dev"). Users feel pushed to promote-now when they want to accumulate 2-5 dev-landed issues and batch-promote to main. Update messaging to offer explicit options: ship now / accumulate / hold in UAT. Note batch is the default for feature-heavy phases. |
-| 4.3 | Batch-promote SOP | ~30 min | New section in `sop/Git_and_Deployment.md` (or a new `sop/Promotion_SOP.md`). Cover: when to batch vs per-issue, how DB migrations apply during accumulation, when to cut the batch, three-tier adaptation for projects with beta. |
-| 4.4 | ~~VBW upstream tracking — issue #506~~ — **DONE** | — | Shipped in VBW v1.35.1 (PR #517, merged 2026-04-24). `ensure_transient_ignore` now fires across all three tracking modes per the original issue. `sop/VBW_Help.md` updated with the resolution note; flip-flip workaround retired. Pipekit pinning bumped to v1.35.1. |
-| 4.5 | `/pipeline` skill (tier 4 proper) | ~2-3 hours | Higher-level orchestrator that wraps /launch's gate layer and auto-progresses through courier-role pauses (execute → verify → UAT move). Preserves judgment-role pauses: plan-reviewer verdict, verify failure classification, PR description writing. Falls back to explicit pause-and-prompt on any non-success signal. Rationale: RS-8 hit three courier pauses ("proceed with /vbw:vibe --verify?" etc.); each is mechanical click-to-continue with no judgment involved. Should only pause where human eyes add irreplaceable value. |
+| 2.1 | `/launch --close` final messaging | ~20 min | Replace the per-issue chain nudge with explicit options: ship now / accumulate / hold in UAT. Note batch is the default for feature-heavy phases. |
+| 2.2 | Batch-promote SOP | ~30 min | New section in `sop/Git_and_Deployment.md` (or a new `sop/Promotion_SOP.md`). When to batch vs per-issue, DB migration timing during accumulation, three-tier adaptation. |
 
-**Risk:** Low-medium per item. 4.1 is the most load-bearing (blocks the current Tier 3 refactor on non-VBW-wired consumers). 4.5 is the biggest scope.
+---
 
-### Suggested execution order
+## Tier 3 — Future / deferred
 
-1. **4.4 first** — trivial when fix ships, and unblocks removing the quirk workaround from consumer SOPs.
-2. **4.1 next** — fixes the concrete RS-8 friction. No consumer can reliably /vbw:vibe --verify today.
-3. **4.2 + 4.3 together** — messaging change pairs naturally with the SOP write-up.
-4. **4.5 last** — biggest design; wants a full session.
+- **VBW upstream tracking** — done (issue #506 fixed in v1.35.1). Keep this tier as a placeholder for future upstream coordination.
+- **`/pipeline` skill** — cancelled per Tier 1 reasoning.
+
+---
+
+## rs-vault layout decision (Path B — 2026-04-25)
+
+User decision: rs-vault stays on its current Linear-per-issue nested layout (`phases/phase-1-data-foundation/rs-N-slug/PLAN.md`) for the rest of Phase 1. At the Phase 1 → Phase 2 boundary, restructure to VBW-native layout (`phases/01-data-foundation/01-N-PLAN.md`) as part of RS-50 (Phase 1 closeout hygiene).
+
+**Implications:**
+
+- For Phase 1 remainder (RS-12, 13, 14, 15, 17, 10): use Option B fallback for verify (skip `/vbw:vibe --verify`, rely on Dev self-verification + `/g-test-vercel` + manual UAT)
+- RS-50 spec to include: rename phase dir, rename PLAN.md files to NN-MM-PLAN.md, generate SUMMARY.md stubs for shipped issues, validate `/vbw:vibe --verify` runs against the migrated dir
+- Phase 2 onward: full VBW-native layout, `/vbw:vibe --execute --verify` works end-to-end
 
 ---
 
 ## Status
 
+## Re-tier history (2026-04-25)
+
+After mapping VBW-steering surface, original Tier 1-3 (rules, skills, /launch refactor) renamed as historical "Foundation Tiers" since they're done. New Tier 1 = Option 3 (slim VBW wrapping). Original Tier 4 items folded/cancelled per Tier 1 spec above.
+
 | Tier | Status |
 |------|--------|
-| Session 0 (gaps closed earlier) | ✅ Done (plan-reviewer, end-session, sync self-update, post-archive hook, VBW 1.35 docs) |
-| Tier 1 — Rules Infrastructure | ✅ Done (commits `f31a2ff`, `96c3b1e`, `dcacaa4`, `7b7454c`) |
-| Tier 2 — Skill Enhancements | ✅ Done (commits `474f296`, `635a1ee`, `dc43b95`) |
-| Tier 3 — /launch Refactor | ✅ Done (commits `f0db16d`, `ac8a3ed`, `5b468dc`) |
+| Session 0 — earlier gaps | ✅ Done (plan-reviewer, end-session, sync self-update, post-archive hook, VBW 1.35 docs) |
+| Foundation A — Rules Infrastructure | ✅ Done (commits `f31a2ff`, `96c3b1e`, `dcacaa4`, `7b7454c`) |
+| Foundation B — Skill Enhancements | ✅ Done (commits `474f296`, `635a1ee`, `dc43b95`) |
+| Foundation C — /launch Refactor (Tier 3) | ✅ Done (commits `f0db16d`, `ac8a3ed`, `5b468dc`) — superseded by new Tier 1 below |
 | Canonical rule rename | ✅ Done (commits `93e14c8`, `174f446`) |
-| Tier 4 — Post-RS-8 findings | ⏳ Pending (5 items, see above) |
-| Session 4 — Piper backport | ⏳ Pending (runbook in `PIPER_BACKPORT.md`) |
+| VBW #506 fix tracking | ✅ Done (commit `3a5d399`) |
+| **Tier 1 (NEW) — Option 3: Pipekit owns gates, VBW owns build** | ⏳ **Active** (5 items, see above) |
+| Tier 2 — Batch-promote messaging | ⏳ Pending Tier 1 |
+| Tier 3 — Future / deferred | ⏳ Placeholder |
+| Session 4 — Piper backport | ⏳ Pending Tier 1 + 2 (runbook in `PIPER_BACKPORT.md` will need updates) |
 
 ### Tier 3 recap
 
