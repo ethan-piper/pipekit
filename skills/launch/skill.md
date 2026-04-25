@@ -207,7 +207,9 @@ Invoked when the user returns with verify confirmed (either via `/vbw:vibe --ver
    
    Ready for human acceptance testing.
    ```
-4. **Inform the user:**
+4. **Inform the user.** Adapt the promotion-options block to the project's git architecture (read from `method.config.md` → `## Git Architecture`):
+
+   **Two-tier projects (`dev` → `main`):**
    ```
    PROJ-XXX is ready for UAT.
    
@@ -217,9 +219,51 @@ Invoked when the user returns with verify confirmed (either via `/vbw:vibe --ver
    
    Promotion options:
      - Ship now:   /g-promote-dev → /g-promote-main
-     - Accumulate: /g-promote-dev, then work on next issue;
-                   batch-promote when 2-5 dev-landed issues are ready
+     - Batch:      /g-promote-dev now, then work on next issue;
+                   /g-promote-main when 2-5 dev-landed issues are ready
      - Hold:       leave in UAT for extended testing before any promote
+   
+   Decision criteria — pick batch unless one of these is true:
+     - This is a hotfix (security, data, payment, auth) → ship now
+     - High-blast-radius migration (column rename, table drop) → ship alone
+     - Pre-deploy gate flipped yellow on dev → investigate before adding
+     - 5+ issues already on dev awaiting main → ship the batch now
+     - 1+ week since last main promotion → ship now to keep changes fresh
+   
+   See sop/Git_and_Deployment.md § Batch vs Per-Issue Promotion for the
+   full decision tree, DB-migration timing, and rollback procedures.
+   ```
+
+   **Three-tier projects (`dev` → `beta` → `main`):**
+   ```
+   PROJ-XXX is ready for UAT.
+   
+   Test with: /g-test-vercel (pushes branch, returns preview URL)
+   Accept with: move to Done in Linear, then /g-promote-dev
+   Reject with: describe what's wrong and I'll re-enter execution
+   
+   Promotion options:
+     - Ship now:   /g-promote-dev → /g-promote-beta → (beta UAT) → /g-promote-main
+     - Batch:      /g-promote-dev now; /g-promote-beta when 2-5 dev-landed
+                   issues are UAT-ready; /g-promote-main after beta UAT passes
+                   on the whole batch
+     - Hold:       leave in UAT for extended testing before any promote
+   
+   Decision criteria at each boundary — see sop/Git_and_Deployment.md
+   § Batch vs Per-Issue Promotion. In particular: don't promote partial
+   beta — if any issue fails beta UAT, hold the whole batch or cherry-
+   pick the working issues forward.
+   ```
+
+   **Migration-bearing issues:** if this issue includes Supabase migrations, also include this note before the promotion options:
+
+   ```
+   ⚠ Migration timing
+   This issue includes a DB migration. When migrations apply depends on
+   your project's setup. Read sop/Git_and_Deployment.md § DB Migration
+   Timing to determine whether dev preview tests against the migrated
+   schema. If your /g-promote-dev does not run `supabase db push`, the
+   migration only takes effect at /g-promote-main — plan UAT accordingly.
    ```
 
 ---

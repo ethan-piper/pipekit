@@ -163,6 +163,93 @@ Clean up: `/branch finish` from within the worktree.
 
 **Three-tier:** PR from `dev` → `beta` (issues → UAT), then PR from `beta` → `main` (issues → Done).
 
+See **Batch vs Per-Issue Promotion** below for when to ship one issue at a time vs. accumulate several before promoting.
+
+### Batch vs Per-Issue Promotion
+
+`/launch --close` and the `/g-promote-*` skills support both patterns. The default for feature-heavy phases is **batch**; the default for hotfixes is **per-issue**. Choose deliberately — different work has different risk profiles.
+
+#### When to per-issue (ship now)
+
+- **Hotfix** — security, data corruption, payment, auth issue. Always per-issue, always immediate.
+- **Migration with high blast radius** — e.g., a column rename or table drop. Ship alone so the rollback story is clear.
+- **First production release of a system** — early users, want fast feedback loop.
+- **Inter-issue conflicts** — your in-flight RS-X depends on RS-Y's runtime behavior; batch would couple the test surface.
+- **Pre-deploy gate flagging warnings** — if CI is yellow for any reason on the issue you're promoting, ship it alone so you can isolate what's causing the noise.
+
+#### When to batch
+
+- **Feature-heavy phases** — accumulating 2-5 related issues lets reviewers see the cohesive change.
+- **Schema migrations that compose** — e.g., RS-7 (profiles) + RS-8 (audit_log refs profiles) + RS-13 (RLS uses both). One main PR with all three is easier to verify than three serial chains.
+- **Doc + test + feature triplets** — when the doc update, the test addition, and the feature implementation belong together conceptually.
+- **Designer-reviewed UI changes** — batch lets the designer review one preview URL with all the changes, not three.
+
+#### Recommended batch size
+
+- **Small (2-3 issues)** — default for most work. Easy to review, contained blast radius.
+- **Medium (4-5 issues)** — when issues are tightly related (same component, same migration set).
+- **Large (6+ issues)** — discouraged. Hard to review, hard to roll back. If you find yourself with 6 unmerged issues on dev, ship two batches instead.
+
+If issue count grows past 5, that's a signal — either batch sooner, or ship the most-decoupled issue per-issue to break the queue.
+
+#### When to cut the batch
+
+Concrete triggers that say "stop accumulating, promote now":
+
+- **Hit the size limit** — 3-5 issues on dev that are all UAT-passed
+- **One week elapsed** since the last main promotion — accumulated changes get harder to review the longer they sit
+- **A new high-priority issue lands** in the queue that can't wait for the current batch
+- **Pre-deploy gate flips yellow** on dev — investigate before adding more
+- **Risk-bearing issue ready to promote** — migration, security, dependency upgrade. Ship the batch with the risky issue cleanly bracketed; don't pile more work on top.
+
+If none of these have triggered, keep accumulating.
+
+#### DB migration timing during accumulation
+
+The migration application moment depends on your project's Supabase setup:
+
+| Setup | Migrations apply at | Test on dev preview? |
+|-------|---------------------|----------------------|
+| **Single shared DB** (no dev/prod split) | `/g-promote-main` only — main is the only path that runs `supabase db push` | No — schema doesn't exist on dev preview until main lands |
+| **Single shared DB + `supabase db push` in `/g-promote-dev`** | At each `/g-promote-dev` (forward-mutates shared DB) | Yes — dev preview tests against migrated schema |
+| **Separate dev + prod DBs** (piper pattern) | Each `/g-promote-{dev,beta,main}` runs `supabase db push --project-ref <env-ref>` | Yes — each env has its own DB, no shared mutation |
+| **Supabase branching** (per-PR ephemeral DBs) | At PR open via Vercel-Supabase integration | Yes — each PR has its own DB branch |
+
+Read your project's `/g-promote-*` skills to determine which mode you're in. If a project's `/g-promote-dev` doesn't reference `supabase db push` and there's only one Supabase project, you're in **mode 1** — migration-bearing issues block batch promotion to dev (the migration won't apply until main).
+
+When mode 1 is the friction, the fix is project-specific: either add `supabase db push` to `/g-promote-dev` (forward-mutation accepted in pre-ship projects), or stand up separate dev/prod Supabase projects (mode 3).
+
+#### Three-tier specifics (dev → beta → main)
+
+In three-tier projects, batch decisions happen at two boundaries:
+
+| Boundary | Default | Trigger to deviate |
+|----------|---------|--------------------|
+| `dev` → `beta` | Batch — accumulate until UAT-ready | Hotfix, single high-risk issue, beta release cut for marketing/PR reasons |
+| `beta` → `main` | Wait for beta UAT to pass on the whole batch | Per-issue if any beta-UAT failure isolates to one issue (cherry-pick the rest) |
+
+Beta is the UAT environment in three-tier. Don't promote partial beta — if RS-13 passes UAT but RS-14 doesn't, hold the batch and either fix RS-14 in place or cherry-pick RS-13 to a new branch off beta and re-promote.
+
+#### Pre-deploy gate at each promotion
+
+Run the pre-deploy gate **before** each `/g-promote-*` step, not just before the first one:
+
+- Before `/g-promote-dev`: gate must pass on the feature branch
+- Before `/g-promote-beta` (three-tier): gate must pass on dev
+- Before `/g-promote-main`: gate must pass on dev (two-tier) or beta (three-tier)
+
+The gate at each boundary catches integration-level regressions that wouldn't show on the originating feature branch. Don't skip "because it passed earlier."
+
+#### Rollback per tier
+
+If a promotion turns out to be wrong:
+
+- **Dev rollback** — revert the merge commit on dev. Cheap. Re-promote the working subset.
+- **Beta rollback** (three-tier) — revert beta's merge from dev, then cherry-pick the working issues forward. Document what was rolled back in the Linear issue's comments.
+- **Main rollback** — revert main's merge, run `supabase db push` if a migration was rolled back (sometimes requires manual `DROP` for additive-only migrations), notify any external users. Treat as an incident.
+
+Database migrations are typically forward-only — the rollback for a destructive migration is a forward migration that re-creates the dropped state. Plan migrations with rollback in mind (avoid `DROP COLUMN` until you're sure no readers depend on the column; prefer `ADD COLUMN` + transitional dual-read period).
+
 ### Verification
 
 After any promotion, verify the deployment (smoke tests, health check).
