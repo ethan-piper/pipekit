@@ -1,6 +1,6 @@
 # VBW Commands Reference
 
-Output of `/vbw:help` (VBW v1.35.0) — included here for context on how Pipekit wraps VBW.
+Output of `/vbw:help` (VBW v1.35.1) — included here for context on how Pipekit wraps VBW.
 
 Regenerate this file from the current installed VBW version with:
 ```

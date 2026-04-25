@@ -1,4 +1,4 @@
-VBW Help — v1.35.0
+VBW Help — v1.35.1
 
 Lifecycle — The Main Loop
     /vbw:discuss [N]         Start/continue phase discussion before planning
@@ -41,24 +41,17 @@ Getting Started: /vbw:init → /vbw:vibe → /vbw:vibe --archive
 
 --
 
-Known quirks (VBW v1.35.0)
+Resolved quirks (historical)
 
-    .vbw-planning/.agent-pids (and siblings) leak into git status
-        Cause: planning-git.sh sync-ignore only writes the nested
-               .vbw-planning/.gitignore when planning_tracking=commit.
-               In manual mode (the default), the transient-files
-               gitignore is never written.
-        Workaround: flip mode to commit then back to manual:
-               /vbw:config planning_tracking commit
-               /vbw:config planning_tracking manual
-               The nested .gitignore persists across the flip.
-               Commit .vbw-planning/.gitignore once; you're done forever.
-        Upstream: tracked as swt-labs/vibe-better-with-claude-code-vbw
-               issue #506. Fix accepted 2026-04-24: ensure_transient_ignore
-               will fire across all three planning_tracking modes (manual,
-               ignore, commit) with regression coverage in
-               tests/planning-git.bats. When that fix ships, this
-               workaround becomes obsolete — drop this section and
-               remove the now-unused flip-flip recipe from any project
-               docs that reference it.
+    .vbw-planning/.agent-pids leak into git status — FIXED in v1.35.1
+        Was: planning-git.sh sync-ignore only wrote the nested
+             .vbw-planning/.gitignore in commit mode, so manual-mode
+             projects (the default) never got transient files filtered.
+        Now: per upstream PR #517 (swt-labs/vibe-better-with-claude-code-vbw
+             issue #506), ensure_transient_ignore fires across all three
+             planning_tracking modes. Regression coverage in
+             tests/planning-git.bats.
+        Action for projects on v1.35.0 or earlier: bump to v1.35.1 via
+             /vbw:update; nested .gitignore will materialize on next
+             /vbw:config or /vbw:init invocation.
 
