@@ -175,7 +175,7 @@ After mapping VBW-steering surface, original Tier 1-3 (rules, skills, /launch re
 | Canonical rule rename | ✅ Done (commits `93e14c8`, `174f446`) |
 | VBW #506 fix tracking | ✅ Done (commit `3a5d399`) |
 | **Tier 1 — Option 3: Pipekit owns gates, VBW owns build** | ✅ Done (commits `2afe963`, `eee6932`, `093cbe4`, `568575f`) |
-| Tier 2 — Batch-promote messaging | ⏳ Pending Tier 1 |
+| Tier 2 — Batch-promote messaging | ✅ Done (commit `1bb3351`) |
 | Tier 3 — Future / deferred | ⏳ Placeholder |
 | Session 4 — Piper backport | ⏳ Pending Tier 1 + 2 (runbook in `PIPER_BACKPORT.md` will need updates) |
 
