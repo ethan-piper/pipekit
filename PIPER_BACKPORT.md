@@ -1,8 +1,10 @@
-# Piper Backport Runbook — 2026-04-23
+# Piper Backport Runbook — 2026-04-23 (revised 2026-04-25 for Tier 1 / Option 3)
 
-Executable plan for bringing Pipekit's 2026-04-22/23 session improvements into piper. Designed to be run from a piper-side Claude Code session.
+Executable plan for bringing Pipekit's 2026-04-22 through 2026-04-25 session improvements into piper. Designed to be run from a piper-side Claude Code session.
 
 This doc lives in pipekit. Piper-side Claude should read it from `~/Projects/pipekit/PIPER_BACKPORT.md` (or the committed version on GitHub).
+
+**2026-04-25 revision:** Pipekit shipped the Tier 1 / Option 3 refactor. `/launch` no longer spawns vbw-lead or plan-reviewer directly — those moved to `/vbw:vibe --plan` and the new `/review-plan` skill respectively. Piper backport simplifies accordingly: install `/review-plan`, refactor `/launch` to open + close, drop the in-skill plan-reviewer integration. See revised P2-B5 (now P2-B5a + P2-B5b) below.
 
 ---
 
@@ -277,80 +279,130 @@ Source: pipekit commit 7c9497e."
 
 ## Priority 2 — High-value, medium-risk (~65 min total)
 
-### P2-B5. `/launch` Tier 3 refactor
+### P2-B5a. Install `/review-plan` skill
 
-**Why:** Highest-value port. Piper's `/launch` still orchestrates `vbw:vbw-dev` per task and `vbw:vbw-qa` directly. VBW v1.35 tightened QA contracts; hand-orchestration drifts against them every release. Delegating to `/vbw:vibe --execute` and `--verify` eliminates that drift.
+**Why:** Pipekit's Tier 1 / Option 3 (2026-04-25) extracted plan-review out of `/launch` into a standalone skill. `/launch` no longer spawns vbw-lead or plan-reviewer directly. To match the new architecture, piper installs `/review-plan` first, then refactors `/launch` (P2-B5b).
 
-**Source:** `~/Projects/pipekit/skills/launch/skill.md` — specifically the rewritten Step 8 + Step 9 + Step 10 + updated Model Selection table.
-**Destination:** `~/Projects/piper/.claude/skills/launch/skill.md`
+**Source:** `~/Projects/pipekit/skills/review-plan/skill.md`
+**Destination:** `~/Projects/piper/.claude/skills/review-plan/skill.md`
 
 **Piper adaptations:**
-- Piper's `/launch` has **three-tier promotion** (`/g-promote-dev`, `/g-promote-beta`, `/g-promote-main`); pipekit's shows two-tier. Preserve piper's `/g-promote-*` references in Step 10's "Accept with" text.
-- Piper's `/launch` points to `/speckit` not `/light-spec-revise`. Keep piper's skill references in error paths.
-- Piper uses `mcp__linear__linear_save_issue` in some places. The `/launch` skill itself doesn't — both repos use the current `mcp__linear-server__save_issue`. No rename needed.
-- Keep piper's Milestone/Project Batch Mode section unchanged.
+- Piper uses `/speckit` where the pipekit skill references `/light-spec` and `/02-light-spec-revise`. Update the `Block` verdict routing text in Step 6 to point at `/speckit` for spec-level revisions.
+- All MCP calls already use `mcp__linear-server__*` (pipekit's current convention) — no rename needed.
 
-**Approach:** merge-based. Replace Steps 8, 9, 10 in piper's `/launch` with pipekit's versions, adapting as above. Do not touch Steps 1-7b or the Batch Mode section.
-
-Before starting, back up piper's `/launch`:
+**Commands:**
 ```bash
-cp ~/Projects/piper/.claude/skills/launch/skill.md ~/Projects/piper/.claude/skills/launch/skill.md.pre-tier3
+mkdir -p ~/Projects/piper/.claude/skills/review-plan
+cp ~/Projects/pipekit/skills/review-plan/skill.md ~/Projects/piper/.claude/skills/review-plan/skill.md
+# Then sed or hand-edit the /02-light-spec-revise references to /speckit
+sed -i.bak 's|/02-light-spec-revise|/speckit|g' ~/Projects/piper/.claude/skills/review-plan/skill.md
+rm ~/Projects/piper/.claude/skills/review-plan/skill.md.bak
 ```
-
-Then open piper's `skill.md` and:
-1. Replace Step 8 block (Old: "Spin up VBW Dev Agent per task") with pipekit's Step 8 (handoff to `/vbw:vibe --execute`)
-2. Replace Step 9 block (Old: "Spin up VBW QA Agent") with pipekit's Step 9 (handoff to `/vbw:vibe --verify`, including fail classification)
-3. Update Step 10 comment and status check text to reference the VBW verify signal instead of the QA agent return
-4. Update Model Selection table — keep only `vbw:vbw-lead` and `plan-reviewer` rows; remove `vbw-dev` and `vbw-qa` rows; add the "VBW-side agents (not pinned here)" paragraph
-5. Update NEXT.md Output section with the handoff-pause-point schedule
-
-Pipekit source lines (for reference when merging):
-- Step 8: skill.md lines 178-214
-- Step 9: skill.md lines 216-259
-- Step 10: skill.md lines 261-287
-- Model Selection update: skill.md lines 29-43
-- NEXT.md Output update: skill.md lines 371-383
 
 **Verify:**
 ```bash
-grep -c "vbw:vbw-dev\|vbw:vbw-qa" .claude/skills/launch/skill.md
-# Expected: 0 in the spawning context (may still appear in method references)
+test -f .claude/skills/review-plan/skill.md && grep -q "plan-reviewer" .claude/skills/review-plan/skill.md && echo OK
+```
 
-grep -c "/vbw:vibe --execute\|/vbw:vibe --verify" .claude/skills/launch/skill.md
-# Expected: at least 3 (Step 8 handoff, Step 9 handoff, some prose reference)
+**Commit:**
+```
+git add .claude/skills/review-plan/skill.md
+git commit -m "feat(skills): add /review-plan — standalone plan-reviewer invocation
+
+Tier 1.1 of pipekit's Option 3 architecture. Pulls plan-reviewer
+agent invocation out of /launch into a dedicated skill so /launch
+no longer needs to spawn vbw-lead and plan-reviewer itself. New
+flow per issue:
+
+  /launch RS-X       → Linear gate, status to Building
+  /vbw:vibe --plan   → user runs (VBW owns planning)
+  /review-plan       → THIS SKILL (Pipekit owns review gate)
+  /vbw:vibe --execute → user runs
+  /vbw:vibe --verify  → user runs
+  /launch RS-X --close → Linear status to UAT
+
+Adapts /02-light-spec-revise references to /speckit for piper's
+spec workflow.
+
+Source: pipekit commit 2afe963."
+```
+
+**Rollback:** `git revert <commit>`.
+
+### P2-B5b. Refactor `/launch` to open + close
+
+**Why:** Piper's `/launch` still orchestrates `vbw:vbw-dev` per task and `vbw:vbw-qa` directly. The Tier 1 refactor splits `/launch` into two thin invocations: open (Linear gate + handoff text) and `--close` (Linear → UAT). Direct VBW-agent spawns are removed; `/vbw:vibe` runs autonomously between open and close.
+
+**Source:** `~/Projects/pipekit/skills/launch/skill.md` — the entire post-Tier-1 version (description, Arguments, Steps 7b-9, Model Selection, NEXT.md Output, example session).
+**Destination:** `~/Projects/piper/.claude/skills/launch/skill.md`
+
+**Piper adaptations (preserve piper's specifics):**
+- **Three-tier promotion** in Step 9 close text: `/g-promote-dev → /g-promote-beta → /g-promote-main` (pipekit shows two-tier). Update the close-time promotion options block accordingly.
+- **`/speckit` not `/light-spec-revise`** in error/revise paths.
+- **Hardcoded team ID** in any Linear MCP call snippets — preserve piper's `021f03cd-5661-4fc3-b292-6878b927b8ff`.
+- **Piper's Milestone/Project Batch Mode section** at the bottom — keep it unchanged.
+
+**Approach:** wholesale Steps 7b-9 + Model Selection + NEXT.md Output replacement.
+
+```bash
+cp ~/Projects/piper/.claude/skills/launch/skill.md ~/Projects/piper/.claude/skills/launch/skill.md.pre-tier1
+```
+
+Then in piper's `skill.md`:
+1. **Description and Arguments table** — replace from pipekit's version (description framing as "thin gate"; add `--close` argument; deprecate `--deep`)
+2. **Model Selection** — replace with pipekit's "no agent spawns" version
+3. **Steps 7b-10** — replace with pipekit's Steps 7b/8/9 (open: handoff sequence text; pause: wait for return; close: Linear → UAT)
+4. **NEXT.md Output** — replace with pipekit's two-pause-point schedule (open + close, not the four-pause Tier 3 version)
+5. **Example session** — replace with pipekit's open/close example, adapting WP-/PROJ- to piper's WIT- prefix and three-tier promotion
+6. **Common Drifts and Red Flags** — preserve piper's existing if richer; otherwise port pipekit's
+
+**Verify:**
+```bash
+grep -c "vbw:vbw-dev\|vbw:vbw-qa\|vbw:vbw-lead" .claude/skills/launch/skill.md
+# Expected: 0 (no direct VBW agent spawns anywhere)
+
+grep -c "/launch.*--close\|/review-plan" .claude/skills/launch/skill.md
+# Expected: at least 3 (open handoff text, close phase, NEXT.md schedule)
+
+grep -c "Agent(.*subagent_type" .claude/skills/launch/skill.md
+# Expected: 0 (no Agent() invocations in /launch at all post-refactor)
 ```
 
 **Commit:**
 ```
 git add .claude/skills/launch/skill.md
-git commit -m "refactor(launch): delegate execute and verify to /vbw:vibe (Tier 3)
+git commit -m "refactor(launch): split into open + close, drop all VBW agent spawns
 
-Steps 8 and 9 no longer spawn vbw-dev per-task or vbw-qa directly.
-They hand off to /vbw:vibe --execute {phase} and /vbw:vibe --verify
-{phase} with pause-and-resume semantics: /launch waits for the user
-to return with a status report, then resumes (UAT transition on
-verify pass, re-enter execute on fixable fail, route back to spec
-on framing errors).
+Tier 1.2 of pipekit's Option 3 architecture. /launch is now a thin
+gate-and-handoff layer with two invocations per issue:
 
-Why: VBW v1.35 tightened the QA contract (plan_ref, plans_verified,
-write-verification.sh). Hand-orchestrating drifts against that
-contract every version bump. Delegating is both safer and lower
-maintenance — VBW owns execution+QA, piper owns Linear gates and
-promote flow.
+  /launch WIT-X          — open: Linear gate, status to Building,
+                           handoff text directing user through full
+                           VBW sequence (--plan → /review-plan →
+                           --execute → --verify → --close)
+  /launch WIT-X --close  — close: Linear status to UAT, post comment,
+                           surface promotion options
 
-Step 7b (plan + plan-reviewer gate) unchanged — that is piper's
-value-add and does not exist in /vbw:vibe. Preserves piper's
-three-tier /g-promote-dev/beta/main flow in Step 10.
+Removed all direct VBW-agent spawns:
+- vbw:vbw-lead (now: user runs /vbw:vibe --plan)
+- plan-reviewer (now: separate /review-plan skill, ported in previous
+  commit)
+- vbw:vbw-dev (was already removed in piper's prior Tier 3 work?)
+- vbw:vbw-qa (same)
 
-Depends on upgraded plan-reviewer agent (previous commit) which
-produces the structured output this refactor expects.
+VBW upgrade surface from /launch drops to ZERO. When VBW updates Lead
+or QA contracts, /launch doesn't care.
 
-Source: pipekit commits f0db16d, ac8a3ed."
+Preserved piper-specific:
+- Three-tier /g-promote-dev/beta/main promotion in close text
+- /speckit references in revise paths
+- Milestone/Project Batch Mode section unchanged
+
+Source: pipekit commits eee6932, 093cbe4. Depends on /review-plan
+skill installed in previous commit."
 ```
 
-**Rollback:** `cp .claude/skills/launch/skill.md.pre-tier3 .claude/skills/launch/skill.md && rm .claude/skills/launch/skill.md.pre-tier3`.
-
-Delete the `.pre-tier3` backup after one successful real launch (delete on the same commit where you add the next feature).
+**Rollback:** `cp .claude/skills/launch/skill.md.pre-tier1 .claude/skills/launch/skill.md && rm .claude/skills/launch/skill.md.pre-tier1`.
 
 ### P2-B2. `/brainstorm` Phase 2 HOLD + trigger grammar
 
