@@ -1,45 +1,53 @@
 ---
 name: launch
-description: Formalized trigger to plan and execute a specced Linear issue through VBW or the batch runner
+description: Open + close gate for a specced Linear issue. Validates readiness, transitions Linear status, hands off to VBW for plan/execute/verify, and transitions to UAT on close.
 ---
 
 # Launch Skill
 
-You are a launch gate controller. Your job is to transition a human-approved Linear issue from spec to execution. Read `method.config.md` for project context. You validate readiness gates, route by complexity, manage Linear status transitions, and produce a shippable feature or queue it for batch processing.
+You are a launch gate controller. Your job is to:
+
+1. **Open** — validate readiness gates on a human-approved Linear issue, route by complexity, transition Linear to Building, hand off to VBW for plan + execute + verify
+2. **Close** — when the user returns post-verify, transition Linear to UAT and surface promotion options
+
+Tier 1 / Option 3 architecture (2026-04-25): `/launch` is a thin gate layer. Pipekit owns Linear status transitions; VBW owns plan / execute / verify via `/vbw:vibe`. The plan-review gate runs as a separate Pipekit skill (`/review-plan`).
+
+Read `method.config.md` for project context.
 
 ## Triggers
 
-- `/launch PROJ-XXX`
-- `/launch --milestone WP-1`
-- `/launch --project "P1. Foundation Fixes"`
+- `/launch PROJ-XXX` — open a single issue
+- `/launch PROJ-XXX --close` — close after the user has run the VBW pipeline and confirmed verify passed
+- `/launch --milestone WP-1` — open all ready issues in a milestone
+- `/launch --project "P1. Foundation Fixes"` — open all ready issues in a project
 
 ## Arguments
 
 | Argument | What it does |
 |----------|--------------|
-| `PROJ-XXX` | Launch a single issue |
-| `--milestone <name>` | Launch all ready issues in a milestone |
-| `--project <name>` | Launch all ready issues in a project |
+| `PROJ-XXX` | Open a single issue: validate gates, transition to Building, hand off to VBW |
+| `PROJ-XXX --close` | Close: transition to UAT after VBW pipeline complete + verify passed |
+| `--milestone <name>` | Open all ready issues in a milestone (per-issue gate validation) |
+| `--project <name>` | Open all ready issues in a project |
 | `--dry-run` | Validate gates and show routing plan without executing |
 | `--force` | Skip milestone readiness gate (use with caution) |
-| `--deep` | Escalate the VBW Dev agent from Sonnet to Opus (see Model Selection). Use for known-complex debugging: race conditions, silent failures, cross-layer state bugs. |
+| `--deep` | (Deprecated — no-op; use `/vbw:vibe --execute --effort=max` instead) |
 
 ---
 
 ## Model Selection
 
-Pipekit only spawns two subagents directly — the rest of the pipeline (execute, verify) is delegated to `/vbw:vibe`, which owns its own model decisions per VBW's config. Subagents default-inherit the parent's model, so explicit pins are non-negotiable:
+Tier 1 (Option 3) refactor removed all direct agent spawns from `/launch`. The skill is now pure gate-and-handoff — no `Agent(subagent_type: ...)` calls.
 
-| Step | Agent | Default model | Rationale |
-|------|-------|---------------|-----------|
-| 7b | `vbw:vbw-lead` | `opus` | Planning is the leverage point — over-spending here saves re-work later. |
-| 7b | `plan-reviewer` | `opus` | Review has to catch what planning missed; same reasoning budget. |
+**Where models are still pinned:**
+- `vbw:vbw-lead` — pinned in `/vbw:vibe --plan` per VBW's config (`/vbw:config effort=...`)
+- `plan-reviewer` — pinned by `/review-plan` skill at `model: opus`
+- `vbw:vbw-dev` — pinned in `/vbw:vibe --execute` per VBW's config
+- `vbw:vbw-qa` — pinned in `/vbw:vibe --verify` per VBW's config
 
-**VBW-side agents (not pinned here):** `vbw:vbw-dev` and `vbw:vbw-qa` run inside `/vbw:vibe --execute` / `--verify`. VBW v1.35+ manages their model selection through `/vbw:config`; configure there, not here. The old behavior of spawning these agents directly from `/launch` has been removed — see the Tier 3 refactor note in `PIPEKIT_IMPROVEMENTS.md`.
+`/launch` itself doesn't spawn agents, so it has no model decisions to make. Configure VBW's effort profile via `/vbw:config effort={fast|balanced|thorough|max}` for cost/quality tradeoffs.
 
-**Escape hatch:** `--deep` previously escalated the Dev agent from sonnet to opus. Now that Dev execution is under `/vbw:vibe`, achieve the same effect via `/vbw:vibe --execute --effort=max` or the equivalent VBW profile. `--deep` on `/launch` is now a no-op preserved for backward compatibility; emit a one-line warning recommending the VBW flag.
-
-This defaults-plus-flag pattern is the forerunner of Anthropic's model-use decision tree (in beta). When that ships, this section should be replaced with a reference to it.
+**`--deep` flag (deprecated):** previously escalated Dev to opus when `/launch` orchestrated the chain. Now a no-op; emit a one-line warning recommending `/vbw:vibe --execute --effort=max` instead.
 
 ---
 
@@ -128,158 +136,90 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
 2. Inform the user: `"PROJ-XXX queued for batch execution. Run /linear-todo-runner to process, or it will be picked up on next runner invocation."`
 3. **Done.** The `/linear-todo-runner` skill handles execution from here.
 
-### Step 7b — Medium/High Complexity: VBW Planning
+### Step 7b — Medium/High Complexity: Hand Off to VBW
 
-1. Read the full issue description (spec + AC)
-2. Spin up the **VBW Lead Agent** (`vbw:vbw-lead`) via the Agent tool:
-   ```
-   Agent(
-     subagent_type: "vbw:vbw-lead",
-     model: "opus",
-     description: "Plan PROJ-XXX: {title}",
-     prompt: "Create a PLAN.md for PROJ-XXX based on the following approved spec from Linear:
-     
-     {full issue description}
-     
-     Read CLAUDE.md for project conventions. If the spec involves UI work, read Strategy/DesignDirection.md for visual design guidance. Place the plan in .vbw-planning/phases/{phase-slug}/
-     The spec has been human-approved — do not change scope or decisions.
-     Decompose into atomic tasks with verify/done criteria derived from the AC."
-   )
-   ```
-3. After the lead agent returns, run the **plan-reviewer** agent with the full input contract the agent expects (see `.claude/agents/plan-reviewer.md` → Input Contract section):
-   ```
-   Agent(
-     subagent_type: "plan-reviewer",
-     model: "opus",
-     description: "Review plan for PROJ-XXX",
-     prompt: "Independent review of VBW Lead's plan for PROJ-XXX before Dev execution.
+Pipekit owns the Linear gate. **VBW owns planning, execution, and verification.** Pipekit no longer spawns `vbw:vbw-lead` directly — `/vbw:vibe --plan` is the canonical path. The plan-review gate now runs as a separate Pipekit skill (`/review-plan`).
 
-     Plan path(s): .vbw-planning/phases/{phase-slug}/*-PLAN.md
-     Approved spec (verbatim from Linear):
-     <<<SPEC
-     {full Light Spec and Acceptance Criteria section from the issue description}
-     SPEC
-
-     Project context:
-     - CLAUDE.md at repo root
-     - method.config.md at repo root
-     - PHASES.md at .vbw-planning/PHASES.md (if present)
-     - CONCERNS.md at .vbw-planning/codebase/CONCERNS.md (if present)
-
-     Follow the Review Protocol in your agent definition. Return the structured markdown output. If you return Block or Revise, the orchestrator will relay your Fast Path to Pass back to Lead; do not attempt to rewrite the plan yourself."
-   )
-   ```
-
-   **Graceful fallback:** if the orchestrator cannot find the `plan-reviewer` agent (pre-install state or older Pipekit sync), it should note this transparently — "No dedicated plan-reviewer agent installed; relying on Lead's Stage 3 self-review" — and present the plan to the user directly for approval. Do not silently skip the review gate.
-4. Present the plan and review to the user for approval
-5. If user approves, proceed to Step 8
-6. If user requests changes, iterate on the plan
-
-### Step 8 — Hand Off to `/vbw:vibe --execute`
-
-Pipekit's plan-gate passed (Step 7b). Execution is VBW's job, not Pipekit's. Do **not** orchestrate `vbw:vbw-dev` spawns manually — VBW v1.35's `/vbw:vibe --execute` handles task-sequencing, atomic commits, execution-state updates, and known-issues tracking natively.
-
-**Hand off to the user** with a clear boundary — Pipekit pauses until they come back:
+**Hand off to the user** with the full sequence laid out so they can run it without coming back between phases:
 
 ```
-## Plan approved — handing off to VBW execution
+## Linear gate passed — handing off to VBW
 
-PROJ-XXX is ready to build. Next action:
+PROJ-XXX is in Building. Run this sequence:
 
-  /vbw:vibe --execute {phase-slug}
+  1. /vbw:vibe --plan {phase-slug}      ← VBW Lead writes PLAN.md
+  2. /review-plan {phase-slug}           ← Pipekit's plan-review gate
+                                            (calls plan-reviewer agent)
+  3. (read review verdict — proceed only on Pass or Revise)
+  4. /vbw:vibe --execute {phase-slug}    ← VBW Dev builds with atomic commits
+  5. /vbw:vibe --verify {phase-slug}     ← VBW QA (see "Verify path" note below)
+  6. /launch PROJ-XXX --close            ← Pipekit transitions Linear to UAT
 
-VBW will:
-- Execute each task in the plan with atomic commits per task
-- Update .vbw-planning/STATE.md and the execution-state tracker
-- Surface any blockers or deviations
+If plan-review returns Block: route to `/vbw:vibe --plan` for Lead-revise,
+or `/02-light-spec-revise PROJ-XXX` if the issue is spec-level (framing, scope).
 
-When /vbw:vibe --execute completes, come back and tell me "done with execute".
-I'll move to QA handoff (Step 9) and then transition the Linear issue to UAT on success.
-
-If execution fails or surfaces blockers, tell me what went wrong — we'll decide
-whether to send it back to Lead for plan revision (stay in Building) or escalate.
+If verify reports failures: re-run `/vbw:vibe --execute` with fix scope. Linear
+stays in Building. Don't run `/launch --close` until verify passes.
 ```
 
-While paused, do not spawn any VBW agents yourself. If the user asks for progress, read `.vbw-planning/STATE.md` and `.vbw-planning/phases/{phase-slug}/*-SUMMARY.md` if present.
-
-**On return:**
-
-1. Quickly verify execution actually completed by checking `.vbw-planning/STATE.md` (or equivalent) shows the phase as executed, not just "in progress."
-2. Post a Linear comment noting execution complete:
-   ```
-   **Build progress:** VBW execution complete. Moving to QA.
-   - Branch: {branch name}
-   - Tasks completed: {N}/{total} (from SUMMARY.md)
-   ```
-3. Proceed to Step 9.
-
-### Step 9 — Hand Off to `/vbw:vibe --verify`
-
-Same pattern as Step 8 — delegate to VBW rather than orchestrating QA manually.
-
-VBW v1.35 tightened QA contracts (`plan_ref`, `plans_verified`, `write-verification.sh` enforcement). `/vbw:vibe --verify` satisfies these natively; hand-orchestrated `vbw:vbw-qa` spawns drift against the contract every version bump. Delegating is both safer and less maintenance.
-
-**Hand off:**
+**Verify path note** (informational; Pipekit doesn't enforce):
 
 ```
-## Execution complete — handing off to VBW verification
+/vbw:vibe --verify expects VBW-native phase layout (.vbw-planning/phases/NN-slug/
+with NN-MM-PLAN.md and NN-MM-SUMMARY.md per plan).
 
-Next action:
+If your project uses a non-native layout (Linear-per-issue nested, etc.) and
+phase-detect returns phase_count=0, /vbw:vibe --verify will fail at its guard.
+Fall back to project precedent — typically Dev self-verification + /g-test-vercel
+preview URL + manual UAT — and run /launch --close once you're satisfied.
 
-  /vbw:vibe --verify {phase-slug}
-
-VBW will:
-- Run goal-backward QA against PLAN.md must_haves
-- Execute the pre-deploy gate (types, lint, test)
-- Write VERIFICATION.md via write-verification.sh
-- Surface any failures as FAIL checks
-
-When /vbw:vibe --verify completes, come back and tell me the verdict:
-  "verify passed" → I'll transition the Linear issue to UAT
-  "verify failed" → tell me which checks failed; we'll decide whether to
-                    route back to /vbw:vibe --execute for fixes or escalate
+This is a project-VBW coupling concern, not a Pipekit concern. Pipekit's gate
+ran at /launch open and runs again at /launch --close.
 ```
 
-**On return (verify passed):** proceed to Step 10.
+While the user is in the VBW pipeline, do not spawn any VBW agents yourself. If they ask for progress, read `.vbw-planning/STATE.md` and any `*-SUMMARY.md` files in the phase dir.
 
-**On return (verify failed):**
+### Step 8 — Wait for User to Return with `--close`
 
-1. Read the failed check list from the user or `.vbw-planning/phases/{phase-slug}/*-VERIFICATION.md`
-2. Classify:
-   - **Fixable in execute:** missing code changes, wrong behavior, failed tests → tell user to re-run `/vbw:vibe --execute` with the fix scope
-   - **Plan-level:** spec/AC misinterpreted, scope gap, wrong approach → route back to `/vbw:vibe --plan` or `/light-spec-revise`
-3. Keep the Linear issue in **Building** — don't advance status on failure.
-4. Post a Linear comment with the failure summary:
-   ```
-   **QA failed:** {N} check(s) failed.
-   - {check ID}: {brief}
-   - ...
-   
-   Re-entering execution with fix scope. Status remains Building.
-   ```
+Pipekit pauses after Step 7b. The user runs the VBW sequence (`--plan` → `/review-plan` → `--execute` → `--verify`) on their own pace. Pipekit re-enters when they invoke `/launch PROJ-XXX --close`.
 
-### Step 10 — Move to UAT
+**While paused:**
+- If user asks "is the plan good?" — point them at `/review-plan {phase-slug}`
+- If user asks "what's the build status?" — read `.vbw-planning/STATE.md` and the latest `*-SUMMARY.md`
+- If user asks "did verify pass?" — read `*-VERIFICATION.md` if VBW-native; otherwise ask them to confirm based on their project's precedent
 
-Triggered only when Step 9 returns with "verify passed."
+Do **not** auto-advance to `--close`. The user must explicitly invoke it. This is the second judgment-role pause (the first was Linear gate at Step 1).
 
-1. Move issue to **UAT** ({UAT state ID from method.config.md}) via `mcp__linear-server__save_issue`
-2. Post a Linear comment:
+### Step 9 — Close: Move to UAT (`/launch PROJ-XXX --close`)
+
+Invoked when the user returns with verify confirmed (either via `/vbw:vibe --verify` passed, or via project-precedent self-verification on non-VBW-native layouts).
+
+1. **Re-validate** the issue is still in Building. If it's already past UAT, no-op with a message.
+2. **Move issue to UAT** ({UAT state ID from method.config.md}) via `mcp__linear-server__save_issue`
+3. **Post a Linear comment** summarizing the build:
    ```
    **Build complete.** Moved to UAT.
-   - VBW execute: ✓
-   - VBW verify: ✓ (via /vbw:vibe --verify)
-   - Pre-deploy gate: ✓ (run inside verify)
+   - Plan reviewed: {Pass | Revise — see /review-plan output} 
+   - Execution: complete (per VBW or project precedent)
+   - Verification: {VBW-native via /vbw:vibe --verify | project precedent — Dev self-verification + /g-test-vercel}
+   - Pre-deploy gate: ✓
    - Branch: {branch name}
    
    Ready for human acceptance testing.
    ```
-3. Inform the user:
+4. **Inform the user:**
    ```
    PROJ-XXX is ready for UAT.
    
    Test with: /g-test-vercel (pushes branch, returns preview URL)
    Accept with: move to Done in Linear, then /g-promote-dev
    Reject with: describe what's wrong and I'll re-enter execution
+   
+   Promotion options:
+     - Ship now:   /g-promote-dev → /g-promote-main
+     - Accumulate: /g-promote-dev, then work on next issue;
+                   batch-promote when 2-5 dev-landed issues are ready
+     - Hold:       leave in UAT for extended testing before any promote
    ```
 
 ---
@@ -370,16 +310,23 @@ When you encounter these situations, take the safer path:
 
 ## NEXT.md Output
 
-With Tier 3's hand-off model, `/launch` pauses at Steps 8 and 9 rather than completing in one invocation. Write `NEXT.md` at each pause point so the user's next action is never lost if they close the session:
+Tier 1 / Option 3 has two `/launch` invocations per issue: open and `--close`. Each one writes `NEXT.md` so the user's next action survives session close.
 
-| Pause point | `NEXT.md` should point to |
-|-------------|----------------------------|
-| End of Step 7b (plan approved) | `/vbw:vibe --execute {phase-slug}` |
-| End of Step 8 (execute handed off, awaiting return) | `/vbw:vibe --execute {phase-slug}` if user hasn't run it yet; `/vbw:vibe --verify {phase-slug}` once user reports execute done |
-| End of Step 9 (verify handed off, awaiting return) | `/vbw:vibe --verify {phase-slug}` if user hasn't run it; return to `/launch PROJ-XXX` once user reports verify status |
-| End of Step 10 (UAT transition complete) | Next Specced issue in phase → `/launch {next issue}`; or `/strategy-sync` if phase complete with pending marker; or `/phase-plan` if phase complete and synced |
+| Invocation | Outcome | `NEXT.md` should point to |
+|------------|---------|----------------------------|
+| `/launch PROJ-XXX` (open) | Linear gate passed, status to Building | `/vbw:vibe --plan {phase-slug}` (or the full handoff sequence in Step 7b) |
+| `/launch PROJ-XXX --close` | Linear status to UAT | Next action — see logic below |
 
-At each pause, emit inline `➜ Next:` and overwrite `NEXT.md` together — the SOP rule is that both must match. See the NEXT.md convention and schema in `sop/Skills_SOP.md` (Routing Pointers → NEXT.md). Use the `YYYY-MM-DD HH:MM local` timestamp format.
+**Close-time NEXT.md logic** (priority order):
+
+1. Next Specced issue in current phase → `/launch {next issue}`
+2. If `.pipekit/pending-strategy-sync` marker exists → `/strategy-sync`
+3. If phase complete and synced → `/phase-plan`
+4. Otherwise → `/g-test-vercel` for the just-shipped issue
+
+Inline `➜ Next:` and `NEXT.md` contents must match. See SOP schema in `sop/Skills_SOP.md` (Routing Pointers → NEXT.md). Use the `YYYY-MM-DD HH:MM local` timestamp format.
+
+**Note:** Pipekit no longer writes NEXT.md between phases (between `--plan`, `--execute`, `--verify`). Those are VBW's pause points; if the user wants context recovery there, they consult `.vbw-planning/STATE.md` directly. Pipekit's NEXT.md tracks the **issue lifecycle**, not the build lifecycle.
 
 ---
 
@@ -423,22 +370,51 @@ User: /launch PROJ-88
   Dependencies: ✓ PROJ-200 (Done), PROJ-201 (Done)
   Milestone: ✓ WP-2 AG Grid Migration — all 4 siblings specced
   Complexity: High (~16h)
-  Route: VBW (Lead → Plan → Dev → QA)
+  Route: VBW
 
-Moving to Building...
-Spinning up VBW Lead Agent...
+Moving to Building... done.
 
-[Plan created, reviewed, approved, executed, QA passed]
+Run this sequence:
+  1. /vbw:vibe --plan ag-grid-migration
+  2. /review-plan ag-grid-migration
+  3. /vbw:vibe --execute ag-grid-migration
+  4. /vbw:vibe --verify ag-grid-migration
+  5. /launch PROJ-88 --close
+
+➜ Next: /vbw:vibe --plan ag-grid-migration
+NEXT.md updated.
+
+---
+
+[User runs the VBW sequence on their own pace]
+
+---
+
+User: /launch PROJ-88 --close
+
+## Closing PROJ-88
+
+  Verifying state... issue in Building, branch ahead of dev: ✓
+  
+  Moving to UAT...
+  Linear updated. Comment posted.
 
 ## PROJ-88 Build Complete — Moved to UAT
 
-  Tasks: 8/8 complete
-  QA: passed
-  Pre-deploy: ✓ types, ✓ lint, ✓ test
+  Plan reviewed: Pass (Readiness 9/10)
+  Execution: complete
+  Verification: passed via /vbw:vibe --verify
   Branch: feature/wit-88-ag-grid
 
-  Test with: /g-test-vercel
-  Accept: move to Done → /g-promote-dev
+  Test with: /g-test-vercel (preview URL)
+  
+  Promotion options:
+    - Ship now:   /g-promote-dev → /g-promote-main
+    - Accumulate: /g-promote-dev, then work on next issue
+    - Hold:       leave in UAT for extended testing
+
+➜ Next: /launch PROJ-89 (next Specced issue in WP-2)
+NEXT.md updated.
 
 ---
 
