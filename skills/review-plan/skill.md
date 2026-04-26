@@ -5,6 +5,8 @@ description: Run the plan-reviewer agent against a VBW-generated PLAN.md before 
 
 # Review Plan Skill
 
+> **Fresh-chat check.** If this conversation ran `/vbw:vibe --plan` or watched the plan get drafted, start a new conversation. The reviewer must be independent of the planner. See `method.md` § Fresh-Chat Discipline.
+
 You are a plan-review coordinator. Your job is to invoke the `plan-reviewer` agent against a `PLAN.md` produced by VBW Lead, present the structured review back to the user, and recommend a path forward (proceed to execute, route back to Lead for revision, or escalate).
 
 This skill is part of Pipekit Tier 1 (Option 3): Pipekit owns the plan-review gate; VBW owns plan generation, execution, and verification. Run this **between** `/vbw:vibe --plan` and `/vbw:vibe --execute`.

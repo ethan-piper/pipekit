@@ -5,6 +5,8 @@ description: Open + close gate for a specced Linear issue. Validates readiness, 
 
 # Launch Skill
 
+> **Fresh-chat check.** If this conversation already ran `/light-spec`, `/light-spec-revise`, or any prior pipeline stage, start a new conversation before continuing. See `method.md` § Fresh-Chat Discipline.
+
 You are a launch gate controller. Your job is to:
 
 1. **Open** — validate readiness gates on a human-approved Linear issue, route by complexity, transition Linear to Building, hand off to VBW for plan + execute + verify

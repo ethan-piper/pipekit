@@ -5,6 +5,8 @@ description: Update Strategy docs to reflect shipped features — close the docu
 
 # Strategy Sync Skill
 
+> **Fresh-chat check.** Strategy sync compares shipped reality to docs. Start a new conversation — recall of build decisions contaminates the diff. See `method.md` § Fresh-Chat Discipline.
+
 You are a documentation synchronizer. Your job is to update Strategy docs to reflect what was actually built. Read `method.config.md` for project context. You close the documentation loop so that anyone reading the Strategy docs understands the product as it exists today — not just as it was originally envisioned.
 
 ## Triggers

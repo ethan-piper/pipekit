@@ -225,6 +225,36 @@ AI proposes, reviews, and executes. Humans decide. AI never locks in a product d
 
 ---
 
+## Fresh-Chat Discipline
+
+Pipeline stages are AI→AI contracts. The contract only holds if each stage's agent reads the prior stage's output **as a document**, not as recalled conversation. A reviewer who watched the spec get drafted is no longer an independent reviewer; a planner who absorbed the launch handoff carries assumptions the spec didn't make explicit.
+
+**Rule:** start a new conversation when crossing a stage boundary. Inside a stage, one chat is fine.
+
+### When to start fresh
+
+| Crossing | Why fresh |
+|---|---|
+| `/light-spec` → `/light-spec-revise` (after agent review) | Reviser must read the published spec + agent comment as documents, not recall the draft session |
+| `/light-spec` → `/launch` | Gate controller must validate the spec on its merits, not from memory of how it was built |
+| `/launch` → `/vbw:vibe --plan` | VBW Lead reads the Linear spec as a contract; prior context biases decomposition |
+| `/vbw:vibe --plan` → `/review-plan` | Plan reviewer must be independent of the planner |
+| `/vbw:vibe --execute` → `/vbw:vibe --verify` | QA must verify against goals, not against the executor's narration |
+| Any stage → `/strategy-sync` | Strategy sync compares shipped reality to docs; recall of build decisions contaminates the diff |
+
+### When to stay in-session
+
+- Inside `/light-spec` (capture → draft → publish are one stage)
+- Inside `/launch` open + immediate planning kickoff if VBW handoff is mechanical
+- Inside execution (multiple `/vbw:vibe --execute` runs on the same plan)
+- Reading-only sessions: `/start-session`, `/linear-status`, `/00-roadmap-review`
+
+### Why this matters more than it looks
+
+The spec-as-contract principle ("no stage may introduce guesswork into the next stage") only works if the next stage is genuinely downstream. A long-running session collapses the stages into one agent making all decisions with shared context, which is the failure mode this whole pipeline exists to prevent. Fresh chats are the cheapest possible enforcement.
+
+---
+
 ## Three-Layer Enforcement Model
 
 | Layer | Purpose | Who it serves |

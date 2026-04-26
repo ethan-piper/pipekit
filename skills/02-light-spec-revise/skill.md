@@ -5,6 +5,8 @@ description: Apply Spec Review Agent feedback to an existing Light Spec. Surgica
 
 # Light Spec Revise Skill
 
+> **Fresh-chat check.** If this conversation drafted the spec being revised, start a new conversation. The revision must read the published spec + agent comment as documents, not recall the draft. See `method.md` § Fresh-Chat Discipline.
+
 Close the feedback loop between Linear's Spec Review Agent and a published Light Spec. Reads the latest agent comment, diffs it against the current description, and either applies targeted fixes for unresolved blockers or reports that the agent's verdict is stale.
 
 ## Triggers
