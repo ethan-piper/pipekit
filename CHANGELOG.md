@@ -6,7 +6,7 @@ Pin to a specific version: `./scripts/sync-method.sh v1.3.0`.
 
 ---
 
-## v1.3.0 — 2026-04-25
+## v1.3.0 — 2026-04-26
 
 ### What's New
 

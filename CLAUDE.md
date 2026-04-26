@@ -15,7 +15,7 @@ Origin: extracted from the Piper production finance platform.
 ## Pipeline
 
 ```
-Stage 0: Foundation (once per project)
+Stage 0: Foundation (a contract — see Entry Modes)
   /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /phase-plan
 
 Stages 1-5: Development (repeats per phase)
@@ -23,7 +23,7 @@ Stages 1-5: Development (repeats per phase)
   VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
 ```
 
-Stage 0 takes a project from idea to first phase. Stages 1-5 repeat per phase/feature. Feedback loops send work backward when ambiguity is detected.
+Stage 0 is a **contract** (a set of artifacts the dev pipeline requires), not a script. Three entry modes satisfy the contract: greenfield (full chain), brownfield (skip /concept and /define), inherited (verify and proceed). `/startup` auto-detects mode and confirms with the user. Stages 1-5 repeat per phase/feature. Feedback loops send work backward when ambiguity is detected. Full Entry Modes table in `method.md`.
 
 ## Repo Structure
 
