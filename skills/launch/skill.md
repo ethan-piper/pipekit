@@ -33,6 +33,7 @@ Read `method.config.md` for project context.
 | `--project <name>` | Open all ready issues in a project |
 | `--dry-run` | Validate gates and show routing plan without executing |
 | `--force` | Skip milestone readiness gate (use with caution) |
+| `--tier {quick\|standard\|heavy}` | Override tier inference. Always confirmed with the user before proceeding. |
 | `--deep` | (Deprecated — no-op; use `/vbw:vibe --execute --effort=max` instead) |
 
 ---
@@ -72,6 +73,28 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
 3. If no spec/AC found: stop and report `"PROJ-XXX has no spec or AC. Run /light-spec PROJ-XXX first."`
 4. If status is before Approved: stop and report `"PROJ-XXX is in {status}. Move to Approved in Linear before launching."`
 
+### Step 1.5 — Determine Tier (always confirm; never auto-pick)
+
+Tiers shape which gates apply. Tier is **orthogonal** to complexity (which routes execution): an issue can be Quick complexity but Heavy tier (e.g., a 2-hour change to billing logic). Tier inference is advisory — the human always confirms before any gate runs.
+
+1. Resolve tier in this order:
+   - `--tier {quick|standard|heavy}` flag, if provided
+   - Issue label `tier:quick`, `tier:standard`, or `tier:heavy`
+   - Inferred default (see heuristic below)
+2. **Inference heuristic** (used only as a starting point for the confirmation prompt):
+   - Default to **standard**
+   - Suggest **quick** if: complexity is Low AND issue has no milestone AND description has `## Acceptance Criteria` with ≤5 bullets AND no `tier:standard` or `tier:heavy` label
+   - Suggest **heavy** if: any of these are true → labels include `security`, `auth`, `payments`, `pii`, `compliance`, `breaking-change`; or the spec mentions schema migration, RLS, or external API contract change
+3. **Always print the inference and ask for explicit confirmation**, even when a flag or label was provided. Wording:
+   ```
+   Tier resolved: {tier} (source: {flag|label|inference})
+   Reason: {one-line summary}
+   Proceed with {tier} tier? (y / change-to {alt} / abort)
+   ```
+4. Once confirmed, load `method/templates/tier-{tier}.md` and treat its gate table as the active gate list for the remainder of `/launch`. The default flow below is **standard**; deviations are noted inline with `[Quick: ...]` and `[Heavy: ...]` markers.
+
+If `method.config.md` has removed a tier from its `## Tiers` table, treat that tier as disallowed and require the user to pick one of the remaining tiers.
+
 ### Step 2 — Check Dependencies
 
 1. Read `blocked_by` relations from the issue
@@ -79,6 +102,8 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
 3. If any blocker is NOT in **Done** ({Done state ID from method.config.md}): stop and report `"PROJ-XXX is blocked by PROJ-YYY ({status}). Resolve blockers first."`
 
 ### Step 3 — Milestone Readiness Gate
+
+[Quick: skip this gate entirely — Quick tier does not require sibling readiness.]
 
 1. Identify the issue's milestone (if any) via the issue's milestone field
 2. If the issue belongs to a milestone:
@@ -100,8 +125,11 @@ All issues in the same milestone must be at least **Specced** (agent-reviewed) b
 
 ### Step 4 — Determine Complexity and Route
 
+[Quick: route is forced to `/linear-todo-runner` regardless of complexity. Skip the complexity field check.]
+[Heavy: route is forced to full VBW Lead → plan-review → Dev → QA regardless of complexity. Batch runner is disallowed.]
+
 1. Read the `## Light Spec` section and extract the `**Complexity:**` field
-2. Route based on complexity:
+2. Route based on complexity (Standard tier only):
 
 | Complexity | Route | What happens |
 |-----------|-------|--------------|
@@ -195,6 +223,14 @@ Do **not** auto-advance to `--close`. The user must explicitly invoke it. This i
 ### Step 9 — Close: Move to UAT (`/launch PROJ-XXX --close`)
 
 Invoked when the user returns with verify confirmed (either via `/vbw:vibe --verify` passed, or via project-precedent self-verification on non-VBW-native layouts).
+
+[Heavy: before transitioning, verify all close-gate artifacts are present:
+- QA report exists and is passing
+- Security review report exists at the path defined in `method.config.md`
+- `/strategy-sync` last-run timestamp is after this issue's last build commit
+- No `.pipekit/pending-strategy-sync` marker exists
+
+If any check fails, refuse to close with a list of missing artifacts and stop. Do not transition Linear status.]
 
 1. **Re-validate** the issue is still in Building. If it's already past UAT, no-op with a message.
 2. **Move issue to UAT** ({UAT state ID from method.config.md}) via `mcp__linear-server__save_issue`

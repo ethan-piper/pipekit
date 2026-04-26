@@ -113,6 +113,20 @@ Add rows as needed. Common additions:
 | Workflow Examples | `Strategy/WorkflowExamples.md` | Step-by-step user scenarios | All |
 | Data Model | `Strategy/DataModel.md` | Schema, relationships, calculations | Developers |
 
+## Tiers
+
+Tiers shape which gates apply to a launched issue. `/launch` infers the tier from issue labels (`tier:quick`, `tier:standard`, `tier:heavy`) but **always confirms with the human before proceeding** — automatic tier escalation/de-escalation is disallowed by design.
+
+| Tier | Default? | Use for | Skipped gates | Added gates |
+|------|----------|---------|---------------|-------------|
+| **Quick** | No (opt-in) | 1–3 stories, single PR, AC fits in head | Spec review, milestone-readiness, plan-review | — |
+| **Standard** | Yes (default) | Normal feature work | — | — |
+| **Heavy** | No (opt-in) | Multi-phase, security-sensitive, cross-strategy-doc | — | Security review, mandatory `/strategy-sync` before close |
+
+Per-tier templates live at `method/templates/tier-{quick,standard,heavy}.md`.
+
+To disable a tier in this project, remove its row above. Removing **Standard** is not allowed — it is the fallback.
+
 ## Pre-Deploy Gate
 
 Commands that must pass before any deployment. Adjust per project stack.

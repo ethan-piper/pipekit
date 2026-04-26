@@ -1,0 +1,51 @@
+# Tier: Heavy
+
+> Extended pipeline for security-sensitive, multi-phase, or cross-strategy-doc work. Adds a security review gate and requires `/strategy-sync` before the issue can close.
+
+## When to use
+
+- Touches authn/authz, payments, billing, PII, or audit trails
+- Spans multiple Strategy docs (e.g., changes both Permissions and Data Model)
+- Multi-phase delivery with explicit checkpoints
+- Compliance-sensitive (SOC2, GDPR, HIPAA, etc.)
+- Externally-visible API or contract changes
+- A failed change has non-reversible side effects (data, billing, customer comms)
+
+## When NOT to use
+
+- Internal refactors with no surface-area change → Standard
+- Single-PR feature, even if "important" → Standard (Heavy is about *risk*, not *priority*)
+
+## Gates
+
+Heavy = Standard + the additions below. Every Standard gate is also required.
+
+| Added gate | When | Owner |
+|------------|------|-------|
+| **Security review** | After QA passes, before `--close` | `/security-review` skill (or human security review for projects without it) |
+| **Strategy sync (mandatory)** | Before `--close` | `/strategy-sync` must run and produce no unapplied diffs |
+| **Pre-deploy compliance check** | Before merge to production | Project-defined (e.g., SOC2 evidence capture) |
+
+## Routing
+
+Heavy tier always routes through full VBW planning, regardless of complexity rating. Batch runner is disallowed — every Heavy issue gets a `PLAN.md` and explicit plan review.
+
+## Required artifacts
+
+- Light spec with explicit threat model section (if security-sensitive)
+- `PLAN.md` with risk/trap coverage
+- Plan-review report
+- QA verification report
+- Security review report (artifact path defined per-project in `method.config.md`)
+- `/strategy-sync` diff log showing docs match shipped reality
+
+## Close path
+
+`/launch PROJ-XXX --close` checks for:
+
+1. QA report present and passing
+2. Security review report present
+3. `/strategy-sync` last-run timestamp is after this issue's last build commit
+4. No `.pipekit/pending-strategy-sync` marker
+
+If any check fails, `--close` is refused with a list of missing artifacts. Linear status only transitions to UAT once all checks pass.

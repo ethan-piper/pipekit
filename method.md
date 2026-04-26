@@ -423,6 +423,20 @@ Detailed standard operating procedures for each discipline:
 
 ---
 
+## Tiers
+
+`/launch` resolves a **tier** for every issue. Tiers shape *which gates apply*; complexity (Low/Medium/High) shapes *how execution is routed*. The two are orthogonal — a Quick-tier issue can be Low or Medium complexity; a Heavy-tier issue is always routed through full VBW planning regardless of complexity.
+
+| Tier | Use for | Notable behavior |
+|------|---------|------------------|
+| **Quick** | 1–3 stories, single PR, AC-as-plan | Skips spec review, milestone-readiness, plan review, QA agent. Routes to batch runner. |
+| **Standard** (default) | Normal feature work | Full pipeline. Complexity routes execution path. |
+| **Heavy** | Security-sensitive, multi-phase, cross-strategy-doc | Adds security review + mandatory `/strategy-sync` before close. Always full VBW planning. |
+
+Tier inference (label, flag, heuristic) is **always confirmed with the human** before any gate runs — automatic tier escalation/de-escalation is disallowed by design. Per-tier templates live at `templates/tier-{quick,standard,heavy}.md`. Per-project tier configuration lives in `method.config.md` § Tiers.
+
+---
+
 ## Project Configuration
 
 Each consuming project maintains a `method.config.md` at its root with project-specific values (Linear workspace, issue prefix, state IDs, environment URLs, pre-deploy commands). Portable skills read this file at runtime. See `method.config.template.md` for the template.
