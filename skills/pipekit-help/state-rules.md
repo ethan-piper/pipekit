@@ -4,12 +4,37 @@
 
 Rules are evaluated top-to-bottom. Early rules handle blocking conditions and post-pipeline actions; later rules handle in-pipeline progression.
 
-## 1. Stage 0 not complete
+## 1. Foundation contract incomplete (mode-aware)
 
-**Match:** `.vbw-planning/PHASES.md` does not exist OR `Strategy/` directory is empty.
+The foundation contract (see `method.md` § Foundation Contract) is the set of artifacts the dev pipeline requires. When any are missing, recommend a mode-appropriate `/startup` invocation rather than a generic one. Detection is top-down; first sub-rule wins.
+
+### 1a. Empty project — greenfield
+
+**Match:** No `concept-brief.md` AND no source tree (no `package.json`, no populated `src/`) AND no `Strategy/`.
 
 **Recommend:** `/startup`
-**Why:** Stage 0 (foundation) hasn't run; pipeline can't operate without it.
+**Why:** Fresh project with no foundation artifacts and no code — run the full Stage 0 chain.
+
+### 1b. Code present, no foundation — brownfield
+
+**Match:** Source tree present (`package.json` or populated `src/`) AND no `Strategy/` directory AND no `method.config.md`.
+
+**Recommend:** `/startup --mode=brownfield`
+**Why:** Existing codebase adopting Pipekit — skip `/concept` and `/define`, route to `/strategy-create` with a manual-edit note.
+
+### 1c. Foundation present, no recent activity — inherited or returning
+
+**Match:** All foundation-contract artifacts present AND no commits in the last 14 days on the current branch AND no `PLAN.md` / `REVIEW.md` / `VERIFICATION.md` markers in the latest phase.
+
+**Recommend:** `/start-session`
+**Why:** Foundation is intact and nothing is mid-flight — review past progress and capture session intentions before picking work. (Run `/startup --mode=inherited` if you want an explicit foundation audit first.)
+
+### 1d. Partial foundation — diagnose first
+
+**Match:** Some foundation-contract artifacts present, others missing — does not match 1a, 1b, or 1c above.
+
+**Recommend:** `/startup --mode=inherited`
+**Why:** Foundation is partially in place — run the Foundation Check to see exactly which artifacts are missing and which retrofit skills to run.
 
 ## 2. Pending strategy sync
 
