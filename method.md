@@ -359,6 +359,7 @@ VBW resolves the path relative to the project root. The hook is fail-open — if
 | `/launch {ISSUE}` | Open: validate Linear gates, route by complexity, transition to Building, hand off to VBW |
 | `/launch {ISSUE} --close` | Close: transition Linear to UAT after VBW pipeline complete + verify passed |
 | `/launch --milestone {WP}` | Launch all ready issues in a milestone |
+| `/pipekit-help` | Read project state, recommend the next pipeline step. Use when you don't know what to run next. |
 | `/review-plan {phase-slug}` | Run plan-reviewer agent against VBW-generated PLAN.md. Run between `/vbw:vibe --plan` and `/vbw:vibe --execute`. |
 | `/linear-todo-runner` | Batch execution of specced issues (called by `/launch` for Low complexity) |
 | `/sync-linear` | Bidirectional VBW ↔ Linear sync |

@@ -176,6 +176,33 @@ To update: `./scripts/sync-method.sh [tag]`
 
 ---
 
+## Next-Step Nudges (Opt-In Stop Hook)
+
+Pipekit ships `scripts/pipekit-next-step-nudge.sh` — a Stop hook that suggests `/pipekit-help` after a pipeline-relevant skill finishes. The hook is **opt-in** (not registered automatically) and **scoped by behavior** (silent unless the most recent assistant turn invoked `/launch`, `/light-spec`, `/light-spec-revise`, `/review-plan`, `/strategy-sync`, or `/vbw:vibe`).
+
+To enable, add this to `.claude/settings.local.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {"type": "command", "command": "$CLAUDE_PROJECT_DIR/scripts/pipekit-next-step-nudge.sh"}
+        ]
+      }
+    ]
+  }
+}
+```
+
+The hook prints a one-line nudge to stderr — Claude Code surfaces this back as additional context for the next turn. Exit code is always 0; the hook never blocks output.
+
+Disable any time by removing the entry from `settings.local.json`. To customize which skills trigger the nudge, fork the script — the override system covers `skills/`, `sop/`, and `method.md` only; scripts are not currently in the override scope.
+
+---
+
 ## Customizing Synced Skills (Overrides)
 
 If a project needs to change behavior of a synced skill, **do not edit the file in `.claude/skills/<name>/` directly** — it will be overwritten on the next sync. Use the override system instead:

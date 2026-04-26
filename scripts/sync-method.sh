@@ -180,6 +180,8 @@ echo "Hook scripts:"
 mkdir -p "$PROJECT_ROOT/scripts"
 sync_file "$TEMP/scripts/pipekit-post-archive.sh" "$PROJECT_ROOT/scripts/pipekit-post-archive.sh" "scripts/pipekit-post-archive.sh"
 [ -f "$PROJECT_ROOT/scripts/pipekit-post-archive.sh" ] && chmod +x "$PROJECT_ROOT/scripts/pipekit-post-archive.sh"
+sync_file "$TEMP/scripts/pipekit-next-step-nudge.sh" "$PROJECT_ROOT/scripts/pipekit-next-step-nudge.sh" "scripts/pipekit-next-step-nudge.sh"
+[ -f "$PROJECT_ROOT/scripts/pipekit-next-step-nudge.sh" ] && chmod +x "$PROJECT_ROOT/scripts/pipekit-next-step-nudge.sh"
 
 # --- Sync canonical .claude/rules/ files ---
 # Contract: Pipekit owns three canonical rule files prefixed `pipekit-`
