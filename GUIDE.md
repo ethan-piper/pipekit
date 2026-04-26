@@ -121,7 +121,23 @@ BETWEEN PHASES:
 
 ## Stage 0: Foundation
 
-Stage 0 takes a project from raw idea to first phase ready for speccing. It runs once per project. The `/startup` skill orchestrates the full flow — you can run each step individually or let `/startup` chain them.
+Stage 0 is the **foundation contract** — a set of artifacts the dev pipeline (Stages 1-5) requires before `/launch` is safe. It is not a script you run once; it is a pre-condition. *How* the contract is satisfied depends on your entry mode.
+
+### Entry Modes
+
+Pick the mode that matches your situation. Full description in [method.md § Entry Modes](method.md#entry-modes).
+
+| Mode | Who | Skills run | Skills skipped |
+|---|---|---|---|
+| **Greenfield** | Founder, fresh idea, no code yet | Full Stage 0 chain | None |
+| **Brownfield** | Team adopting Pipekit on an existing codebase | `/startup --mode=brownfield`, `/vbw:init`, `/roadmap-create`, `/phase-plan` | `/concept`, `/define` |
+| **Inherited** | New contributor joining a Pipekit project | None — verify foundation, jump to dev pipeline | All of Stage 0 |
+
+`/startup` auto-detects the mode and confirms with you before proceeding (same pattern as tier resolution in `/launch`). `/strategy-from-code` (auto-audit for brownfield) is deferred to v1.4.0; brownfield currently routes through `/strategy-create` with a manual-edit note.
+
+The rest of this section describes the **greenfield flow** in detail. Brownfield skips Steps 0.1 and 0.2 — adapt accordingly. Inherited mode runs no Stage 0 steps; jump straight to [Stage 1](#stage-1-definition) once the foundation check passes.
+
+The `/startup` skill orchestrates the greenfield flow — you can run each step individually or let `/startup` chain them.
 
 ### Step 0.1: Concept
 

@@ -61,6 +61,18 @@ Full ownership table and drift-risk mitigations in [method.md](method.md#vbw--pi
 | 10 | Ship | Promote to production |
 | 11 | Strategy Sync | Update docs to match what was built |
 
+## Entry Modes
+
+Pipekit projects enter the dev pipeline through one of three modes — pick the one that matches your situation before running `/startup`. Full description and skill routing in [method.md § Entry Modes](method.md#entry-modes).
+
+| Mode | Who | Skills run | Skills skipped |
+|---|---|---|---|
+| **Greenfield** | Founder, fresh idea, no code yet | Full Stage 0 chain | None |
+| **Brownfield** | Team adopting Pipekit on an existing codebase | `/startup --mode=brownfield`, `/vbw:init`, `/roadmap-create`, `/phase-plan` | `/concept`, `/define` |
+| **Inherited** | New contributor joining a Pipekit project | None — verify foundation, jump to dev pipeline | All of Stage 0 |
+
+`/startup` auto-detects the mode and confirms with you before proceeding. `/strategy-from-code` (auto-audit for brownfield) is deferred to v1.4.0; brownfield currently routes through `/strategy-create` with a manual-edit note.
+
 ## Getting Started
 
 > **Use a terminal.** Pipekit involves running shell commands alongside Claude Code. Use a terminal or terminal emulator — iTerm, VS Code's integrated terminal, Cursor, tmux, etc. The Claude desktop app isn't designed for shell workflows.
