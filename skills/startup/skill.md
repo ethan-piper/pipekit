@@ -104,6 +104,62 @@ Use these in the Progress table:
 
 ---
 
+## Foundation Check (Inherited-Mode Subroutine)
+
+This subroutine is called by `--mode=inherited` (see [Mode Routing](#mode-routing) below) and can be invoked standalone whenever you want to confirm a project's foundation contract is intact. It does **not** create or modify artifacts — it inspects state and reports.
+
+### What it checks
+
+For each artifact in the foundation contract (see `method.md` § Foundation Contract), verify presence on disk. The check is presence-only — `[TBD]` content is fine; missing files are not.
+
+| Artifact | Path | If missing — retrofit suggestion |
+|---|---|---|
+| Concept brief | `concept-brief.md` | Run `/concept` to retrofit (or document the existing project's concept manually) |
+| Project definition | `project-definition.md` | Run `/define` to retrofit |
+| Strategy docs | `Strategy/*.md` (matching `method.config.md` manifest) | Run `/strategy-create` to retrofit, or wait for `/strategy-from-code` in v1.4.0 |
+| Project config | `method.config.md` | Run `/startup --mode=brownfield` (it populates config from existing project state) |
+| VBW scaffold | `.vbw-planning/` | Run `/vbw:init` |
+| Linear-VBW map | `.vbw-planning/linear-map.json` | Run `/roadmap-create` (creates the map) |
+| Phase plan | `.vbw-planning/PHASES.md` | Run `/phase-plan` |
+
+For the Strategy docs check, read `method.config.md` § Strategy Docs to get the manifest, then verify each listed file exists. If `method.config.md` itself is missing, treat the manifest check as deferred — flag the config gap as the blocker.
+
+### Output
+
+**If everything exists:**
+
+```
+Foundation OK.
+
+  Current phase: {phase name from PHASES.md}
+  Issues in flight: {N from PHASES.md current phase}
+
+➜ Next: /start-session  (review past progress and capture intentions)
+   or:   /light-spec PROJ-XXX  (begin speccing an issue from the current phase)
+```
+
+Read `.vbw-planning/PHASES.md` to extract the current phase name and issue list. If multiple issues are in flight (status In Progress / Building), recommend `/linear-status` instead so the user can pick.
+
+**If anything is missing:**
+
+```
+Foundation incomplete — {N} artifact(s) missing:
+
+  ✗ {path} — {retrofit suggestion}
+  ✗ {path} — {retrofit suggestion}
+
+Resolve the missing artifacts before entering the dev pipeline.
+Run /pipekit-help for a state-aware next-step recommendation.
+```
+
+List every missing artifact with its retrofit suggestion. Do **not** auto-run any retrofit skill — present options and let the user choose.
+
+### Emit `NEXT.md`
+
+Whether the check passes or fails, write `NEXT.md` at the project root with the recommended next command and a one-line reason (matching the on-screen `➜ Next:`). See `sop/Skills_SOP.md` § NEXT.md convention.
+
+---
+
 ## Execution
 
 Each step checks if its output already exists and offers to skip — making `/startup` resumable. If you stop after Step 4, re-running picks up at Step 5.
