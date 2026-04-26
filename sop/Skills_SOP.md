@@ -173,3 +173,18 @@ This defaults-plus-flag pattern is the forerunner of Anthropic's model-use decis
 Portable skills are maintained in the method repo and synced into projects via `scripts/sync-method.sh`. After syncing, the skills appear in `.claude/skills/` alongside project-specific skills.
 
 To update: `./scripts/sync-method.sh [tag]`
+
+---
+
+## Customizing Synced Skills (Overrides)
+
+If a project needs to change behavior of a synced skill, **do not edit the file in `.claude/skills/<name>/` directly** — it will be overwritten on the next sync. Use the override system instead:
+
+1. Copy the skill into `.claude/overrides/skills/<name>/skill.md`.
+2. Make your project-specific edits there.
+3. Add a row to `.claude/overrides/MANIFEST.md` explaining what you changed and why.
+4. Re-run `scripts/sync-method.sh` — the override is applied on top of the upstream sync.
+
+The sync script saves a snapshot of the upstream version it replaced and warns on the next sync if upstream has changed the same file (so you can review whether your override is still appropriate).
+
+See `method.md` § Sync-Safe Overrides for the full contract.

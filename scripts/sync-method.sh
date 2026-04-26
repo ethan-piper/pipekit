@@ -19,6 +19,16 @@
 #   .claude/skills/{local}  <- Project-specific skills
 #   .vbw-planning/          <- Project state
 #   method.config.md        <- Project configuration
+#
+# Overrides (sync-safe customization):
+#   .claude/overrides/skills/<name>/skill.md      <- full-file replacement
+#   .claude/overrides/sop/<file>.md               <- full-file replacement
+#   .claude/overrides/method.md.patch             <- unified diff applied to method.md
+#   .claude/overrides/.upstream-snapshot/         <- managed by sync; do not edit
+#   .claude/overrides/MANIFEST.md                 <- human-curated list (what + why)
+#
+# Overrides are applied AFTER upstream sync. Drift is surfaced when upstream
+# changes a file that has an override — the user must review.
 
 set -euo pipefail
 
@@ -279,6 +289,129 @@ for script in drift-check.sh sync-method.sh; do
   fi
 done
 
+# --- Apply overrides ---
+# Project-local overrides live under .claude/overrides/. After upstream sync,
+# we replay full-file overrides for skills/sop and apply method.md.patch.
+# We snapshot the upstream version we replaced so the *next* sync can detect
+# upstream drift on overridden files.
+OVERRIDES_DIR="$PROJECT_ROOT/.claude/overrides"
+OVERRIDE_SNAPSHOT="$OVERRIDES_DIR/.upstream-snapshot"
+OVERRIDES_APPLIED=""
+OVERRIDE_DRIFT=""
+
+apply_override() {
+  # $1 = override file path (under OVERRIDES_DIR)
+  # $2 = target file path (in project)
+  # $3 = label for output
+  local override="$1"
+  local target="$2"
+  local label="$3"
+
+  if [ ! -f "$target" ]; then
+    echo "  SKIP override $label (target missing: $target)"
+    return
+  fi
+
+  local rel="${override#$OVERRIDES_DIR/}"
+  local snap_path="$OVERRIDE_SNAPSHOT/$rel"
+  mkdir -p "$(dirname "$snap_path")"
+
+  # Drift check: if a previous snapshot exists and doesn't match the upstream
+  # version we just synced, upstream changed underneath the override.
+  if [ -f "$snap_path" ] && ! cmp -s "$snap_path" "$target"; then
+    OVERRIDE_DRIFT="$OVERRIDE_DRIFT $label"
+    echo "  ⚠ DRIFT $label — upstream changed; review override against new upstream"
+  fi
+
+  if $DRY_RUN; then
+    echo "  WOULD OVERRIDE $label"
+  else
+    # Snapshot the upstream version BEFORE overwriting it.
+    cp "$target" "$snap_path"
+    cp "$override" "$target"
+    echo "  OVERRIDE $label"
+    OVERRIDES_APPLIED="$OVERRIDES_APPLIED $label"
+  fi
+}
+
+apply_patch_override() {
+  # $1 = patch file (under OVERRIDES_DIR)
+  # $2 = target file (in project)
+  # $3 = label
+  local patch_file="$1"
+  local target="$2"
+  local label="$3"
+
+  if [ ! -f "$target" ]; then
+    echo "  SKIP patch $label (target missing: $target)"
+    return
+  fi
+
+  local rel="${patch_file#$OVERRIDES_DIR/}"
+  local snap_path="$OVERRIDE_SNAPSHOT/$rel.target"
+  mkdir -p "$(dirname "$snap_path")"
+
+  # Drift check on patches: compare new upstream target to last-known upstream.
+  if [ -f "$snap_path" ] && ! cmp -s "$snap_path" "$target"; then
+    OVERRIDE_DRIFT="$OVERRIDE_DRIFT $label"
+    echo "  ⚠ DRIFT $label — upstream changed; patch may not apply cleanly"
+  fi
+
+  if $DRY_RUN; then
+    echo "  WOULD PATCH $label"
+    return
+  fi
+
+  # Snapshot upstream BEFORE patching.
+  cp "$target" "$snap_path"
+
+  # Apply patch. Use --dry-run first to fail loud rather than half-apply.
+  if patch --dry-run -p1 -d "$(dirname "$target")" -i "$patch_file" >/dev/null 2>&1; then
+    patch -p1 -d "$(dirname "$target")" -i "$patch_file" >/dev/null
+    echo "  PATCHED $label"
+    OVERRIDES_APPLIED="$OVERRIDES_APPLIED $label"
+  else
+    echo "  ✗ PATCH FAILED $label — upstream diverged from patch context."
+    echo "    Inspect: $patch_file"
+    echo "    Upstream snapshot: $snap_path"
+    echo "    Sync continuing; resolve patch manually before next sync."
+  fi
+}
+
+if [ -d "$OVERRIDES_DIR" ]; then
+  echo ""
+  echo "Overrides:"
+
+  # Skill overrides: .claude/overrides/skills/<name>/skill.md
+  if [ -d "$OVERRIDES_DIR/skills" ]; then
+    while IFS= read -r -d '' override_file; do
+      skill_name=$(basename "$(dirname "$override_file")")
+      target="$PROJECT_ROOT/.claude/skills/$skill_name/$(basename "$override_file")"
+      apply_override "$override_file" "$target" "skills/$skill_name/$(basename "$override_file")"
+    done < <(find "$OVERRIDES_DIR/skills" -type f -name '*.md' -print0 2>/dev/null)
+  fi
+
+  # SOP overrides: .claude/overrides/sop/<file>.md
+  if [ -d "$OVERRIDES_DIR/sop" ]; then
+    while IFS= read -r -d '' override_file; do
+      target="$PROJECT_ROOT/method/sop/$(basename "$override_file")"
+      apply_override "$override_file" "$target" "sop/$(basename "$override_file")"
+    done < <(find "$OVERRIDES_DIR/sop" -type f -name '*.md' -print0 2>/dev/null)
+  fi
+
+  # method.md patch
+  if [ -f "$OVERRIDES_DIR/method.md.patch" ]; then
+    apply_patch_override \
+      "$OVERRIDES_DIR/method.md.patch" \
+      "$PROJECT_ROOT/method/method.md" \
+      "method.md.patch"
+  fi
+
+  if [ -z "$OVERRIDES_APPLIED" ] && [ -z "$OVERRIDE_DRIFT" ]; then
+    echo "  (no overrides found)"
+  fi
+fi
+
 # --- Check for method.config.md ---
 echo ""
 if [ ! -f "$PROJECT_ROOT/method.config.md" ]; then
@@ -380,6 +513,23 @@ CHLOG
   echo "---" >> "$CHANGELOG"
   echo "_Read by \`/pipekit-update\` for reconciliation. Safe to delete after review._" >> "$CHANGELOG"
 
+  if [ -n "$OVERRIDES_APPLIED" ] || [ -n "$OVERRIDE_DRIFT" ]; then
+    echo "" >> "$CHANGELOG"
+    echo "## Overrides" >> "$CHANGELOG"
+    if [ -n "$OVERRIDES_APPLIED" ]; then
+      echo "### Applied" >> "$CHANGELOG"
+      for o in $OVERRIDES_APPLIED; do
+        echo "- \`$o\`" >> "$CHANGELOG"
+      done
+    fi
+    if [ -n "$OVERRIDE_DRIFT" ]; then
+      echo "### Drift (review required)" >> "$CHANGELOG"
+      for o in $OVERRIDE_DRIFT; do
+        echo "- \`$o\` — upstream changed; verify override is still correct" >> "$CHANGELOG"
+      done
+    fi
+  fi
+
   echo ""
   echo "Changelog written to: method/.sync-changelog.md"
 fi
@@ -395,6 +545,11 @@ if $DRY_RUN; then
   echo "Remove --dry-run to apply"
 else
   echo "Synced from: $METHOD_REPO @ $REF"
+  if [ -n "$OVERRIDE_DRIFT" ]; then
+    echo ""
+    echo "⚠ Override drift detected on:$OVERRIDE_DRIFT"
+    echo "  Upstream changed files you override. Review before committing."
+  fi
   echo ""
   echo "Next steps:"
   echo "  1. Review method/.sync-changelog.md for what changed"

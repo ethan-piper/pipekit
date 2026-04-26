@@ -443,6 +443,38 @@ Each consuming project maintains a `method.config.md` at its root with project-s
 
 ---
 
+## Sync-Safe Overrides
+
+Pipekit syncs upstream content via `scripts/sync-method.sh`, which overwrites `skills/`, `sop/`, `templates/`, and `method.md` on every run. Projects that need to customize a synced file should use the override system rather than editing the synced file directly (which gets clobbered on next sync) or forking the skill (which loses upstream improvements).
+
+### Layout
+
+```
+.claude/overrides/
+  skills/<name>/skill.md        # full-file replacement for a synced skill
+  sop/<file>.md                 # full-file replacement for a synced SOP
+  method.md.patch               # unified diff applied to method/method.md
+  MANIFEST.md                   # human-curated list (what + why)
+  .upstream-snapshot/           # managed by sync; do not edit
+```
+
+### Behavior
+
+1. `sync-method.sh` first copies upstream files into place (current behavior).
+2. Then for each override, the script saves the upstream version it's about to replace into `.upstream-snapshot/`, then applies the override.
+3. On the next sync, it compares the new upstream version against the snapshot. If they differ, it surfaces a **drift warning** — upstream changed a file you override, and the override may no longer be appropriate.
+4. Patches are applied with `patch --dry-run` first; if the patch can't apply cleanly, sync continues but flags the failure for manual resolution.
+
+### Authoring guidance
+
+- Use **full-file overrides** for skills and SOPs. They're easy to reason about and survive any upstream change.
+- Use **patches** for `method.md` (the only patch-target supported). Patches preserve upstream improvements when they don't touch your patched section.
+- Always document the override in `MANIFEST.md` with a **why**. Without it, future-you can't tell whether the override is still load-bearing.
+
+See `templates/overrides-manifest.template.md` for the manifest format.
+
+---
+
 ## Outcome
 
 This method creates a deterministic, low-ambiguity system for software delivery where:
