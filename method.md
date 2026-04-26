@@ -25,15 +25,15 @@ When ambiguity is detected, the pipeline sends work backward — not forward. A 
 ## Pipeline
 
 ```
-Stage 0: Foundation (runs once per project)
+Stage 0: Foundation (a contract, not a script)
   /concept → /define → /strategy-create → /startup → /vbw:init → /roadmap-create → /phase-plan
 
-Stages 1-5: Development Pipeline (repeats per phase/feature)
+Stages 1-5: Development Pipeline (repeats per phase/feature, contract-strict)
   [Roadmap Review] → Light Spec → Agent Review → Human Review → Launch →
   VBW Plan → Plan Review → Execution → QA → UAT → Ship → [Strategy Sync]
 ```
 
-**Stage 0** takes a project from idea to first phase ready for speccing. **Stages 1-5** repeat for each phase of features.
+**Stage 0** is the *contract* the development pipeline depends on — a set of artifacts (concept, definition, strategy, config, VBW scaffold, Linear map, phase plan) that must exist before `/launch` is safe to run. It's not a script you run once; it's a pre-condition. *How* those artifacts come to exist depends on the project's entry mode (greenfield, brownfield, inherited — see [Entry Modes](#entry-modes) below). **Stages 1-5** consume the contract and repeat per phase of features.
 
 **Bookends:** `/roadmap-review` validates Stage 0 outputs and plan health before entering the pipeline. `/strategy-sync` updates Strategy docs after features ship — closing the documentation loop.
 
@@ -79,13 +79,49 @@ Stage 0 runs once per project. `/startup` orchestrates the full flow.
 
 ---
 
+## Foundation Contract
+
+The development pipeline (Stages 1-5) is **contract-strict**: every skill in it assumes a specific set of artifacts already exists. If any of these are missing, `/launch` is unsafe — gates can't validate, plans can't reference strategy, Linear sync has no map. The contract below is the minimum surface; how each artifact came to exist is mode-specific (see [Entry Modes](#entry-modes)).
+
+| Artifact | Path | Required for |
+|---|---|---|
+| Concept brief | `concept-brief.md` | `/define` |
+| Project definition | `project-definition.md` | `/strategy-create`, `/roadmap-create` |
+| Strategy docs | `Strategy/*.md` | `/light-spec`, `/strategy-sync` |
+| Project config | `method.config.md` | All Pipekit skills |
+| VBW scaffold | `.vbw-planning/` | `/launch`, VBW agents |
+| Linear-VBW map | `.vbw-planning/linear-map.json` | `/launch`, `/sync-linear` |
+| Phase plan | `.vbw-planning/PHASES.md` | `/launch`, `/phase-plan` |
+
+`/roadmap-review` is the gate that verifies the contract before the dev pipeline begins. `/pipekit-help` and `/startup --mode=inherited` (see [Entry Modes](#entry-modes)) inspect the contract on demand and recommend retrofits when artifacts are missing.
+
+> **Note on completeness vs. existence.** The contract requires that artifacts *exist*; it does not require them to be perfect. `[TBD]` sections in strategy docs are normal at v0.1.0 — the spec pipeline is what fills them in. The contract is a presence check, not a content audit.
+
+---
+
+## Entry Modes
+
+A project can enter the dev pipeline through three legitimate paths. They differ in how the foundation contract gets satisfied — not in what the contract is.
+
+| Mode | Who | Skills run | Skills skipped |
+|---|---|---|---|
+| **Greenfield** | Founder, fresh idea, no code yet | Full Stage 0 chain (`/concept` → `/define` → `/strategy-create` → `/startup` → `/vbw:init` → `/roadmap-create` → `/phase-plan`) | None |
+| **Brownfield** | Team adopting Pipekit on an existing codebase | `/startup --mode=brownfield` (stub for now), `/vbw:init`, `/roadmap-create`, `/phase-plan` | `/concept`, `/define` (the project already exists; concept/definition are reverse-engineered manually or via the v1.4.0 `/strategy-from-code` skill) |
+| **Inherited** | New contributor joining a Pipekit project | None — `/startup --mode=inherited` verifies the contract is intact and points to the dev pipeline | All of Stage 0 (artifacts are already on disk) |
+
+`/startup` auto-detects the mode by inspecting project state (no concept-brief + no code → greenfield; code present, no Strategy/ → brownfield; everything present → inherited) and **always confirms with the user** before proceeding — same pattern as tier resolution in `/launch`. Mode is never picked silently.
+
+> **`/strategy-from-code` is deferred to v1.4.0.** Brownfield mode currently routes through `/strategy-create` with a manual-edit note: the generated docs reflect the project definition, not the existing code, so you'll want to edit them against reality before the first `/light-spec`.
+
+---
+
 ## Stage 0: Foundation
 
 **Steps:** 0.1–0.7 (Concept → Define → Strategy → Setup → VBW Init → Roadmap → Phase Plan)
 
 **Tools:** `/concept`, `/define`, `/strategy-create`, `/startup`, `/vbw:init`, `/roadmap-create`, `/phase-plan`
 
-Runs once per project. Takes a raw idea through structured definition, strategy documentation, infrastructure setup, and roadmap creation to produce a populated Linear board with the first phase ready for speccing.
+Stage 0 is the contract above (Foundation Contract), not a script. The greenfield path runs all seven skills in order. Brownfield skips the first two. Inherited skips the entire stage and just verifies the artifacts. See [Entry Modes](#entry-modes) for which path applies to your project. This section documents the greenfield flow; the others are variations on it.
 
 - `/concept` captures the idea and assesses viability — supports ingesting existing documents (proposals, research, notes)
 - `/define` distills the concept into stages, roles, workflows, and success criteria
