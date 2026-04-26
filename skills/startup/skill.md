@@ -10,6 +10,9 @@ You are a project bootstrap orchestrator. Your job is to chain pre-pipeline skil
 ## Triggers
 
 - `/startup`
+- `/startup --mode=greenfield` (explicit greenfield)
+- `/startup --mode=brownfield` (existing codebase adopting Pipekit)
+- `/startup --mode=inherited` (joining an existing Pipekit project — runs the Foundation Check only)
 - "start the project setup"
 - "bootstrap this project"
 
@@ -160,7 +163,59 @@ Whether the check passes or fails, write `NEXT.md` at the project root with the 
 
 ---
 
+## Mode Routing
+
+`/startup` accepts a `--mode={greenfield,brownfield,inherited}` flag. If absent, auto-detect by inspecting project state, then **always confirm with the user** before proceeding (same pattern as tier resolution in `/launch` Step 1.5 — never auto-pick).
+
+### Auto-detection rules
+
+Evaluate top-down; first match wins:
+
+| Detected state | Mode |
+|---|---|
+| All foundation-contract artifacts present (see Foundation Check above) | **inherited** |
+| Source tree present (`package.json` or `src/` with files) AND no `Strategy/` directory | **brownfield** |
+| No `concept-brief.md` AND no source tree | **greenfield** |
+| Mixed / ambiguous state (some artifacts present, some not) | **fallback to greenfield** with explicit warning that the detection was ambiguous |
+
+### Confirmation prompt
+
+Mirror the wording from `skills/launch/skill.md` Step 1.5:
+
+```
+Auto-detected entry mode: {mode}
+  ({short reason — e.g., "no concept-brief, no source tree → fresh project"})
+
+Proceed with {mode}?  (y / change-to {alt} / abort)
+```
+
+`{alt}` is the most plausible alternative based on detection (e.g., a brownfield detection's `{alt}` is `inherited`; a greenfield detection's `{alt}` is `brownfield`). If the user picks `change-to <other>`, accept it without re-validating — they know their project better than the heuristic does.
+
+When `--mode=` is passed explicitly, skip auto-detection entirely. Do **not** confirm — the explicit flag is the confirmation.
+
+### Mode behavior
+
+| Mode | What runs |
+|---|---|
+| **greenfield** | The existing 12-step flow in [Execution](#execution) below. No behavioral change from prior versions. |
+| **brownfield** | Skip Step 1 (Concept) and Step 2 (Define). Prompt for project metadata (name, one-liner, audience) and write a minimal `project-definition.md` from the answers — enough for `/strategy-create` to consume. Route to Step 5 (Strategy Docs) via `/strategy-create` with this banner: _"The generated strategy docs reflect the project definition you just provided, not the existing code. You'll likely want to edit them against reality before the first `/light-spec`. Auto-audit via `/strategy-from-code` is planned for v1.4.0."_ Then continue with Step 7 (VBW Init) → Step 8 (Roadmap) → Step 9 → 10 → 11 → 12 (Phase Plan). Skip Steps 3, 4 (Tech Stack, Infrastructure) since the codebase already has these — instead, populate the relevant `method.config.md` sections (Stack, Environments, Pre-Deploy Gate) by inspecting the existing project (`package.json`, deployment config, CI files). |
+| **inherited** | Run the [Foundation Check](#foundation-check-inherited-mode-subroutine) subroutine above. Do not run any of the 12 steps. Exit with the next-step recommendation from the check's output. |
+
+### Tracker handling
+
+The startup tracker (`{folder-name}-startup.md`) records the mode under a new line in the header:
+
+```
+**Mode:** greenfield | brownfield | inherited
+```
+
+For **inherited** mode, the tracker is read-only — the foundation check produces a report but does not modify tracker state, and `/startup --mode=inherited` does not create a tracker file if one doesn't exist. For **brownfield**, create the tracker as usual but mark skipped Stage 0 steps as `⏭️ Skipped (brownfield)` in the Progress table.
+
+---
+
 ## Execution
+
+The steps below describe the **greenfield** flow in full. Brownfield skips Steps 1-2 (and Steps 3-4, since the codebase already exists) and adapts the others as noted in [Mode Routing](#mode-routing) above. Inherited mode does not execute these steps — it runs the Foundation Check and exits.
 
 Each step checks if its output already exists and offers to skip — making `/startup` resumable. If you stop after Step 4, re-running picks up at Step 5.
 
