@@ -40,6 +40,8 @@ Stage 0 takes a project from idea to first phase. Stages 1-5 repeat per phase/fe
 
 Projects pull from this repo using `sync-method.sh`. The sync copies `skills/`, `sop/`, `templates/`, and `method.md` into the project. It never touches project-specific files (`method.config.md`, `.claude/rules/`, `.vbw-planning/`, project-specific skills).
 
+**Sync-safe overrides:** projects can override synced skills/SOPs/method.md without forking by writing to `.claude/overrides/`. The sync script applies overrides after the upstream copy and surfaces drift warnings when upstream changes a file you override. See `method.md` § Sync-Safe Overrides.
+
 ## VBW / Pipekit Ownership
 
 Pipekit wraps VBW — it does not replace VBW's planning layer. The boundary is explicit:
@@ -82,9 +84,10 @@ VBW agents don't call skills — they read the consuming project's CLAUDE.md dir
 
 | Skill | Purpose |
 |-------|---------|
-| `/launch` | Validates gates, routes by complexity, triggers execution |
+| `/launch` | Validates gates, resolves tier (Quick/Standard/Heavy), routes by complexity, triggers execution |
 | `/light-spec` | Generates structured specs as AI-to-AI contracts |
 | `/light-spec-revise` | Applies Spec Review Agent feedback surgically; detects stalemate loops |
+| `/pipekit-help` | Reads project state, recommends the next pipeline step (push-based replacement for "what skill do I run now?") |
 | `/strategy-sync` | Updates Strategy docs post-ship to match what was actually built |
 | `/pipekit-update` | Pull latest Pipekit from GitHub into project (supports `--push`) |
 

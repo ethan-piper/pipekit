@@ -497,7 +497,9 @@ After agent review passes, you review the spec in Linear. This is where product 
 | **Dependency gate** | All `blocked_by` issues are Done | Stop — resolve blockers |
 | **Milestone gate** | All sibling issues in the milestone are at least Specced | Stop — spec the siblings (or `--force` to bypass) |
 
-**Complexity routing:** The spec's complexity field determines the execution path:
+**Tier resolution (always confirmed with human):** before gates run, `/launch` resolves a tier — Quick, Standard, or Heavy — that shapes *which gates apply*. Tier inference is advisory; auto escalation is disallowed by design. See `method.md` § Tiers and `templates/tier-{quick,standard,heavy}.md` for per-tier gate tables. Quick skips spec review, milestone-readiness, plan review, and QA; Heavy adds security review + mandatory `/strategy-sync` before close.
+
+**Complexity routing:** The spec's complexity field determines the execution path (Standard tier; Quick always batches, Heavy always full VBW):
 
 | Complexity | Route | What Happens |
 |-----------|-------|-------------|
@@ -931,6 +933,7 @@ The method repo is the source of truth. Projects pull from it using `scripts/syn
 | `method.config.md` | Project-specific |
 | `.claude/rules/` | Project coding conventions |
 | `.claude/skills/{project-specific}/` | Stack-specific skills |
+| `.claude/overrides/` | Sync-safe customization (applied on top of sync; see `method.md` § Sync-Safe Overrides) |
 | `.vbw-planning/` | Project state |
 | `CLAUDE.md` | Project-specific |
 

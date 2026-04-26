@@ -52,7 +52,7 @@ Full ownership table and drift-risk mitigations in [method.md](method.md#vbw--pi
 | 1 | Light Spec | Spec the feature (codebase-aware, AI→AI contract) |
 | 2 | Agent Review | Linear's agent reviews the spec |
 | 3 | Human Review | You sign off in Linear |
-| 4 | Launch | Gates checked, complexity routed |
+| 4 | Launch | Gates checked, tier resolved (Quick/Standard/Heavy), complexity routed |
 | 5 | **VBW Plan** | **VBW Lead generates PLAN.md from the spec** |
 | 6 | **Plan Review** | **Plan validated for executability** |
 | 7 | **VBW Execution** | **VBW Dev agents build it** |
@@ -209,7 +209,7 @@ pipekit/
       pipekit-discipline.md        #     Red Flags, Ad-hoc Plan Gate, scope hygiene
       pipekit-tooling.md           #     Verify Library API, package manager, pre-deploy gate
       pipekit-security.md          #     Secrets, boundary validation, OWASP, explicit auth
-  skills/                          # Portable Claude Code skills (25 total)
+  skills/                          # Portable Claude Code skills (26 total)
   scripts/
     sync-method.sh                 # Pull method into a consuming project
     drift-check.sh                 # Detect stale references in documentation
@@ -230,6 +230,7 @@ pipekit/
 - `{folder-name}-startup.md` — startup tracker (created by `/startup`)
 - `.claude/rules/` — project coding conventions
 - `.claude/skills/{project-specific}/` — skills tied to your stack
+- `.claude/overrides/` — sync-safe customization of synced skills, SOPs, and method.md (see [method.md § Sync-Safe Overrides](method.md#sync-safe-overrides))
 - `.vbw-planning/` — all project state (ROADMAP, PHASES, plans)
 
 ## Documentation
