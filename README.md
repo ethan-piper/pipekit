@@ -33,7 +33,7 @@ Full ownership table and drift-risk mitigations in [method.md](method.md#vbw--pi
 
 ## The Pipeline
 
-**Stage 0: Foundation** (runs once per project)
+**Stage 0: Foundation** (a contract — see [Entry Modes](#entry-modes) for greenfield/brownfield/inherited routing)
 
 | Step | Skill | Output |
 |------|-------|--------|

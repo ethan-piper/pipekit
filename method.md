@@ -51,7 +51,7 @@ Stages 1-5: Development Pipeline (repeats per phase/feature, contract-strict)
 | 0.6 | **Roadmap** | `/roadmap-create` | Strategy docs + definition | `ROADMAP.md` + populated Linear | Every requirement has an issue |
 | 0.7 | **Phase Plan** | `/phase-plan` | Populated Linear board | First phase in "Needs Spec" | Dependencies clear, phase sized |
 
-Stage 0 runs once per project. `/startup` orchestrates the full flow.
+Stage 0 is the foundation contract — a set of artifacts, not a script. The greenfield flow above is one of three entry modes (see [Entry Modes](#entry-modes)). `/startup` orchestrates whichever mode applies.
 
 #### Stages 1-5: Development Pipeline
 

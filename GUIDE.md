@@ -74,7 +74,7 @@ When ambiguity is detected, the pipeline sends work **backward** — not forward
 ## The Complete Pipeline
 
 ```
-STAGE 0: FOUNDATION (runs once per project)
+STAGE 0: FOUNDATION (a contract — greenfield path shown below)
 ──────────────────────────────────────────────────────────────────────
 
   /concept ──→ /define ──→ /strategy-create ──→ /startup ──→ /vbw:init
@@ -115,7 +115,7 @@ BETWEEN PHASES:
   /phase-plan --next ──→ /roadmap-review ──→ /light-spec (next phase begins)
 ```
 
-**Stage 0** runs once when the project starts. Everything after that repeats for each phase of features. Between phases, `/phase-plan --next` selects the next batch and `/roadmap-review` validates before speccing begins again.
+**Stage 0** is the foundation contract — a set of artifacts the dev pipeline depends on. Greenfield projects build the contract by running the full Stage 0 chain; brownfield projects skip `/concept` and `/define`; inherited projects verify and proceed. See [Entry Modes](#stage-0-foundation) below. After Stage 0 is satisfied, the dev pipeline repeats for each phase of features. Between phases, `/phase-plan --next` selects the next batch and `/roadmap-review` validates before speccing begins again.
 
 ---
 

@@ -2,7 +2,55 @@
 
 All notable Pipekit releases. Versioning follows semver-ish — minor bumps for new capability, patch for fixes/docs only.
 
-Pin to a specific version: `./scripts/sync-method.sh v1.2.0`.
+Pin to a specific version: `./scripts/sync-method.sh v1.3.0`.
+
+---
+
+## v1.3.0 — 2026-04-25
+
+### What's New
+
+**Stage 0 reframed as a contract; entry-mode routing.** Stage 0 is no longer documented as a script you "run once per project" — it's the *contract* (a set of artifacts) that the dev pipeline consumes. Three legitimate entry modes (greenfield, brownfield, inherited) are now first-class, replacing the implicit greenfield-only assumption.
+
+#### Foundation Contract section in `method.md`
+A new section enumerates every artifact the dev pipeline (Stages 1-5) requires, with paths and consuming skills. The contract is presence-only — `[TBD]` content is fine; missing files are not. `/roadmap-review` remains the gate that verifies the contract before speccing.
+
+#### Entry-mode tables (parity in `method.md`, `README.md`, `GUIDE.md`)
+The greenfield/brownfield/inherited table now appears prominently in all three docs, with `method.md` as the canonical source. Each mode lists who it's for, which skills run, and which are skipped.
+
+#### `/startup --mode={greenfield,brownfield,inherited}` flag
+- `--mode=greenfield` — existing 12-step flow, no behavioral change.
+- `--mode=brownfield` — skips `/concept` and `/define`, prompts for project metadata, routes through `/strategy-create` with a manual-edit note. Tech-stack and infrastructure steps populate `method.config.md` from the existing project rather than scaffolding.
+- `--mode=inherited` — runs the new Foundation Check subroutine (presence audit of every contract artifact) and exits with a next-step recommendation. Does not modify state.
+
+When `--mode=` is absent, `/startup` auto-detects from project state and **always confirms with the user** (mirrors `/launch` Step 1.5 tier resolution — never auto-pick).
+
+#### Foundation Check subroutine in `/startup`
+Verifies every foundation-contract artifact, suggests retrofit paths for missing ones, and reports the current phase from `PHASES.md` when the contract is intact. Used internally by `--mode=inherited` and callable standalone whenever you want a foundation audit. No new skill — keeps the skill count steady.
+
+#### Mode-aware Rule #1 in `/pipekit-help`
+The single "Stage 0 not complete → run /startup" rule is replaced with four sub-rules:
+- Empty project → greenfield → `/startup`
+- Code present, no foundation → brownfield → `/startup --mode=brownfield`
+- Foundation present, no recent activity → returning/inherited → `/start-session`
+- Partial foundation → diagnose via `/startup --mode=inherited`
+
+All other rules are unchanged.
+
+### Migration
+
+For consuming projects on v1.2.0:
+
+1. `./scripts/sync-method.sh v1.3.0` — pulls the updated `method.md`, `/startup` skill, and `/pipekit-help` state rules.
+2. No config changes required. Existing greenfield projects continue to behave identically.
+3. New contributors joining an existing Pipekit project can now run `/startup --mode=inherited` to verify the foundation contract before picking up work.
+
+No breaking changes.
+
+### Open items deferred to v1.4.0
+
+- **`/strategy-from-code`** — auto-audit skill that would generate strategy docs by inspecting an existing codebase. Brownfield mode currently routes through `/strategy-create` with a banner instructing the user to manually edit the generated docs against reality. Auto-audit is the v1.4.0 follow-up.
+- **Brownfield tracker bootstrap from `package.json`** — `/startup --mode=brownfield` currently prompts for project metadata; v1.4.0 will infer name, stack, and deployment from existing project files where possible.
 
 ---
 
