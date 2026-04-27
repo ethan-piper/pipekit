@@ -2,7 +2,47 @@
 
 All notable Pipekit releases. Versioning follows semver-ish — minor bumps for new capability, patch for fixes/docs only.
 
-Pin to a specific version: `./scripts/sync-method.sh v1.3.0`.
+Pin to a specific version: `./scripts/sync-method.sh v1.4.0`.
+
+---
+
+## v1.4.0 — 2026-04-25
+
+### What's New
+
+**Friction-fix release.** Five fixes closing the observations from v1.3.x real-world use (rs-vault Phase 1 closeout, sessions across 2026-04-27). No new capability — all five are behavioral tightenings that close silent-failure modes and cross-system gaps observed in production. Clean sync from v1.3.0 (no breaking changes, no config migration).
+
+#### `/branch` pre-checks Linear status before worktree creation (closes #5)
+When `--linear PROJ-XX` is passed, `/branch` now fetches the Linear issue **before** creating the worktree. Done/Canceled/Duplicate prompts confirmation (default abort); In Progress/Building warns and proceeds; other states proceed silently. Linear transition to In Progress still happens after worktree creation (preserves prior behavior). Catches "the work was already shipped" before the user wastes setup time.
+
+#### `/launch --close` is idempotent + comment-on-presence (closes #4)
+`--close` no longer silently no-ops when the issue has already moved past UAT (PR-merge automation, label-driven Linear automation, `/linear-todo-runner`, etc.). The status transition and the close-summary comment are now decoupled:
+- status `<= Building` → transition to UAT (canonical path)
+- status `>= UAT` → status transition is a no-op
+- always: scan existing comments for the `**Build complete.**` marker; post the close-summary if absent, skip silently if present
+
+Re-running `--close` is safe: idempotent on the comment, idempotent on the status. Audit trail survives all closeout-style flows.
+
+#### Subagent permission-denial-stop instruction + canonical-file pattern doc (closes #6)
+Spawned worker agents in `/linear-todo-runner` (and any future agent spawn from `/launch`) now include an explicit permission-denial protocol in the task description: stop on first `EditPermissionDenied` / `HookFeedbackBlocked`, do not retry, surface denied path + intended change + rationale. Prevents agents from burning turns retrying against hook-protected canonical files. The canonical-file-protection pattern (`.claude/rules/*` as agent-write-locked) is now documented in `sop/Skills_SOP.md` so projects intentionally protect their canonical files.
+
+Orchestrator-side denial detection deferred to v1.5.0 per the issue's lighter-fix path.
+
+#### `/launch` surfaces VBW phase-state warnings (closes #7)
+New Step 1.6 reads `phase-detect.sh` (read-only) after the Linear gate-check and surfaces unresolved VBW state — `qa_status=failed`, `qa_status=pending` on shipped phases, `has_unverified_phases`, `next_phase_state=needs_qa_remediation` / `needs_uat_remediation`. User can continue (default), address VBW state first, or abort. `phase-detect.sh` failure is non-blocking. Closes the read-only awareness gap between Pipekit and VBW called out in `method.md` § VBW / Pipekit Ownership Model. Ownership boundary unchanged — Pipekit never writes VBW state.
+
+#### `/launch` handoff routing for closeout-style work (closes #3)
+`/launch` now runs a VBW absorption check inside Step 7b before emitting the canonical handoff. If `next_phase_state=all_done` or no matching unbuilt phase exists, the user gets a three-way routing prompt: (1) add a new VBW phase first, (2) skip VBW and author plan manually + `/review-plan <path>`, or (3) abort and escalate. Always confirms; never auto-routes. The manual-plan path explicitly documents that `/review-plan` accepts a path argument (not just a phase slug) so Standard-tier's plan-review gate is satisfied without VBW. Fixes the recurring friction where `/launch` emitted `/vbw:vibe --plan <slug>` against a closed VBW state, producing a broken command for closeout work.
+
+### Migration
+
+For consuming projects on v1.3.0:
+
+1. `./scripts/sync-method.sh v1.4.0` — pulls the updated `branch`, `launch`, `06-linear-todo-runner` skills and `Skills_SOP.md`.
+2. No config changes required. No template changes. No new state IDs.
+3. If your project has agents that edit canonical files via Pipekit-spawned skills, the new permission-denial protocol will surface hook denials immediately rather than silently — review any prior partial-progress reports against the new behavior.
+
+No breaking changes. The five fixes are all backward-compatible: canonical paths (open VBW phase, in-pipeline issue, fresh `--close` on Building, `/branch` without `--linear`) behave identically to v1.3.0.
 
 ---
 
