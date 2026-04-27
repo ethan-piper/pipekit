@@ -95,6 +95,47 @@ Tiers shape which gates apply. Tier is **orthogonal** to complexity (which route
 
 If `method.config.md` has removed a tier from its `## Tiers` table, treat that tier as disallowed and require the user to pick one of the remaining tiers.
 
+### Step 1.6 — VBW Phase-State Awareness (informational gate)
+
+After the Linear gate-check passes and tier is resolved, read VBW's phase state to surface any unresolved conditions that may interact with the issue being launched. **Read-only — Pipekit never writes to VBW state.** This implements the cross-system awareness called out in `method.md` § VBW / Pipekit Ownership Model.
+
+```bash
+# Read VBW state (read-only, never writes).
+# phase-detect.sh lives in the project's VBW install (typically
+# .vbw-planning/scripts/phase-detect.sh or on $PATH via VBW's bin).
+phase-detect.sh > /tmp/pipekit-vbw-state.txt 2>/dev/null
+PHASE_DETECT_RC=$?
+```
+
+Parse the output for any of these warning conditions:
+
+- `qa_status=failed` on any phase
+- `qa_status=pending` on a phase already marked shipped
+- `has_unverified_phases=true`
+- `next_phase_state=needs_qa_remediation`
+- `next_phase_state=needs_uat_remediation`
+
+**If `phase-detect.sh` exits non-zero or is unavailable** (`PHASE_DETECT_RC != 0`): print a one-line note `"⚠ VBW state unavailable — proceeding without phase-state awareness."` and continue. This is **non-blocking** — Pipekit must still function in projects that don't use VBW or have a non-standard VBW install.
+
+**If any warning condition is met**, surface a single AskUserQuestion with the unresolved state listed:
+
+```
+⚠ VBW reports the following unresolved state:
+  - Phase 01 (slug): qa_status=failed
+  - Phase 02 (slug): unverified
+
+This launch may interact with phase-level work in flight.
+
+Options:
+  (a) Continue — this issue is independent of phase state  [default]
+  (b) Address VBW first — run /vbw:vibe to enter remediation
+  (c) Abort
+```
+
+Default action: **(a) Continue.** The warning is informational, not blocking — the canonical case (no warnings) is unchanged. If user picks (b), exit with a pointer to `/vbw:vibe`; if (c), exit silently. If (a), proceed to Step 2 (Check Dependencies).
+
+This gate runs **before** the Linear status transition to Building (Step 6), so an aborted/redirected launch leaves Linear state untouched.
+
 ### Step 2 — Check Dependencies
 
 1. Read `blocked_by` relations from the issue
