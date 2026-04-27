@@ -211,6 +211,49 @@ This sets the workspace title to `{project} - PROJ-XXX` (read project name from 
 
 Pipekit owns the Linear gate. **VBW owns planning, execution, and verification.** Pipekit no longer spawns `vbw:vbw-lead` directly — `/vbw:vibe --plan` is the canonical path. The plan-review gate now runs as a separate Pipekit skill (`/review-plan`).
 
+#### 7b.0 — VBW absorption check (closeout-style routing)
+
+Before emitting the canonical handoff, re-read `phase-detect.sh` (or reuse the output from Step 1.6 if still in scope) and inspect whether VBW has a phase that can absorb this issue:
+
+- **Canonical case** — `next_phase_state` indicates an unbuilt phase that matches the issue context (no plan written yet, slug aligns with the issue's scope). → Emit the canonical handoff in 7b.1 below. **Behavior unchanged from prior versions.**
+- **Closeout case** — `next_phase_state=all_done`, no matching unbuilt phase, or VBW reports no phases at all. The issue is "closeout-style" (migration, hygiene, doc update, infra cutover) and does not naturally slot into VBW's "next unbuilt phase" model. → Run the routing prompt below; never auto-route.
+
+**Routing prompt (closeout case only):**
+
+```
+VBW has no unbuilt phase that can absorb PROJ-XXX.
+  next_phase_state: {all_done | none}
+
+This is closeout-style work — choose how to plan it:
+
+  (1) Add a new VBW phase first
+        Run:  /vbw:vibe --add <slug>     (creates the phase)
+        Then: /vbw:vibe --plan N          (N is the new phase number)
+        Use this when the issue is sizeable enough to deserve its own
+        VBW phase entry and you want VBW's plan/execute/verify cadence.
+
+  (2) Skip VBW pipeline — author plan manually
+        Write PLAN.md by hand at the project's chosen path, then run:
+          /review-plan <path-to-PLAN.md>
+        /review-plan accepts a path argument (not just a phase slug)
+        and runs the plan-reviewer agent standalone. Standard tier's
+        plan-review gate is satisfied. Execute manually or by spawning
+        a worktree agent yourself.
+        Use this for one-off closeout work too small for a VBW phase.
+
+  (3) Abort and escalate
+        Stop here. The user resolves the routing question (e.g., add
+        the phase to ROADMAP.md first, or reclassify the issue).
+
+Pick (1), (2), or (3):
+```
+
+Always confirm — never auto-route. If the user picks (1) or (2), exit `/launch` with a pointer to the chosen command; do not write `NEXT.md` for the canonical 7b.1 sequence (Linear has already transitioned to Building per Step 6, so the user picks up wherever VBW lands them or wherever they author the manual plan). If (3), no further action.
+
+**Note on `/vbw:vibe --plan` accepting slugs vs phase numbers:** the recurring friction in rs-vault was that `/launch` emitted `/vbw:vibe --plan <slug>` while VBW expected a phase number. The canonical handoff in 7b.1 still emits a phase slug because the canonical case has a phase already in VBW's index where the slug resolves. The closeout case is exactly when slug-resolution fails — handle it via this prompt instead of emitting a broken command.
+
+#### 7b.1 — Canonical handoff (when VBW can absorb the issue)
+
 **Hand off to the user** with the full sequence laid out so they can run it without coming back between phases:
 
 ```
