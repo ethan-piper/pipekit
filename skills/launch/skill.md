@@ -232,9 +232,18 @@ Invoked when the user returns with verify confirmed (either via `/vbw:vibe --ver
 
 If any check fails, refuse to close with a list of missing artifacts and stop. Do not transition Linear status.]
 
-1. **Re-validate** the issue is still in Building. If it's already past UAT, no-op with a message.
-2. **Move issue to UAT** ({UAT state ID from method.config.md}) via `mcp__linear-server__save_issue`
-3. **Post a Linear comment** summarizing the build:
+**Idempotent + comment-on-presence** (since v1.4.0): `--close` is safe to invoke regardless of how the issue moved past UAT. PR-merge automation, label-driven Linear automation, and `/linear-todo-runner` may transition the issue past UAT before the user runs `--close`. The close-summary comment is the audit trail and must always be posted exactly once.
+
+1. **Read current Linear status** via `mcp__linear-server__get_issue`.
+2. **Status transition logic:**
+   - If status is `<= Building` (Approved, Specced, Building, In Progress) → transition to **UAT** ({UAT state ID from method.config.md}) via `mcp__linear-server__save_issue`. This is the canonical path.
+   - If status is `>= UAT` (UAT, Done, Canceled, Duplicate) → status transition is a **no-op**. Skip silently. Do not error.
+3. **Comment-on-presence** (independent of status, runs every invocation):
+   - List existing comments via `mcp__linear-server__list_comments` for the issue.
+   - Scan each comment body for the marker `**Build complete.**` (the literal bolded phrase at the start of any comment line).
+   - **If the marker is absent** → post the close-summary comment described below.
+   - **If the marker is present** → skip silently. Re-running `--close` is idempotent: no duplicate comment, no error.
+4. **Close-summary comment** (posted only when marker absent):
    ```
    **Build complete.** Moved to UAT.
    - Plan reviewed: {Pass | Revise — see /review-plan output} 
@@ -245,7 +254,7 @@ If any check fails, refuse to close with a list of missing artifacts and stop. D
    
    Ready for human acceptance testing.
    ```
-4. **Inform the user.** Adapt the promotion-options block to the project's git architecture (read from `method.config.md` → `## Git Architecture`):
+5. **Inform the user.** Adapt the promotion-options block to the project's git architecture (read from `method.config.md` → `## Git Architecture`):
 
    **Two-tier projects (`dev` → `main`):**
    ```
