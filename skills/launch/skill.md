@@ -209,6 +209,18 @@ ran at /launch open and runs again at /launch --close.
 
 While the user is in the VBW pipeline, do not spawn any VBW agents yourself. If they ask for progress, read `.vbw-planning/STATE.md` and any `*-SUMMARY.md` files in the phase dir.
 
+**Permission-denial protocol for any agent you do spawn (now or in future variants of this skill):** if you ever invoke `Agent()` from inside `/launch`, include the following instruction in the agent's task description so hook-driven blocks surface immediately rather than burning turns:
+
+```
+If any Edit/Write call fails with a permission denial (EditPermissionDenied,
+HookFeedbackBlocked, or similar), STOP IMMEDIATELY and report in your final
+summary. Do not retry. Include: the denied path, the intended change verbatim,
+why it was needed (which task / which AC). The orchestrator will surface the
+denial for manual resolution.
+```
+
+This pattern protects against silent agent failures when project hooks guard canonical files (e.g., `.claude/rules/*`). See `sop/Skills_SOP.md` § Canonical-file protection.
+
 ### Step 8 — Wait for User to Return with `--close`
 
 Pipekit pauses after Step 7b. The user runs the VBW sequence (`--plan` → `/review-plan` → `--execute` → `--verify`) on their own pace. Pipekit re-enters when they invoke `/launch PROJ-XXX --close`.

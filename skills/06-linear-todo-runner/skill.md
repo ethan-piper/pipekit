@@ -273,6 +273,21 @@ You are implementing a Linear issue. Read CLAUDE.md and method.config.md for pro
    - Branch name and commit hashes
    - Pre-deploy gate results (pass/fail for each)
    - Any issues or decisions you made
+
+## Permission-denial protocol
+
+If any Edit/Write call fails with a permission denial (EditPermissionDenied,
+HookFeedbackBlocked, or similar hook-driven block), STOP IMMEDIATELY and
+report in your final summary. Do not retry. Do not attempt to work around
+the block by editing a different file or splitting the change. Include in
+your summary:
+  - The denied path
+  - The intended change verbatim (the patch you would have applied)
+  - Why it was needed (which task / which acceptance criterion)
+The orchestrator will surface the denial for manual resolution. A single
+denial is not a transient error — it indicates a project-policy mismatch
+(typically a hook protecting a canonical file like .claude/rules/*) that
+the user must resolve before the work can continue.
 ```
 
 ---

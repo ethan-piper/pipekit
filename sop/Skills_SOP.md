@@ -203,6 +203,16 @@ Disable any time by removing the entry from `settings.local.json`. To customize 
 
 ---
 
+## Canonical-file protection (agent-protected paths)
+
+Some files in a Pipekit project are **canonical** — they encode conventions that VBW agents should *read* but not *mutate*. The default protected set lives under `.claude/rules/*` (the portable `pipekit-discipline.md`, `pipekit-tooling.md`, `pipekit-security.md` hub-and-spoke template). Projects can opt additional paths into protection — `Strategy/`, `method.config.md`, and `PHASES.md` are common candidates.
+
+Protection is enforced by **hook**, not by skill prose. A `PreToolUse` hook on `Edit` and `Write` blocks the call when the target path matches the protected set; the agent receives `EditPermissionDenied` (or `HookFeedbackBlocked`, depending on the hook variant). This is intentional: hooks win over `bypassPermissions` mode because hook-level guards are the project's last line of defense, and orchestrator-spawned agents are not exempt from project policy.
+
+The corresponding skill-side discipline (since v1.4.0): every skill that spawns an agent expected to call `Edit`/`Write` includes a **permission-denial-stop instruction** in the agent's task description (see `skills/06-linear-todo-runner/skill.md` § Permission-denial protocol and the parallel block in `skills/launch/skill.md`). Without that instruction, agents tend to retry on denial, exhaust attempts, and report partial progress — the user only finds out the work was blocked after burning turns. With it, the agent stops on first denial and surfaces the denied path, intended change, and rationale, so the user can either grant the exception (revise hook), redirect the work, or abort the issue.
+
+When you add a new skill that spawns file-editing agents, copy the permission-denial block verbatim. When you protect a new path with a hook, document the protection in `method.config.md` so future readers know which paths are agent-write-locked and why.
+
 ## Customizing Synced Skills (Overrides)
 
 If a project needs to change behavior of a synced skill, **do not edit the file in `.claude/skills/<name>/` directly** — it will be overwritten on the next sync. Use the override system instead:
