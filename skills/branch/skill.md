@@ -59,7 +59,33 @@ git checkout "$BASE_BRANCH" 2>/dev/null || true
 git pull origin "$BASE_BRANCH"
 ```
 
-### 3. Create Worktree
+### 3. Pre-Check Linear Status (when `--linear` is passed)
+
+If `--linear PROJ-XX` was specified, **before any worktree creation**, fetch the Linear issue and inspect its current status. This catches issues that have already been shipped, canceled, or duplicated and prevents wasted setup time.
+
+```
+1. mcp__linear-server__get_issue identifier=PROJ-XX
+2. Inspect status name:
+   - Done / Canceled / Duplicate
+       → AskUserQuestion:
+         "PROJ-XX is already {status}. Create worktree anyway?"
+         Options: ["Abort" (default), "Create anyway"]
+         If user picks Abort: stop here, no worktree, no symlinks.
+         If user picks Create anyway: proceed to Step 4 (worktree creation).
+   - In Progress / Building
+       → Print warning: "⚠ PROJ-XX is already {status} — someone else may
+         be working on it. Proceeding."
+         Continue without prompting.
+   - Any other status (Approved, Specced, Needs Spec, On Deck, etc.)
+       → Proceed silently.
+3. Only after this status check passes, continue to worktree creation.
+```
+
+If `--linear` was not passed, skip this step entirely (no Linear API call, no behavior change).
+
+This is the **only** Linear API call before worktree creation. Do not re-query Linear later in the flow — Step 6 (Linear status transition) reuses what we know from this check.
+
+### 4. Create Worktree
 
 ```bash
 WORKTREE_PATH="{worktree prefix from method.config.md}{kebab-name}"
@@ -68,7 +94,7 @@ WORKTREE_PATH="{worktree prefix from method.config.md}{kebab-name}"
 git worktree add "$WORKTREE_PATH" -b {prefix}{kebab-name}
 ```
 
-### 4. Symlink Shared Config Files
+### 5. Symlink Shared Config Files
 
 Only symlink files that actually exist -- skip any that are missing without error.
 
@@ -95,11 +121,13 @@ ln -sf "$MAIN_REPO/.env" "$WORKTREE_PATH/.env"
   ln -sf "$MAIN_REPO/.claude/settings.local.json" "$WORKTREE_PATH/.claude/settings.local.json"
 ```
 
-### 5. Optional Linear Link
+### 6. Transition Linear to In Progress
 
-If `--linear PROJ-XX` was specified, update the Linear issue status to "In Progress".
+If `--linear PROJ-XX` was specified and the user did not abort in Step 3, update the Linear issue status to "In Progress" via `mcp__linear-server__save_issue`.
 
-### 6. Rename cmux Workspace
+This preserves the prior post-creation behavior. The pre-check in Step 3 only inspects status; the transition happens here once the worktree exists.
+
+### 7. Rename cmux Workspace
 
 Rename the current cmux workspace so it reflects the new work context:
 
@@ -109,7 +137,7 @@ bash ~/.claude/scripts/cmux-workspace-name.sh "{kebab-name}"
 
 This sets the workspace title to `{project} - {kebab-name}` (read project name from `method.config.md`). Skip silently if cmux is unavailable.
 
-### 7. Confirm
+### 8. Confirm
 
 ```
 Branch: {prefix}{kebab-name}
